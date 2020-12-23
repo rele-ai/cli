@@ -8,6 +8,23 @@ RELE.AI CLI Tool
 [![Downloads/week](https://img.shields.io/npm/dw/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
 [![License](https://img.shields.io/npm/l/@releai/cli.svg)](https://github.com/rele-ai/cli/blob/master/package.json)
 
+<!-- notes -->
+rb auth login
+rb auth logout
+
+rb workflow list
+rb workflow get $id -o
+
+rb workflow activate $id
+rb workflow deactivate $id
+
+rb app list -> lists user's apps and global apps
+rb app get $id
+
+rb apply $path_to_file
+rb delete $path_to_file
+rb validate $path_to_file
+
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
@@ -28,24 +45,44 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`rb hello`](#rb-hello)
+* [`rb auth`](#rb-auth)
+* [`rb workflow`](#rb-workflow)
+* [`rb app`](#rb-app)
+* [`rb apply`](#rb-apply)
+* [`rb delete`](#rb-delete)
+* [`rb validate`](#rb-validate)
 * [`rb help [COMMAND]`](#rb-help-command)
 
-## `rb hello`
+## `rb auth`
 
 ```
 USAGE
-  $ rb hello
-
-OPTIONS
-  -n, --name=name  name to print
+  $ rb auth login
 
 DESCRIPTION
   ...
-  Extra documentation goes here
+  Login via SSO through the RELE.AI platform
 ```
 
-_See code: [src/commands/hello.js](https://github.com/rele-ai/cli/blob/v0.1.0/src/commands/hello.js)_
+```
+USAGE
+  $ rb auth logout
+
+DESCRIPTION
+  ...
+  Revokes the session
+```
+
+## `rb workflow`
+
+```
+USAGE
+  $ rb workflow list
+
+DESCRIPTION
+  ...
+  Revokes the session
+```
 
 ## `rb help [COMMAND]`
 
@@ -59,6 +96,4 @@ ARGUMENTS
 OPTIONS
   --all  see all commands in CLI
 ```
-
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.0/src/commands/help.ts)_
 <!-- commandsstop -->
