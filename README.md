@@ -27,6 +27,7 @@ rb logs [--tail,-t]
 rb push [VERSION=latest] [--reset]
 
 // do `rb push` and `rb workflow activate`
+// NOTE: set git tag
 rb deploy [VERSION]
 
 // manage workflows
