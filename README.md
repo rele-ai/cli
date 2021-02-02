@@ -43,9 +43,10 @@ rb app get [APP_ID] [--output,-o {path}, --format,-f {format}]
 rb app delete [APP_ID]
 
 // manage translations
-rb translation list
+rb translation list [--output,-o {path}, --format,-f {format}]
 rb translation get [TRANSLATION_ID] [--output,-o {path}, --format,-f {format}]
 rb translation delete [TRANSLATION_ID]
+rb translation import [--file,-f {path}]
 
 // manage yamls
 rb apply --file,-f {path}
