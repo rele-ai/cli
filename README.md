@@ -24,7 +24,7 @@ rb logs [--tail,-t]
 // push dev version only for user
 // NOTE: `rb push` calls an internal deployment script for
 // the user's integrations
-rb push
+rb push [--reset]
 
 // do `rb push` and `rb workflow activate`
 rb deploy [VERSION]
