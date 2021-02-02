@@ -3,97 +3,46 @@
 
 RELE.AI CLI Tool
 
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
 [![Downloads/week](https://img.shields.io/npm/dw/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
 [![License](https://img.shields.io/npm/l/@releai/cli.svg)](https://github.com/rele-ai/cli/blob/master/package.json)
 
-<!-- notes -->
+```
+// create a new project from source template & format
+rb create [PROJECT_NAME] [--template,-t {github link}]
+
+// generate refresh token and stores in ~/.rb/token
 rb auth login
 rb auth logout
 
+// list of all activate versions
+rb versions
+
+// tail logs from all services
+rb logs [--tail,-t]
+
+// push dev version only for user
+// NOTE: `rb push` calls an internal deployment script for
+// the user's integrations
+rb push
+
+// do `rb push` and `rb workflow activate`
+rb deploy [VERSION]
+
+// manage workflows
 rb workflow list
-rb workflow get $id -o
+rb workflow get [WORKFLOW_ID] [--output,-o {path}, --format,-f {format}]
+rb workflow delete [WORKFLOW_ID]
+rb workflow activate [WORKFLOW_ID]
+rb workflow deactivate [WORKFLOW_ID]
 
-rb workflow activate $id
-rb workflow deactivate $id
+// manage apps
+rb app list
+rb app get [WORKFLOW_ID] [--output,-o {path}, --format,-f {format}]
+rb app delete [WORKFLOW_ID]
 
-rb app list -> lists user's apps and global apps
-rb app get $id
-
-rb apply $path_to_file
-rb delete $path_to_file
-rb validate $path_to_file
-
-<!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
-# Usage
-<!-- usage -->
-```sh-session
-$ npm install -g @releai/cli
-$ rb COMMAND
-running command...
-$ rb (-v|--version|version)
-@releai/cli/0.1.0 darwin-x64 node-v15.2.1
-$ rb --help [COMMAND]
-USAGE
-  $ rb COMMAND
-...
+// manage yamls
+rb apply --file,-f {path}
+rb delete --file,-f {path}
+rb validate --file,-f {path}
 ```
-<!-- usagestop -->
-# Commands
-<!-- commands -->
-* [`rb auth`](#rb-auth)
-* [`rb workflow`](#rb-workflow)
-* [`rb app`](#rb-app)
-* [`rb apply`](#rb-apply)
-* [`rb delete`](#rb-delete)
-* [`rb validate`](#rb-validate)
-* [`rb help [COMMAND]`](#rb-help-command)
-
-## `rb auth`
-
-```
-USAGE
-  $ rb auth login
-
-DESCRIPTION
-  ...
-  Login via SSO through the RELE.AI platform
-```
-
-```
-USAGE
-  $ rb auth logout
-
-DESCRIPTION
-  ...
-  Revokes the session
-```
-
-## `rb workflow`
-
-```
-USAGE
-  $ rb workflow list
-
-DESCRIPTION
-  ...
-  Revokes the session
-```
-
-## `rb help [COMMAND]`
-
-```
-USAGE
-  $ rb help [COMMAND]
-
-ARGUMENTS
-  COMMAND  command to show help for
-
-OPTIONS
-  --all  see all commands in CLI
-```
-<!-- commandsstop -->
