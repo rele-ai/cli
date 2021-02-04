@@ -271,22 +271,17 @@ class CreateCommand extends Command {
       for (const file of keys) {
         // skipping files with skipInterpolation option
         if (skipInterpolation && multimatch([file], skipInterpolation, { dot: true }).length) {
-          console.log("skip 1")
           continue
         }
 
         const str = files[file].contents.toString()
         // do not attempt to render files that do not have mustaches
         if (!/{{([^{}]+)}}/g.test(str)) {
-          console.log("skip 2", file)
           continue
         }
 
-        console.log("render", file)
         await new Promise((resolve, rej) => {
           render(str, metalsmithMetadata, (err, res) => {
-            console.log("render", err, res)
-
             if (err) {
               err.message = `[${file}] ${err.message}`
               return rej(err)
