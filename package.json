@@ -52,7 +52,13 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
     "cli-ux": "^5.5.1",
+    "consolidate": "^0.16.0",
+    "download-git-repo": "^3.0.2",
+    "handlebars": "^4.7.6",
+    "inquirer": "^6.5.2",
     "js-yaml": "^3.14.0",
-    "open": "^7.3.0"
+    "metalsmith": "^2.3.0",
+    "open": "^7.3.0",
+    "rimraf": "^2.6.3"
   }
 }
