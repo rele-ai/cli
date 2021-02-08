@@ -6,7 +6,7 @@ const renders = require("./renders")
 const { validateCode } = require("./utils")
 const mustacheExpress = require("mustache-express")
 
-const start = () => {
+const start = ({ state }) => {
   // init express app
   const app = express()
 
@@ -24,21 +24,24 @@ const start = () => {
 
   // server webpage
   app.use(async (req, res) => {
+    // validate state
     try {
-      // validate the code and check refresh token
-      const token = await validateCode(req.query.code)
+      if (Number(req.query.state) === Number(state)) {
+        // validate the code and check refresh token
+        const token = await validateCode(req.query.code)
 
-      // process refresh token
-      if (token) {
-        // write creds
-        fs.writeFileSync(path.join(credsPath, "creds.json"), JSON.stringify(token))
+        // process refresh token
+        if (token) {
+          // write creds
+          fs.writeFileSync(path.join(credsPath, "creds.json"), JSON.stringify(token))
 
-        // return render page
-        res.render("index", renders.success)
-        setTimeout(() => {
-          process.exit(0)
-        }, 2000)
-        return
+          // return render page
+          res.render("index", renders.success)
+          setTimeout(() => {
+            process.exit(0)
+          }, 2000)
+          return
+        }
       }
     } catch (err) {
       console.error("unable to get refresh token", err)
