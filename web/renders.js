@@ -3,7 +3,7 @@ module.exports = {
         class: "message-error",
         title: "Oops!",
         subtitle: "RELE.AI CLI Login Failed",
-        content: "The RELE.AI CLI login request was rejected or an error occurred. Please run <code>rb auth login</code> again or contact support if you continue to have difficulty logging in."
+        content: "The RELE.AI CLI login request was rejected or an error occurred. Please run <code>rb auth:login</code> again or contact support if you continue to have difficulty logging in."
     },
     success: {
         class: "message-success",

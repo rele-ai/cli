@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package auth;
+
+// ------------ Authentication Service -------------
+service Authentication {
+  // Generates refresh token from code
+  rpc GetRefreshToken(GetRefreshTokenReq) returns (GetRefreshTokenRes);
+}
+
+// ------------ Messages -------------
+message GetRefreshTokenReq {
+  // user's code
+  string code = 1;
+}
+
+message GetRefreshTokenRes {
+  // refresh token
+  string refresh_token = 1;
+
+  // current active id token
+  string access_token = 2;
+}
