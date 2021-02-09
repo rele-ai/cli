@@ -6,34 +6,32 @@ const rimraf = require("rimraf")
 const inquirer = require("inquirer")
 const Metalsmith = require("metalsmith")
 const Handlebars = require("handlebars")
+const {flags} = require("@oclif/command")
 const download = require("download-git-repo")
-const {Command, flags} = require("@oclif/command")
+const {isLocalPath} = require("../utils/local-path")
+const BaseCommand = require("../utils/base-command")
 const render = require("consolidate").handlebars.render
-const {isLocalPath, getTemplatePath} = require("../utils/local-path")
-
-const home = os.homedir()
-const tmp = path.join(home, ".rb-templates")
 
 // Support types from prompt-for which was used before
 const promptMapping = {
-  string: 'input',
-  boolean: 'confirm'
+  string: "input",
+  boolean: "confirm"
 }
 
 // register handlebars helper
-Handlebars.registerHelper('if_eq', function (a, b, opts) {
+Handlebars.registerHelper("if_eq", function (a, b, opts) {
   return a === b
     ? opts.fn(this)
     : opts.inverse(this)
 })
 
-Handlebars.registerHelper('unless_eq', function (a, b, opts) {
+Handlebars.registerHelper("unless_eq", function (a, b, opts) {
   return a === b
     ? opts.inverse(this)
     : opts.fn(this)
 })
 
-class CreateCommand extends Command {
+class CreateCommand extends BaseCommand {
   // define the command args
   static args = [
     {
@@ -79,12 +77,12 @@ class CreateCommand extends Command {
     cli.ux.action.start("Downloading template")
 
     // clear template dir
-    if (fs.existsSync(tmp)) {
-      rimraf.sync(tmp)
+    if (fs.existsSync(BaseCommand.TEMPLATE_DIR)) {
+      rimraf.sync(BaseCommand.TEMPLATE_DIR)
     }
 
     return new Promise((resolve, reject) => {
-      download(templatePath, tmp, { clone }, (err) => {
+      download(templatePath, BaseCommand.TEMPLATE_DIR, { clone }, (err) => {
         // handler result
         if (err) {
           // stop spinner
@@ -98,7 +96,7 @@ class CreateCommand extends Command {
           cli.ux.action.stop()
 
           // resolve with tmp path
-          resolve(tmp)
+          resolve(BaseCommand.TEMPLATE_DIR)
         }
       })
     })
@@ -258,7 +256,7 @@ class CreateCommand extends Command {
    */
   renderTemplateFiles(skipInterpolation) {
     // update input
-    skipInterpolation = typeof skipInterpolation === 'string'
+    skipInterpolation = typeof skipInterpolation === "string"
       ? [skipInterpolation]
       : skipInterpolation
 

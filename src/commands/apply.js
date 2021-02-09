@@ -1,6 +1,6 @@
 const {Command, flags} = require('@oclif/command')
-const { readConfig } = require("../readers")
-const { confToDoc } = require("../parser")
+const { readConfig } = require("../utils/readers")
+const { confToDoc } = require("../utils/parser")
 
 class ApplyCommand extends Command {
   async run() {

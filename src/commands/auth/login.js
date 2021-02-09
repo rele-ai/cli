@@ -3,22 +3,17 @@ const fs = require("fs")
 const open = require("open")
 const cli = require("cli-ux")
 const {start} = require("../../../web/index")
-const {Command, flags} = require("@oclif/command")
-
-const CREDS_PATH = `${os.homedir()}/.rb/creds.json`
-const CONSOLE_PATH = process.env.NODE_ENV === "development"
-  ? "https://console.dev.bot.rele.ai"
-  : "https://console.rele.ai"
+const BaseCommand = require("../../utils/base-command")
 
 // login command execution
-class LoginCommand extends Command {
+class LoginCommand extends BaseCommand {
   /**
    * Execute the login command
    */
   async run() {
-    if (fs.existsSync(CREDS_PATH)) {
+    if (fs.existsSync(BaseCommand.CREDS_PATH)) {
       // clear old creds
-      fs.rmSync(CREDS_PATH)
+      fs.rmSync(BaseCommand.CREDS_PATH)
     }
 
     // generate random state validation
@@ -28,7 +23,7 @@ class LoginCommand extends Command {
     start({state})
 
     // define the target url
-    const consolePath = `${CONSOLE_PATH}?state=${state}&redirect_uri=http://localhost:9091/`
+    const consolePath = `${BaseCommand.CONSOLE_PATH}?state=${state}&redirect_uri=http://localhost:9091/`
 
     // log info to user
     this.log(`Visit this URL on this device to log in:\n\n${consolePath}\n\n`)

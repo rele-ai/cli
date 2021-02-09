@@ -60,6 +60,7 @@
     "handlebars": "^4.7.6",
     "inquirer": "^6.5.2",
     "js-yaml": "^3.14.0",
+    "jwt-decode": "^3.1.2",
     "metalsmith": "^2.3.0",
     "open": "^7.3.0",
     "rimraf": "^2.6.3"
