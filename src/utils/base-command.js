@@ -42,7 +42,7 @@ class BaseCommand extends Command {
   get jwt() {
     return this.accessToken
       .then(token => {
-        return jwtDecode(token)
+        return jwtDecode(token.id_token)
       })
       .catch(e => {
         this.error("unable to get access token when parsing JWT", e)
@@ -55,8 +55,8 @@ class BaseCommand extends Command {
    */
   get refreshToken() {
     // check if creds file exists
-    if (fs.existsSync(this.CREDS_PATH)) {
-      return (JSON.parse(fs.readFileSync(this.CREDS_PATH).toString("utf-8")) || {}).refresh_token || ""
+    if (fs.existsSync(BaseCommand.CREDS_PATH)) {
+      return (JSON.parse(fs.readFileSync(BaseCommand.CREDS_PATH).toString("utf-8")) || {}).refresh_token || ""
     }
 
     return ""
