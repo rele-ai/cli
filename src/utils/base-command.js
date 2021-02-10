@@ -51,6 +51,11 @@ class BaseCommand extends Command {
   }
 
   /**
+   * Load user from components service
+   */
+  get user() {}
+
+  /**
    * Returns the refresht token from the creds path
    */
   get refreshToken() {
