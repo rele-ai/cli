@@ -170,6 +170,24 @@ service AppActions {
   rpc Create (CreateAppActionRequest) returns (CreateAppActionResponse) {}
 }
 
+// ------------ Translations Service -------------
+service Translations {
+  // list of Translations
+  rpc List (ListTranslationRequest) returns (ListTranslationResponse) {}
+
+  // get Translation by id
+  rpc Get (GetTranslationRequest) returns (GetTranslationResponse) {}
+
+  // update Translation by id
+  rpc Update (UpdateRequest) returns (UpdateTranslationResponse) {}
+
+  // delete Translation by id
+  rpc Delete (DeleteTranslationRequest) returns (DeleteTranslationResponse) {}
+
+  // create trugger by id
+  rpc Create (CreateTranslationRequest) returns (CreateTranslationResponse) {}
+}
+
 // ------------ Enums -------------
 enum Vendor {
   vendor_default = 0;
@@ -903,4 +921,46 @@ message DeleteUserWithAuthRequest {
 
 message DeleteUserWithAuthResponse {
   bool deleted = 1;
+}
+
+// translations requests service
+message ListTranslationRequest {
+  repeated bytes conditions = 1;
+}
+
+message ListTranslationResponse {
+  repeated Translation translations = 1;
+}
+
+message GetTranslationRequest {
+  string id = 1;
+}
+
+message GetTranslationResponse {
+  Translation translation = 1;
+}
+
+message UpdateTranslationResponse {
+  string id = 1;
+}
+
+message DeleteTranslationRequest {
+  string id = 1;
+}
+
+message DeleteTranslationResponse {}
+
+message CreateTranslationRequest {
+  Translation translation = 1;
+}
+
+message CreateTranslationResponse {
+  string id = 1;
+}
+
+// Translation message
+message Translation {
+  string key = 1;
+  string lang = 2;
+  string value = 3;
 }
