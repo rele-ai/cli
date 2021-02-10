@@ -1,3 +1,4 @@
+const cli = require("cli-ux")
 const { AppsClient } = require("../../../lib/components")
 const {Command, flags} = require('@oclif/command')
 const BaseCommand = require("../../utils/base-command")
@@ -5,6 +6,8 @@ const { flatten } = require("../../utils/formatters")
 
 class ListCommand extends BaseCommand {
   async run() {
+    cli.ux.action.start("Pull Apps")
+
     // resolve access token
     const accessToken = await this.accessToken
 
@@ -26,10 +29,10 @@ class ListCommand extends BaseCommand {
     })
 
     // resolve app list promises
-    const appsRecords = flatten(await Promise.all(promises))
-    console.log("apps records: ", appsRecords)
+    const appsRecords = await flatten(await Promise.all(promises))
+    this.log("Apps pulled successfuly.")
 
-    this.log(`list`)
+    return appsRecords
   }
 }
 
@@ -37,13 +40,5 @@ ListCommand.description = `Apply a set of configurations to RELE.AI App
 ...
 Please read more about the configuration files in the github repository docs.
 `
-
-ListCommand.flags = {
-  config: flags.string({
-    char: "c",
-    description: "A path to the configuration file",
-    required: false
-  })
-}
 
 module.exports = ListCommand
