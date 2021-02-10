@@ -13,9 +13,10 @@ class LogoutCommand extends BaseCommand {
     // start revoking process
     cli.ux.action.start("Revoking access")
 
+
     // remove creds
     if (fs.existsSync(BaseCommand.CREDS_PATH)) {
-      fs.rmSync(BaseCommand.CREDS_PATH)
+      fs.unlinkSync(BaseCommand.CREDS_PATH)
     }
 
     // stop spinner

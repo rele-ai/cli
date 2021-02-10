@@ -2,6 +2,7 @@ const fs = require("fs")
 const os = require("os")
 const jwtDecode = require("jwt-decode")
 const {Command} = require("@oclif/command")
+const { UsersClient } = require("../../lib/components")
 const AuthClient = require("../../lib/auth")
 
 // pull the homr dir
@@ -53,7 +54,13 @@ class BaseCommand extends Command {
   /**
    * Load user from components service
    */
-  get user() {}
+  get user() {
+    return this.jwt
+      .then(async decodeJwt => {
+        const accessToken = await this.accessToken
+        return (new UsersClient(accessToken.id_token)).getById(decodeJwt.userFsId)
+      })
+  }
 
   /**
    * Returns the refresht token from the creds path
@@ -78,6 +85,26 @@ class BaseCommand extends Command {
     // set to this
     this.flags = flags
     this.args = args
+  }
+
+  /**
+   * Convert data to bytes.
+   *
+   * @param {*} data - data to conver to bytes
+   */
+  _toBytes(data) {
+    if (data) {
+      switch (data.constructor) {
+      case Array:
+      case Number:
+      case String:
+      case Object:
+        data = JSON.stringify(data)
+        return Buffer.from(data)
+      default:
+        throw new Error("unsupporeted type")
+      }
+    }
   }
 }
 

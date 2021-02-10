@@ -13,7 +13,7 @@ class LoginCommand extends BaseCommand {
   async run() {
     if (fs.existsSync(BaseCommand.CREDS_PATH)) {
       // clear old creds
-      fs.rmSync(BaseCommand.CREDS_PATH)
+      fs.unlinkSync(BaseCommand.CREDS_PATH)
     }
 
     // generate random state validation
