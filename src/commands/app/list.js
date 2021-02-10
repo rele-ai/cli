@@ -3,7 +3,7 @@ const BaseCommand = require("../../utils/base-command")
 
 class ListCommand extends BaseCommand {
   async run() {
-    // new client(this.accessToken)...
+    // new client(this.accessToken.id_token)...
     // client.list()
     this.log(`list`)
   }
