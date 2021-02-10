@@ -86,26 +86,6 @@ class BaseCommand extends Command {
     this.flags = flags
     this.args = args
   }
-
-  /**
-   * Convert data to bytes.
-   *
-   * @param {*} data - data to conver to bytes
-   */
-  _toBytes(data) {
-    if (data) {
-      switch (data.constructor) {
-      case Array:
-      case Number:
-      case String:
-      case Object:
-        data = JSON.stringify(data)
-        return Buffer.from(data)
-      default:
-        throw new Error("unsupporeted type")
-      }
-    }
-  }
 }
 
 module.exports = BaseCommand
