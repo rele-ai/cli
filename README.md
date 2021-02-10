@@ -12,8 +12,8 @@ RELE.AI CLI Tool
 [x] rb create [PROJECT_NAME] [--template,-t {github link}]
 
 // generate refresh token and stores in ~/.rb/token
-[] rb auth login
-[] rb auth logout
+[x] rb auth:login
+[x] rb auth:logout
 
 // list of all activate versions
 [] rb versions

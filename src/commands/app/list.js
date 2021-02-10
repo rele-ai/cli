@@ -1,7 +1,10 @@
 const {Command, flags} = require('@oclif/command')
+const BaseCommand = require("../../utils/base-command")
 
-class ListCommand extends Command {
+class ListCommand extends BaseCommand {
   async run() {
+    // new client(this.accessToken)...
+    // client.list()
     this.log(`list`)
   }
 }
