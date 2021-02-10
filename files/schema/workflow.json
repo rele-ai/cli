@@ -1,0 +1,59 @@
+{
+    "type": "object",
+    "required": [
+        "type",
+        "match",
+        "key"
+    ],
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "Workflow"
+            ]
+        },
+        "match": {
+            "type": "object",
+            "required": [
+                "callback",
+                "input"
+            ],
+            "properties": {
+                "callback": {
+                    "type": "string",
+                    "enum": [
+                        "match_any",
+                        "exact_match",
+                        "match_by_regex",
+                        "match_by_opreation_key",
+                        "contains"
+                    ]
+                },
+                "input": {
+                    "type": [
+                        "number",
+                        "string",
+                        "array"
+                    ]
+                },
+                "weight": {
+                    "type": "number"
+                }
+            }
+        },
+        "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+        },
+        "display_name": {
+            "type": "object",
+            "default": {},
+            "patternProperties": {
+                "^([a-z]{2})(_[a-z]{2})?$": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9\\s-_]+$"
+                }
+            }
+        }
+    }
+}
