@@ -8,9 +8,9 @@ const yaml = require("js-yaml")
  * @returns {object} - Config file data.
  */
 module.exports.readConfig = (path) => {
-    // read the file
-    const file = fs.readFileSync(path, "utf-8")
+  // read the file
+  const file = fs.readFileSync(path, "utf-8")
 
-    // parse yaml to object and return to user
-    return yaml.safeLoadAll(file)
+  // parse yaml to object and return to user
+  return yaml.safeLoadAll(file)
 }
