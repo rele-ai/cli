@@ -118,7 +118,6 @@ const loadWorkflowConf = (doc) => {
  * @returns {object} YAML config.
  */
 const loadOperationConf = (doc, apps, appActions, workflows) => {
-  console.log(doc)
   return yaml.dump({
     type: "Operation",
     selector: {
