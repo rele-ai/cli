@@ -20,10 +20,10 @@ class ListCommand extends BaseCommand {
       const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
       // init app actions client
-      const client = new AppActionsClient(accessToken.id_token)
+      const client = new AppActionsClient(user, accessToken)
 
       // list app actions records
-      const { apps } = await client.list(user.orgs)
+      const appActions = await client.list()
 
       // return app records
       const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
