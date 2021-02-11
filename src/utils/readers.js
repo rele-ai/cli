@@ -12,5 +12,5 @@ module.exports.readConfig = (path) => {
   const file = fs.readFileSync(path, "utf-8")
 
   // parse yaml to object and return to user
-  return yaml.safeLoadAll(file)
+  return yaml.loadAll(file)
 }

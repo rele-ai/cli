@@ -101,7 +101,10 @@ const loadWorkflowConf = (doc) => {
     type: "Workflow",
     display_name: doc.display_name,
     key: doc.key,
-    match: doc.match
+    match: {
+      ...doc.match,
+      input: (doc.match.input || "").indexOf(",") !== -1 ? doc.match.input.split(",") : doc.match.input
+    }
   })
 }
 

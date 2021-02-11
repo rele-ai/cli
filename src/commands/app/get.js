@@ -6,7 +6,7 @@ const { AppsClient } = require("../../../lib/components")
 const { docToConf } = require("../../utils/parser")
 
 /**
- * Get a specific user by the selector key.
+ * Get a specific app by the selector key.
  */
 class GetCommand extends BaseCommand {
   // command flags
