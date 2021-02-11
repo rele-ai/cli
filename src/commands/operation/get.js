@@ -19,7 +19,7 @@ class GetCommand extends BaseCommand {
     }),
 
     // filter by workflow key
-    appKey: flags.string({
+    workflowKey: flags.string({
       char: "w",
       description: "Filter by workflow key",
       required: true
@@ -86,7 +86,7 @@ class GetCommand extends BaseCommand {
       const client = new OperationsClient(user, accessToken)
 
       // get operation record
-      const operation = await client.getByKey(key, [[this.getWorkflowKey(workflows, this.flags.workflowKey).id, "in", "workflows"]])
+      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
 
       // check response
       if (operation) {

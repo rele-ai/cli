@@ -63,7 +63,7 @@ class ListCommand extends BaseCommand {
       const client = new OperationsClient(user, accessToken)
 
       // build conditions
-      const conds = this.flags.workflowKey ? [[this.getWorkflowKey(workflows, this.flags.workflowKey).id, "in", "workflows"]] : []
+      const conds = this.flags.workflowKey ? [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]] : []
 
       // list operations records
       const operations = await client.list(conds)
