@@ -2,30 +2,54 @@ const {Command, flags} = require('@oclif/command')
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const BaseCommand = require("../utils/base-command")
-const { AppsClient } = require("../../lib/components")
+const Clients = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
+  // command flags
+  static flags = {
+    path: flags.string({
+      char: "f",
+      description: "A path to source yaml file.",
+      required: false
+    })
+  }
+
   async run() {
-    // get flags
-    // const {config} = this.parse(ApplyCommand).flags
+    // destract path
+    const { path } = this.flags
+
     // resolve access token and user info
-    // const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+    const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
-    // init apps client
-    // const appsClient = new AppsClient(user, accessToken)
+    // init clients
+    let clients = {}
+    Object.keys(Clients).forEach(key => {
+      clients[key] = new Clients[key](user, accessToken)
+    })
 
-    // await appsClient.deleteByKey("matan_test")
+    // format yaml to array of objects
+    const yamlData = readConfig(path)
 
-    // read the yaml config
-    const yamlData = readConfig(config)
-    this.log(yamlData)
+    // collect update or create promises
+    const prms = yamlData.map(async object => {
+      // pull client by type
+      const client = clients[`${object.type}sClient`]
 
-    // convert to object
-    const { docType, doc } = confToDoc(yamlData)
+      // check if the config is already exists
+      const config = await client.getByKey(object.key)
 
-    // apply
-    const res = await componentsApi[docType].write(doc)
-    this.log(`config applied to id: ${res.id}`)
+      if (config) {
+        // update config
+        return client.updateByKey(object.key, object)
+      } else {
+        // create config
+        return client.create(object)
+      }
+    })
+
+    // resolve all create/update promises
+    const rsPrms = await Promise.all(prms)
+    console.log(rsPrms)
   }
 }
 
@@ -33,13 +57,5 @@ ApplyCommand.description = `Apply a set of configurations to RELE.AI App
 ...
 Please read more about the configuration files in the github repository docs.
 `
-
-// ApplyCommand.flags = {
-//   config: flags.string({
-//     char: "c",
-//     description: "A path to the configuration file",
-//     required: true
-//   })
-// }
 
 module.exports = ApplyCommand
