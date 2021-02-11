@@ -29,6 +29,7 @@ class ListCommand extends BaseCommand {
   }
 
   /**
+   * Find application based on given system key.
    *
    * @param {Array.<object>} apps - List of apps.
    * @param {string} key - App system key.
