@@ -46,10 +46,10 @@ class GetCommand extends BaseCommand {
       const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
       // init apps client
-      const appsClient = new AppsClient(accessToken.id_token)
+      const appsClient = new AppsClient(user, accessToken)
 
       // get app record
-      const app = await appsClient.getByKey(key, user.orgs)
+      const app = await appsClient.getByKey(key)
 
       // convert to yaml
       const appConf = docToConf("app", app)

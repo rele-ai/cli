@@ -20,21 +20,21 @@ class ListCommand extends BaseCommand {
       const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
       // init apps client
-      this.log(`access token: ${accessToken}`)
-      // const appsClient = new AppsClient(user, accessToken)
+      const appsClient = new AppsClient(user, accessToken)
 
-      // // apps records
-      // const apps = await appsClient.list()
+      // apps records
+      const apps = await appsClient.list()
 
-      // // return app records
-      // const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
+      // return app records
+      const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
 
-      // // log to user
-      // this.log(yamlConf)
+      // log to user
+      this.log(yamlConf)
 
       // stop spinner
       cli.ux.action.stop()
     } catch(error) {
+      console.error(error)
       // handle errors
       cli.ux.action.stop("failed")
       this.error(`unable to list apps:\n${error}`)

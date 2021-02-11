@@ -26,7 +26,7 @@ class ListCommand extends BaseCommand {
       const appActions = await client.list()
 
       // return app records
-      const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
+      const yamlConf = appActions.map((appAction) => docToConf("app_action", appAction)).join("---\n")
 
       // log to user
       this.log(yamlConf)
@@ -36,14 +36,14 @@ class ListCommand extends BaseCommand {
     } catch(error) {
       // handle errors
       cli.ux.action.stop("failed")
-      this.error(`unable to list apps:\n${error}`)
+      this.error(`unable to list app actions:\n${error}`)
     }
   }
 }
 
-ListCommand.description = `List all global and org releated app configs.
+ListCommand.description = `List all global and org releated app actions configs.
 ...
-Additional information about the app:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-list
+Additional information about the app-action:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-action-list
 `
 
 module.exports = ListCommand
