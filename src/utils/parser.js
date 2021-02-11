@@ -1,3 +1,4 @@
+const yaml = require("js-yaml")
 
 /**
 * Configuration data from YAML.
@@ -28,14 +29,15 @@ module.exports.confToDoc = (conf) => {
 *
 * @param {string} docType - The document type.
 * @param {object} doc - Firestore document structure.
+* @param {object} options - additional params.
 * @returns {object} conf - YAML config
 */
-module.exports.docToConf = (docType, doc) => {
+module.exports.docToConf = (docType, doc, { apps }) => {
   switch(docType) {
     case "app":
       return loadAppConf(doc)
     case "app_action":
-      return loadAppActionConf(doc)
+      return loadAppActionConf(doc, apps)
     case "workflow":
       return loadWorkflowConf(doc)
     case "operation":
@@ -55,16 +57,36 @@ module.exports.docToConf = (docType, doc) => {
  * @returns {object} YAML config.
  */
 const loadAppConf = (doc) => {
-
+  return yaml.dump({
+    type: "App",
+    base_url: doc.base_url,
+    tls: doc.tls || false,
+    display_name: doc.display_name,
+    protocol: doc.protocol,
+    request: doc.request,
+    key: doc.system_key,
+  })
 }
 
 /**
  * Load the app action config from the firestore document.
  *
  * @param {object} doc - Firestore document.
+ * @param {object} apps - Map of all the applications.
  * @returns {object} YAML config.
  */
-const loadAppActionConf = (doc) => {}
+const loadAppActionConf = (doc, apps) => {
+  return yaml.dump({
+    type: "AppAction",
+    request: doc.request,
+    display_name: doc.display_name,
+    metadata: doc.metadata,
+    key: doc.operation_key,
+    selector: {
+      app: apps[doc.app_id].system_key
+    }
+  })
+}
 
 /**
  * Load the workflow config from the firestore document.
