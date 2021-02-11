@@ -101,16 +101,15 @@ class GetCommand extends BaseCommand {
         cli.ux.action.stop(`couldn't find app action for key: ${key}`)
       }
     } catch (error) {
-      console.error(error)
       cli.ux.action.stop("falied")
-      this.error(`Unable to get application ${key}.\n${error}`)
+      this.error(`Unable to get app action ${key}.\n${error}`)
     }
   }
 }
 
-GetCommand.description = `Get an application by the app selector key.
+GetCommand.description = `Get an app action by the app action selector key.
 ...
-Additional information about the app:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-get
+Additional information about the app-action:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-action-get
 `
 
 module.exports = GetCommand
