@@ -58,7 +58,7 @@ class BaseCommand extends Command {
     return this.jwt
       .then(async decodeJwt => {
         const accessToken = await this.accessToken
-        return (new UsersClient(accessToken.id_token)).getById(decodeJwt.userFsId)
+        return (new UsersClient({}, accessToken)).getById(decodeJwt.userFsId)
       })
   }
 
