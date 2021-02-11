@@ -1,29 +1,29 @@
 const cli = require("cli-ux")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient } = require("../../../lib/components")
+const { AppActionsClient } = require("../../../lib/components")
 
 /**
- * List all global and org releated apps.
+ * List all global and org releated app actions.
  */
 class ListCommand extends BaseCommand {
   /**
-   * Execute the list apps command
+   * Execute the list app actions command
    */
   async run() {
     // start spinner
-    cli.ux.action.start("Pulling apps")
+    cli.ux.action.start("Pulling app actions")
 
     // try to pull apps
     try {
       // resolve access token and user info
       const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
-      // init apps client
-      const appsClient = new AppsClient(accessToken.id_token)
+      // init app actions client
+      const client = new AppActionsClient(accessToken.id_token)
 
-      // apps records
-      const { apps } = await appsClient.list(user.orgs)
+      // list app actions records
+      const { apps } = await client.list(user.orgs)
 
       // return app records
       const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")

@@ -23,7 +23,7 @@ class ListCommand extends BaseCommand {
       const appsClient = new AppsClient(accessToken.id_token)
 
       // apps records
-      const { apps } = await appsClient.list(user.orgs)
+      const apps = await appsClient.list(user.orgs)
 
       // return app records
       const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")

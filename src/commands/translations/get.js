@@ -1,22 +1,79 @@
-const {Command, flags} = require('@oclif/command')
+const cli = require("cli-ux")
+const {flags} = require("@oclif/command")
+const { writeConfig } = require("../../utils/writers")
+const BaseCommand = require("../../utils/base-command")
+const { AppsClient } = require("../../../lib/components")
+const { docToConf } = require("../../utils/parser")
 
-class GetCommand extends Command {
+/**
+ * Get a specific user by the selector key.
+ */
+class GetCommand extends BaseCommand {
+  // command flags
+  static flags = {
+    output: flags.string({
+      char: "o",
+      description: "A path to output file.",
+      required: false
+    })
+  }
+
+  // command arguments
+  static args = [
+    {
+      name: "key",
+      required: true,
+      description: "App selector key."
+    }
+  ]
+
+  /**
+   * Run the get command that loads the application
+   */
   async run() {
-    this.log(`get`)
+    // destruct args object
+    const { key } = this.args
+
+    // destract flags object
+    const { output } = this.flags
+
+    // try to pull app
+    try {
+      // init loader
+      cli.ux.action.start(`Pulling application ${key}`)
+
+      // resolve access token
+      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+
+      // init apps client
+      const appsClient = new AppsClient(accessToken.id_token)
+
+      // get app record
+      const app = await appsClient.getByKey(key, user.orgs)
+
+      // convert to yaml
+      const appConf = docToConf("app", app)
+
+      // write output if path provided
+      if (output) {
+        writeConfig(appConf, output)
+      } else {
+        // return app object
+        this.log(appConf)
+      }
+
+      // stop spinner
+      cli.ux.action.stop()
+    } catch (error) {
+      cli.ux.action.stop("falied")
+      this.error(`Unable to get application ${key}.\n${error}`)
+    }
   }
 }
 
-GetCommand.description = `Apply a set of configurations to RELE.AI App
+GetCommand.description = `Get an application by the app selector key.
 ...
-Please read more about the configuration files in the github repository docs.
+Additional information about the app:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-get
 `
-
-GetCommand.flags = {
-  config: flags.string({
-    char: "c",
-    description: "A path to the configuration file",
-    required: true
-  })
-}
 
 module.exports = GetCommand
