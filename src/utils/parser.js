@@ -196,6 +196,11 @@ const loadAppActionDoc = (conf) => {
  * @returns {object} - Firestore document.
  */
 const loadWorkflowDoc = (conf) => {
+  let coWrf = { ...conf }
+
+  delete coWrf.selector
+
+  coWrf["workflows"] = conf.selector.workflow
   return {
     docType: toSnakeCase(conf.type),
     doc: {}

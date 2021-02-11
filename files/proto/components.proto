@@ -569,12 +569,30 @@ message Var {
 
 // message OperationOutput
 message OperationOutput {
-  repeated string format_function = 1;
+  repeated FormatFunctionObj format_function = 1;
+  repeated RedisFunctionsObj redis_functions = 2;
+  string operation_type = 3;
 }
 
 // message OperationInput
 message OperationInput {
-  repeated string format_function = 1;
+  repeated FormatFunctionObj format_function = 1;
+  repeated RedisFunctionsObj redis_functions = 2;
+}
+
+// message FormatFunctionObj
+message FormatFunctionObj {
+  string operation = 1;
+  string output = 2;
+  OperationPayload value = 3;
+}
+
+// message RedisFunctionsObj
+message RedisFunctionsObj {
+  string operation = 1;
+  string path = 2;
+  OperationPayload value = 3;
+  string type = 4;
 }
 
 // message OperationAction

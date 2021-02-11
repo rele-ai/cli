@@ -1,4 +1,3 @@
-const {Command, flags} = require('@oclif/command')
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const { toSnakeCase } = require("../utils/index")
@@ -41,7 +40,7 @@ class ApplyCommand extends BaseCommand {
 
       // define the data object
       const data = {
-        [`${toSnakeCase(`${object.type}s`)}`]: object
+        [`${toSnakeCase(`${object.type}`)}`]: confToDoc(object)
       }
 
       if (config) {
