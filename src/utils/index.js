@@ -10,3 +10,20 @@ module.exports.toSnakeCase = (str) => {
     (x,y) => "_" + y.toLowerCase()
   ).replace(/^_/, "")
 }
+
+/**
+ * Converts list of objects to map.
+ *
+ * @param {Array.<object>} docs - List of firestore objects.
+ * @returns {object} - Mapped data.
+ */
+module.exports.docListToObj = (docs) => {
+  let data = {}
+
+  // map data
+  docs.forEach((doc) => {
+    data[doc.id] = doc
+  })
+
+  return data
+}

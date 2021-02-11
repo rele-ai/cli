@@ -15,7 +15,7 @@ class GetCommand extends BaseCommand {
       char: "o",
       description: "A path to output file.",
       required: false
-    })
+    }),
   }
 
   // command arguments
@@ -51,19 +51,24 @@ class GetCommand extends BaseCommand {
       // get app record
       const app = await appsClient.getByKey(key)
 
-      // convert to yaml
-      const appConf = docToConf("app", app)
+      // check yaml config
+      if (app) {
+        // convert to yaml
+        const appConf = docToConf("app", app)
 
-      // write output if path provided
-      if (output) {
-        writeConfig(appConf, output)
+        // write output if path provided
+        if (output) {
+          writeConfig(appConf, output)
+        } else {
+          // return app object
+          this.log(appConf)
+        }
+
+        // stop spinner
+        cli.ux.action.stop()
       } else {
-        // return app object
-        this.log(appConf)
+        cli.ux.action.stop(`couldn't find app for key: ${key}`)
       }
-
-      // stop spinner
-      cli.ux.action.stop()
     } catch (error) {
       cli.ux.action.stop("falied")
       this.error(`Unable to get application ${key}.\n${error}`)

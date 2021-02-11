@@ -25,14 +25,19 @@ class ListCommand extends BaseCommand {
       // apps records
       const apps = await appsClient.list()
 
-      // return app records
-      const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
+      // check results
+      if (apps && apps.length) {
+        // return app records
+        const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
 
-      // log to user
-      this.log(yamlConf)
+        // log to user
+        this.log(yamlConf)
 
-      // stop spinner
-      cli.ux.action.stop()
+        // stop spinner
+        cli.ux.action.stop()
+      } else {
+        cli.ux.action.stop("no apps found")
+      }
     } catch(error) {
       console.error(error)
       // handle errors
