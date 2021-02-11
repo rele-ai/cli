@@ -542,6 +542,8 @@ message Operation {
   repeated string workflows = 7;
   string next_operation = 8;
   OperationInput input = 9;
+  string key = 10;
+  string id = 11;
 }
 
 // message OperationRedis
@@ -591,6 +593,8 @@ message Workflow {
   ConfigBuild config_build = 2;
   WorkflowMatch match = 3;
   map<string, string> display_name = 7;
+  string key = 8;
+  string id = 9;
 }
 
 // message WorkflowMatch
@@ -607,6 +611,7 @@ message AppAction {
   map<string, string> display_name = 4;
   string app_id = 5;
   map<string, bool> metadata = 6;
+  string id = 7;
 }
 
 // message AppActionRequest
@@ -964,4 +969,5 @@ message Translation {
   string key = 1;
   string lang = 2;
   string value = 3;
+  string id = 4;
 }
