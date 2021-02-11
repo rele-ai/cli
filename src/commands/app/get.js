@@ -1,81 +1,79 @@
 const cli = require("cli-ux")
-const {Command, flags} = require('@oclif/command')
+const {flags} = require("@oclif/command")
+const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
 const { AppsClient } = require("../../../lib/components")
-const { writeConfig } = require("../../utils/writers")
+const { docToConf } = require("../../utils/parser")
 
+/**
+ * Get a specific user by the selector key.
+ */
 class GetCommand extends BaseCommand {
-  async run() {
-    // parse GetCommand
-    const { args, flags } = this.parse(GetCommand)
+  // command flags
+  static flags = {
+    output: flags.string({
+      char: "o",
+      description: "A path to output file.",
+      required: false
+    })
+  }
 
+  // command arguments
+  static args = [
+    {
+      name: "key",
+      required: true,
+      description: "App selector key."
+    }
+  ]
+
+  /**
+   * Run the get command that loads the application
+   */
+  async run() {
     // destruct args object
-    const { key } = args
+    const { key } = this.args
 
     // destract flags object
-    const { output } = flags
+    const { output } = this.flags
 
+    // try to pull app
     try {
       // init loader
-      cli.ux.action.start(`Pull App by key = ${key}`)
+      cli.ux.action.start(`Pulling application ${key}`)
 
       // resolve access token
-      const accessToken = await this.accessToken
-
-      // pull user
-      const { user } = await this.user
+      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
       // init apps client
       const appsClient = new AppsClient(accessToken.id_token)
 
       // get app record
-      const { apps = [] } = await appsClient.getByKey(key, user.orgs)
+      const app = await appsClient.getByKey(key, user.orgs)
 
-      // stop loader
-      cli.ux.action.stop()
+      // convert to yaml
+      const appConf = docToConf("app", app)
 
-      // return app record
-      // and write to end path.
-      if (apps.length) {
-        // destract app
-        const [app] = apps
-
-        // write output if path provided
-        if (output) {
-          writeConfig(app, output)
-        }
-
+      // write output if path provided
+      if (output) {
+        writeConfig(appConf, output)
+      } else {
         // return app object
-        this.log("App pulled successfuly.")
-        return app
-      } else return {}
+        this.log(appConf)
+      }
+
+      // stop spinner
+      cli.ux.action.stop()
     } catch (error) {
-      console.error(error)
       cli.ux.action.stop("falied")
-      return
+      this.error(`Unable to get application ${key}.\n${error}`)
     }
   }
 }
 
-GetCommand.description = `Apply a set of configurations to RELE.AI App
+GetCommand.description = `Get an application by the app selector key.
 ...
-Please read more about the configuration files in the github repository docs.
+Additional information about the app:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-get
 `
-
-GetCommand.flags = {
-  output: flags.string({
-    char: "o",
-    description: "A path to output file.",
-    required: false
-  })
-}
-
-GetCommand.args = [
-  {
-    name: "key",
-    required: true,
-    description: "Identifier Key."
-  }
-]
 
 module.exports = GetCommand

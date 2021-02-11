@@ -1,7 +1,7 @@
 const cli = require("cli-ux")
 const { docToConf } = require("../../utils/parser")
-const { AppsClient } = require("../../../lib/components")
 const BaseCommand = require("../../utils/base-command")
+const { AppsClient } = require("../../../lib/components")
 
 /**
  * List all global and org releated apps.
@@ -26,10 +26,13 @@ class ListCommand extends BaseCommand {
       const { apps } = await appsClient.list(user.orgs)
 
       // return app records
-      const yamlConf = apps.map((app) => docToConf("app", app)).join("\n---\n")
+      const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
 
       // log to user
       this.log(yamlConf)
+
+      // stop spinner
+      cli.ux.action.stop()
     } catch(error) {
       // handle errors
       cli.ux.action.stop("failed")
@@ -40,7 +43,7 @@ class ListCommand extends BaseCommand {
 
 ListCommand.description = `List all global and org releated app configs.
 ...
-Please read more about the configuration files in the github repository docs.
+Additional information about the app:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-list
 `
 
 module.exports = ListCommand

@@ -1,4 +1,5 @@
 const fs = require("fs")
+const path = require("path")
 const yaml = require("js-yaml")
 
 /**
@@ -9,5 +10,20 @@ const yaml = require("js-yaml")
  * @returns {object} - Config file data.
  */
 module.exports.writeConfig = (object, output) => {
-  fs.writeFileSync(output, yaml.safeDump(object))
+  // parse output path
+  const parsed = path.parse(output)
+
+  // check output ext
+  if ([".yaml", ".yml"].includes(parsed.ext)) {
+    // check if dir path exists
+    if (!fs.existsSync(parsed.dir)) {
+      fs.mkdirSync(parsed.dir, { recursive: true })
+    }
+
+    // write file
+    fs.writeFileSync(output, yaml.dump(object))
+  } else {
+    // handle error
+    throw new Error("provided output path must be of a YAML file.")
+  }
 }

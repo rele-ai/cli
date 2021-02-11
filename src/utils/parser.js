@@ -1,4 +1,5 @@
 const yaml = require("js-yaml")
+const { toSnakeCase } = require("./index")
 
 /**
 * Configuration data from YAML.
@@ -32,7 +33,7 @@ module.exports.confToDoc = (conf) => {
 * @param {object} options - additional params.
 * @returns {object} conf - YAML config
 */
-module.exports.docToConf = (docType, doc, { apps }) => {
+module.exports.docToConf = (docType, doc, { apps, appActions, workflows } = {}) => {
   switch(docType) {
     case "app":
       return loadAppConf(doc)
@@ -41,7 +42,7 @@ module.exports.docToConf = (docType, doc, { apps }) => {
     case "workflow":
       return loadWorkflowConf(doc)
     case "operation":
-      return loadOperationConf(doc)
+      return loadOperationConf(doc, apps, appActions, workflows)
     case "translation":
       return loadTranslationConf(doc)
     default:
@@ -65,6 +66,7 @@ const loadAppConf = (doc) => {
     protocol: doc.protocol,
     request: doc.request,
     key: doc.system_key,
+    is_global: doc.org === "global"
   })
 }
 
@@ -94,15 +96,52 @@ const loadAppActionConf = (doc, apps) => {
  * @param {object} doc - Firestore document.
  * @returns {object} YAML config.
  */
-const loadWorkflowConf = (doc) => {}
+const loadWorkflowConf = (doc) => {
+  return yaml.dump({
+    type: "Workflow",
+    display_name: doc.display_name,
+    key: doc.key,
+    match: doc.match
+  })
+}
 
 /**
  * Load the operation config from the firestore document.
  *
  * @param {object} doc - Firestore document.
+ * @param {object} apps - Map of all applications.
+ * @param {object} appActions - Map of all app actions.
+ * @param {object} workflows - Map of all workflows.
  * @returns {object} YAML config.
  */
-const loadOperationConf = (doc) => {}
+const loadOperationConf = (doc, apps, appActions, workflows) => {
+  return yaml.dump({
+    type: "Operation",
+    selector: {
+      workflow: doc.workflows.map((wid) => workflows[wid].key),
+      app: apps[doc.app_id],
+      app_action: appActions[doc.action.id]
+    },
+    next_operation: {
+      selector: Object.entries(doc.next_operation).map(([wid, oid]) => ({
+        workflow: wid,
+        operation: oid
+      }))
+    },
+    on_error: {
+      selector: Object.entries(doc.on_error).map(([wid, oid]) => ({
+        workflow: wid,
+        operation: oid
+      }))
+    },
+    payload: doc.payload,
+    is_root: doc.is_root || false,
+    input: doc.input,
+    output: doc.output,
+    redis: doc.redis,
+    key: doc.key
+  })
+}
 
 /**
  * Load the translation config from the firestore document.
@@ -110,7 +149,12 @@ const loadOperationConf = (doc) => {}
  * @param {object} doc - Firestore document.
  * @returns {object} YAML config.
  */
-const loadTranslationConf = (doc) => {}
+const loadTranslationConf = (doc) => {
+  return yaml.dump({
+    type: "Translation",
+    ...doc
+  })
+}
 
 /**
  * Converts the given YAML config to the matchinf firestore
@@ -121,7 +165,7 @@ const loadTranslationConf = (doc) => {}
  */
 const loadAppDoc = (conf) => {
   return {
-    docType: "",
+    docType: toSnakeCase(conf.type),
     doc: {}
   }
 }
@@ -135,7 +179,7 @@ const loadAppDoc = (conf) => {
  */
 const loadAppActionDoc = (conf) => {
   return {
-    docType: "",
+    docType: toSnakeCase(conf.type),
     doc: {}
   }
 }
@@ -149,7 +193,7 @@ const loadAppActionDoc = (conf) => {
  */
 const loadWorkflowDoc = (conf) => {
   return {
-    docType: "",
+    docType: toSnakeCase(conf.type),
     doc: {}
   }
 }
@@ -163,7 +207,7 @@ const loadWorkflowDoc = (conf) => {
  */
 const loadOperationDoc = (conf) => {
   return {
-    docType: "",
+    docType: toSnakeCase(conf.type),
     doc: {}
   }
 }
@@ -177,7 +221,7 @@ const loadOperationDoc = (conf) => {
  */
 const loadTranslationDoc = (conf) => {
   return {
-    docType: "",
+    docType: toSnakeCase(conf.type),
     doc: {}
   }
 }
