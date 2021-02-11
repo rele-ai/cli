@@ -246,10 +246,11 @@ message UpdateRequest {
     Trigger trigger = 7;
     Operation operation = 8;
     AppAction app_action = 9;
+    Translation translation = 10;
   }
 
   // ignore flatten function
-  bool ignore_flatten = 10;
+  bool ignore_flatten = 11;
 }
 
 // object id message
