@@ -118,21 +118,22 @@ const loadWorkflowConf = (doc) => {
  * @returns {object} YAML config.
  */
 const loadOperationConf = (doc, apps, appActions, workflows) => {
+  console.log(doc)
   return yaml.dump({
     type: "Operation",
     selector: {
       workflow: doc.workflows.map((wid) => workflows[wid].key),
-      app: apps[doc.app_id],
-      app_action: appActions[doc.action.id]
+      app: apps[doc.app_id].system_key,
+      app_action: appActions[doc.action.id].operation_key
     },
     next_operation: {
-      selector: Object.entries(doc.next_operation).map(([wid, oid]) => ({
+      selector: Object.entries((doc.next_operation || {})).map(([wid, oid]) => ({
         workflow: wid,
         operation: oid
       }))
     },
     on_error: {
-      selector: Object.entries(doc.on_error).map(([wid, oid]) => ({
+      selector: Object.entries((doc.on_error || {})).map(([wid, oid]) => ({
         workflow: wid,
         operation: oid
       }))

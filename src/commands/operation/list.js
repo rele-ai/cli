@@ -68,12 +68,6 @@ class ListCommand extends BaseCommand {
       // list operations records
       const operations = await client.list(conds)
 
-      console.log({
-        workflows: docListToObj(workflows),
-        apps: docListToObj(apps),
-        appActions: docListToObj(appActions),
-      })
-
       // check results
       if (operations && operations.length) {
         // return operations records
