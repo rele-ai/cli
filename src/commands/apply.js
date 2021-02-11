@@ -1,6 +1,7 @@
 const {Command, flags} = require('@oclif/command')
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
+const { toSnakeCase } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const Clients = require("../../lib/components")
 
@@ -38,18 +39,22 @@ class ApplyCommand extends BaseCommand {
       // check if the config is already exists
       const config = await client.getByKey(object.key)
 
+      // define the data object
+      const data = {
+        [`${toSnakeCase(`${object.type}s`)}`]: object
+      }
+
       if (config) {
         // update config
-        return client.updateByKey(object.key, object)
+        return client.updateByKey(object.key, data)
       } else {
         // create config
-        return client.create(object)
+        return client.create(data)
       }
     })
 
     // resolve all create/update promises
     const rsPrms = await Promise.all(prms)
-    console.log(rsPrms)
   }
 }
 

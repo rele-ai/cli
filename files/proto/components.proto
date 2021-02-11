@@ -540,10 +540,11 @@ message Operation {
   map<string,OperationPayload> payload = 5;
   OperationOutput output = 6;
   repeated string workflows = 7;
-  string next_operation = 8;
+  map<string, string> next_operation = 8;
   OperationInput input = 9;
   string key = 10;
   string id = 11;
+  map<string, string> on_error = 12;
 }
 
 // message OperationRedis
