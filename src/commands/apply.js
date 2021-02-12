@@ -1,3 +1,4 @@
+const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const { toSnakeCase } = require("../utils/index")
