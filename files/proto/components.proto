@@ -558,13 +558,7 @@ message OperationPayload {
   string data = 1;
   string type = 2;
   string rkey_type = 3;
-  map<string, Var> vars = 4;
-}
-
-message Var {
-  string data = 1;
-  string type = 2;
-  string default = 3;
+  map<string, OperationPayload> vars = 4;
 }
 
 // message OperationOutput
