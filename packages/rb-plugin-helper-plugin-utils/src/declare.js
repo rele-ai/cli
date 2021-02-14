@@ -42,16 +42,28 @@ const generatePluginApi = () => {
       structure,
       {
         // list of command callbacks
-        _callbacks: [],
+        _callbacks: {},
 
         // executions function
-        _execute(...args) {
-          return this._callbacks.map((cb) => cb(...args))
+        _execute(event, ...args) {
+          // check even callbacks before execute
+          if (this._callbacks[event] && this._callbacks[event].length) {
+            return this._callbacks[event].map((cb) => cb(...args))
+          }
+
+          // return empty callbacks if no even was found
+          return []
         },
 
         // callback event handler setter
-        on(cb) {
-          this._callbacks.push(cb)
+        on(event, cb) {
+          // create callback section
+          if (!this._callbacks[event]) {
+            this._callbacks[event] = []
+          }
+
+          // push to event
+          this._callbacks[event].push(cb)
         }
       }
     )

@@ -37,7 +37,8 @@ class ListCommand extends BaseCommand {
       // collect translations records
       const translations = await client.list(conds)
 
-      plugins.translation.list._execute({
+      // execute before write
+      plugins.translation.list._execute("beforeWrite", {
         translation: "translations data"
       })
 
@@ -51,10 +52,25 @@ class ListCommand extends BaseCommand {
 
         // stop spinner
         cli.ux.action.stop()
+
+        // execute success
+        plugins.translation.list._execute("success", {
+          translation: "translations data"
+        })
       } else {
+        // execute success
+        plugins.translation.list._execute("error", {
+          translation: "translations data"
+        })
+
         cli.ux.action.stop("no translations found")
       }
     } catch(error) {
+      // execute success
+      plugins.translation.list._execute("error", {
+        translation: "translations data"
+      })
+
       // handle errors
       cli.ux.action.stop("failed")
       this.error(`unable to list translation:\n${error}`)
