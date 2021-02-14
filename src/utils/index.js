@@ -51,3 +51,22 @@ module.exports.sortByTypes = (data) => {
     (a,b) => (orders[a.type] > orders[b.type]) ? 1 : ((orders[b.type] > orders[a.type]) ? -1 : 0)
   )
 }
+
+/**
+ * Build stages array
+ */
+module.exports.stagesByTypes = (data) => {
+  let firstStage = [], secondStage = []
+  const firstStageIdentifiers = ["App", "Workflow", "Translation"]
+  const secondStageIdenrifiers = ["AppAction", "Operation"]
+
+  data.forEach(object => {
+    if (firstStageIdentifiers.includes(object.type)) {
+      firstStage.push(object)
+    } else {
+      secondStage.push(object)
+    }
+  })
+
+  return [firstStage, secondStage]
+}

@@ -3,7 +3,7 @@ const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const { CONF_KEYS_MAP } = require("../utils/formatters")
-const { toSnakeCase, docListToObj, sortByTypes } = require("../utils/index")
+const { toSnakeCase, docListToObj, sortByTypes, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const Clients = require("../../lib/components")
 
@@ -57,39 +57,47 @@ class ApplyCommand extends BaseCommand {
       const yamlData = readConfig(path)
 
       // collect update or create promises
-      const prms = sortByTypes(yamlData).map(async object => {
-        // pull client by type
-        const client = clients[`${object.type}sClient`]
+      const x = stagesByTypes(yamlData)
+      console.log(x)
+      const prms = stagesByTypes(yamlData).map(async configStage => {
 
-        // define snakeCase config type
-        const snakeCaseType = toSnakeCase(object.type)
+        const stagePrms = configStage.map(async object => {
+          // pull client by type
+          const client = clients[`${object.type}sClient`]
 
-        // key identifier
-        const formattedKey = CONF_KEYS_MAP[`${snakeCaseType}s`]
+          // define snakeCase config type
+          const snakeCaseType = toSnakeCase(object.type)
 
-        // check if the config is already exists
-        const config = await client.getByKey(object[formattedKey])
+          // key identifier
+          const formattedKey = CONF_KEYS_MAP[`${snakeCaseType}s`]
 
-        // define the data object
-        const data = {
-          [snakeCaseType]: confToDoc(
-            object.type,
-            object,
-            {
-              workflows: docListToObj(workflows),
-              apps: docListToObj(apps),
-              appActions: docListToObj(appActions),
-            }
-          )
-        }
+          // check if the config is already exists
+          const config = await client.getByKey(object[formattedKey])
 
-        if (config) {
-          // update config
-          return (await client.updateByKey(object[formattedKey], data))
-        } else {
-          // create config
-          return (await client.create(data))
-        }
+          // define the data object
+          const data = {
+            [snakeCaseType]: confToDoc(
+              object.type,
+              object,
+              {
+                workflows: docListToObj(workflows),
+                apps: docListToObj(apps),
+                appActions: docListToObj(appActions),
+              }
+            )
+          }
+
+          if (config) {
+            // update config
+            return (await client.updateByKey(object[formattedKey], data))
+          } else {
+            // create config
+            return (await client.create(data))
+          }
+        })
+
+        // resolve promises
+        await Promise.all(stagePrms)
       })
 
       // resolve all create/update promises
