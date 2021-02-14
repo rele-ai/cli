@@ -11,7 +11,7 @@ class DeleteCommand extends BaseCommand {
   // command flags
   static flags = {
     // filter by workflow key
-    appKey: flags.string({
+    workflowKey: flags.string({
       char: "w",
       description: "Filter by workflow key",
       required: true

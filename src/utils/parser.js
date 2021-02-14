@@ -155,7 +155,9 @@ const loadOperationConf = (doc, apps, appActions, workflows) => {
 const loadTranslationConf = (doc) => {
   return yaml.dump({
     type: "Translation",
-    ...doc
+    key: doc.key,
+    lang: doc.lang,
+    value: doc.value
   })
 }
 

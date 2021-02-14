@@ -11,7 +11,7 @@ class ListCommand extends BaseCommand {
   static args = [
     {
       name: "key",
-      description: "Workflow selector key."
+      description: "Translation selector key."
     }
   ]
 
