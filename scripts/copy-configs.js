@@ -3,7 +3,7 @@ const path = require("path")
 const fs = require("fs-extra")
 
 // global constansts
-const RB_DIR = `${os.homedir}/.rb`
+const RB_DIR = `${os.homedir()}/.rb`
 const CONFIG_DIR = `${RB_DIR}/configs`
 const LOCAL_CONFIG_DIR = path.join(__dirname, "..", "files", "configs")
 

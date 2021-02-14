@@ -1,0 +1,19 @@
+{
+  "name": "@releai/helper-plugin-utils",
+  "version": "0.1.0",
+  "description": "Global plugin helpers",
+  "main": "src/index.js",
+  "scripts": {},
+  "keywords": [
+    "plugin",
+    "utils",
+    "releai",
+    "rb"
+  ],
+  "author": {
+    "name": "Elon Salfati",
+    "email": "support@rele.ai",
+    "url": "https://rele.ai"
+  },
+  "license": "Apache License"
+}

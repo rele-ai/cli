@@ -1,4 +1,5 @@
 const cli = require("cli-ux")
+const plugins = require("../../utils/plugin")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
 const { TranslationsClient } = require("../../../lib/components")
@@ -35,6 +36,10 @@ class ListCommand extends BaseCommand {
 
       // collect translations records
       const translations = await client.list(conds)
+
+      plugins.translation._execute({
+        translation: "translations data"
+      })
 
       // check response
       if (translations && translations.length) {
