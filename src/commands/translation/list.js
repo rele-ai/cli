@@ -37,7 +37,7 @@ class ListCommand extends BaseCommand {
       // collect translations records
       const translations = await client.list(conds)
 
-      plugins.translation._execute({
+      plugins.translation.list._execute({
         translation: "translations data"
       })
 

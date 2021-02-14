@@ -15,5 +15,9 @@
     "email": "support@rele.ai",
     "url": "https://rele.ai"
   },
-  "license": "Apache License"
+  "license": "Apache License",
+  "dependencies": {
+    "@releai/cli": "file:../..",
+    "glob": "^7.1.6"
+  }
 }
