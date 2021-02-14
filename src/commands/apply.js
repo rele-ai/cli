@@ -3,7 +3,7 @@ const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const { CONF_KEYS_MAP } = require("../utils/formatters")
-const { toSnakeCase, docListToObj, sortByTypes } = require("../utils/index")
+const { toSnakeCase, docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const Clients = require("../../lib/components")
 
@@ -33,6 +33,53 @@ class ApplyCommand extends BaseCommand {
     ]
   }
 
+  /**
+   * generate config record on firestore.
+   */
+  async _generateRecord(object) {
+    // resolve access token and user info
+    const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+
+    // init clients
+    let clients = {}
+    Object.keys(Clients).forEach(key => {
+      clients[key] = new Clients[key](user, accessToken)
+    })
+
+    // load selectors data
+    const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(clients))
+
+    // pull client by type
+    const client = clients[`${object.type}sClient`]
+
+    // define snakeCase config type
+    const snakeCaseType = toSnakeCase(object.type)
+
+    // check if the config is already exists
+    const config = await client.getByKey(object.key)
+
+    // define the data object
+    const data = {
+      [snakeCaseType]: confToDoc(
+        object.type,
+        object,
+        {
+          workflows: docListToObj(workflows),
+          apps: docListToObj(apps),
+          appActions: docListToObj(appActions),
+        }
+      )
+    }
+
+    if (config) {
+      // update config
+      return client.updateByKey(object.key, data)
+    } else {
+      // create config
+      return client.create(data)
+    }
+  }
+
   async run() {
     try {
       // start spinner
@@ -41,59 +88,27 @@ class ApplyCommand extends BaseCommand {
       // destract path
       const { path } = this.flags
 
-      // resolve access token and user info
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
-
-      // init clients
-      let clients = {}
-      Object.keys(Clients).forEach(key => {
-        clients[key] = new Clients[key](user, accessToken)
-      })
-
-      // load selectors data
-      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(clients))
-
       // format yaml to array of objects
       const yamlData = readConfig(path)
 
-      // collect update or create promises
-      const prms = sortByTypes(yamlData).map(async object => {
-        // pull client by type
-        const client = clients[`${object.type}sClient`]
+      // destract stages
+      const [firstStage = [], secondStage = []] = stagesByTypes(yamlData)
 
-        // define snakeCase config type
-        const snakeCaseType = toSnakeCase(object.type)
-
-        // key identifier
-        const formattedKey = CONF_KEYS_MAP[`${snakeCaseType}s`]
-
-        // check if the config is already exists
-        const config = await client.getByKey(object[formattedKey])
-
-        // define the data object
-        const data = {
-          [snakeCaseType]: confToDoc(
-            object.type,
-            object,
-            {
-              workflows: docListToObj(workflows),
-              apps: docListToObj(apps),
-              appActions: docListToObj(appActions),
-            }
-          )
-        }
-
-        if (config) {
-          // update config
-          return (await client.updateByKey(object[formattedKey], data))
-        } else {
-          // create config
-          return (await client.create(data))
-        }
+      // collect first stage promises
+      const firstStagePrm = firstStage.map(async object => {
+        return this._generateRecord(object)
       })
 
-      // resolve all create/update promises
-      await Promise.all(prms)
+      // resolve first stage promises
+      await Promise.all(firstStagePrm)
+
+      // collect second stage promises
+      const secondStagePrm = secondStage.map(async object => {
+        return this._generateRecord(object)
+      })
+
+      // resolve first stage promises
+      await Promise.all(secondStagePrm)
 
       // stop spinner
       cli.ux.action.stop()
