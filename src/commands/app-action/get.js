@@ -47,6 +47,7 @@ class GetCommand extends BaseCommand {
   }
 
   /**
+   * Pull application from list by key.
    *
    * @param {Array.<object>} apps - List of apps.
    * @param {string} key - App system key.
