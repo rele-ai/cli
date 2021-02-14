@@ -51,3 +51,30 @@ module.exports.sortByTypes = (data) => {
     (a,b) => (orders[a.type] > orders[b.type]) ? 1 : ((orders[b.type] > orders[a.type]) ? -1 : 0)
   )
 }
+
+/**
+ * Defines the configuration array into two stages.
+ * The first stage to resolve is the stage on which nothing depends, followed by the second stage} data
+ *
+ * @param {Array.<object>} data - configs array
+ * @returns {Array.<Array.<Object>>} - matrix of two stages
+ */
+module.exports.stagesByTypes = (data) => {
+  // define stages
+  let firstStage = [], secondStage = []
+
+  // first stage identifier
+  const firstStageIdentifiers = ["App", "Workflow", "Translation"]
+
+  // add to stages
+  data.forEach(object => {
+    if (firstStageIdentifiers.includes(object.type)) {
+      firstStage.push(object)
+    } else {
+      secondStage.push(object)
+    }
+  })
+
+  // return stages
+  return [firstStage, secondStage]
+}

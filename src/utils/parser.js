@@ -176,7 +176,12 @@ const loadAppDoc = (conf) => {
 
   // delete unessesary keys
   delete cpApp.type
+  delete cpApp.key
 
+  // attach system key
+  cpApp.system_key = conf.key
+
+  // return formatted app
   return cpApp
 }
 
@@ -189,13 +194,16 @@ const loadAppDoc = (conf) => {
  * @returns {object} - Firestore document.
  */
 const loadAppActionDoc = (conf, apps) => {
-
   // deep config copy
   let cpAppAction = { ...conf }
 
   // delete unessesary keys
   delete cpAppAction.type
   delete cpAppAction.selector
+  delete cpAppAction.key
+
+  // attach operation type
+  cpAppAction.operation_key = conf.key
 
   // find app id related to app action
   const relatedAppId = Object.keys(apps).find(key => {
