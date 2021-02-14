@@ -28,7 +28,6 @@ module.exports.docListToObj = (docs) => {
   return data
 }
 
-
 /**
  * Sort array of configurations by types
  * according to importance.
