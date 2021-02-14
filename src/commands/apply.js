@@ -1,7 +1,9 @@
+const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
-const { toSnakeCase } = require("../utils/index")
+const { CONF_KEYS_MAP } = require("../utils/formatters")
+const { toSnakeCase, docListToObj, sortByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const Clients = require("../../lib/components")
 
@@ -15,46 +17,91 @@ class ApplyCommand extends BaseCommand {
     })
   }
 
+  /**
+   * Load all selectors data
+   */
+  loadSelectorsData(clients) {
+    return [
+      // load workflow data
+      clients["WorkflowsClient"].list(),
+
+      // load apps data
+      clients["AppsClient"].list(),
+
+      // load app actions data
+      clients["AppActionsClient"].list(),
+    ]
+  }
+
   async run() {
-    // destract path
-    const { path } = this.flags
+    try {
+      // start spinner
+      cli.ux.action.start("Applying configuration file...")
 
-    // resolve access token and user info
-    const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // destract path
+      const { path } = this.flags
 
-    // init clients
-    let clients = {}
-    Object.keys(Clients).forEach(key => {
-      clients[key] = new Clients[key](user, accessToken)
-    })
+      // resolve access token and user info
+      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
 
-    // format yaml to array of objects
-    const yamlData = readConfig(path)
+      // init clients
+      let clients = {}
+      Object.keys(Clients).forEach(key => {
+        clients[key] = new Clients[key](user, accessToken)
+      })
 
-    // collect update or create promises
-    const prms = yamlData.map(async object => {
-      // pull client by type
-      const client = clients[`${object.type}sClient`]
+      // load selectors data
+      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(clients))
 
-      // check if the config is already exists
-      const config = await client.getByKey(object.key)
+      // format yaml to array of objects
+      const yamlData = readConfig(path)
 
-      // define the data object
-      const data = {
-        [`${toSnakeCase(`${object.type}`)}`]: confToDoc(object)
-      }
+      // collect update or create promises
+      const prms = sortByTypes(yamlData).map(async object => {
+        // pull client by type
+        const client = clients[`${object.type}sClient`]
 
-      if (config) {
-        // update config
-        return client.updateByKey(object.key, data)
-      } else {
-        // create config
-        return client.create(data)
-      }
-    })
+        // define snakeCase config type
+        const snakeCaseType = toSnakeCase(object.type)
 
-    // resolve all create/update promises
-    const rsPrms = await Promise.all(prms)
+        // key identifier
+        const formattedKey = CONF_KEYS_MAP[`${snakeCaseType}s`]
+
+        // check if the config is already exists
+        const config = await client.getByKey(object[formattedKey])
+
+        // define the data object
+        const data = {
+          [snakeCaseType]: confToDoc(
+            object.type,
+            object,
+            {
+              workflows: docListToObj(workflows),
+              apps: docListToObj(apps),
+              appActions: docListToObj(appActions),
+            }
+          )
+        }
+
+        if (config) {
+          // update config
+          return (await client.updateByKey(object[formattedKey], data))
+        } else {
+          // create config
+          return (await client.create(data))
+        }
+      })
+
+      // resolve all create/update promises
+      await Promise.all(prms)
+
+      // stop spinner
+      cli.ux.action.stop()
+      this.log("Configuration file applied successfully.")
+    } catch (error) {
+      cli.ux.action.stop("failed")
+      this.error(`Unable to apply configuration file.\n${error}`)
+    }
   }
 }
 

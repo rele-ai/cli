@@ -27,3 +27,28 @@ module.exports.docListToObj = (docs) => {
 
   return data
 }
+
+
+/**
+ * Sort array of configurations by types
+ * according to importance.
+ * 1. app, workflow, translation
+ * 2. app_action
+ * 3. operation
+ *
+ * @param {Array.<object>} data - configs as array of objects
+ * @param {Array.<object>} - sorted by types
+ */
+module.exports.sortByTypes = (data) => {
+  const orders = {
+    App: 0,
+    Workflow: 1,
+    Translation: 2,
+    AppAction: 3,
+    Operation: 4
+  }
+
+  return data.sort(
+    (a,b) => (orders[a.type] > orders[b.type]) ? 1 : ((orders[b.type] > orders[a.type]) ? -1 : 0)
+  )
+}

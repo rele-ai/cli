@@ -4,19 +4,21 @@ const { toSnakeCase } = require("./index")
 /**
 * Configuration data from YAML.
 *
-* @param {object} conf - Configuration data.
+* @param {string} confType - The config type.
+* @param {object} config - YAML document structure.
+* @param {object} options - additional params.
 * @returns {object} doc - Firestore doc representation.
 */
-module.exports.confToDoc = (conf) => {
-  switch(conf.type) {
+module.exports.confToDoc = (confType, conf, { apps, appActions, workflows } = {}) => {
+  switch(confType) {
     case "App":
       return loadAppDoc(conf)
     case "AppAction":
-      return loadAppActionDoc(conf)
+      return loadAppActionDoc(conf, apps)
     case "Workflow":
       return loadWorkflowDoc(conf)
     case "Operation":
-      return loadOperationDoc(conf)
+      return loadOperationDoc(conf, apps, appActions, workflows)
     case "Translation":
       return loadTranslationDoc(conf)
     default:
@@ -167,10 +169,13 @@ const loadTranslationConf = (doc) => {
  * @returns {object} - Firestore document.
  */
 const loadAppDoc = (conf) => {
-  return {
-    docType: toSnakeCase(conf.type),
-    doc: {}
-  }
+  // deep config copy
+  let cpApp = { ...conf }
+
+  // delete unessesary keys
+  delete cpApp.type
+
+  return cpApp
 }
 
 /**
@@ -178,13 +183,32 @@ const loadAppDoc = (conf) => {
  * document.
  *
  * @param {object} conf - YAML config.
+ * @param {object} apps - Map of all the applications.
  * @returns {object} - Firestore document.
  */
-const loadAppActionDoc = (conf) => {
-  return {
-    docType: toSnakeCase(conf.type),
-    doc: {}
+const loadAppActionDoc = (conf, apps) => {
+
+  // deep config copy
+  let cpAppAction = { ...conf }
+
+  // delete unessesary keys
+  delete cpAppAction.type
+  delete cpAppAction.selector
+
+  // find app id related to app action
+  const relatedAppId = Object.keys(apps).find(key => {
+    return apps[key].system_key === (conf.selector || {}).app
+  })
+
+  if (relatedAppId) {
+    // attach app id
+    cpAppAction.app_id = relatedAppId
+  } else {
+    throw new Error(`unable to find related app with system key = ${(conf.selector || {}).app}`)
   }
+
+  // return formatted app action
+  return cpAppAction
 }
 
 /**
@@ -195,15 +219,13 @@ const loadAppActionDoc = (conf) => {
  * @returns {object} - Firestore document.
  */
 const loadWorkflowDoc = (conf) => {
+  // deep config copy
   let coWrf = { ...conf }
 
-  delete coWrf.selector
+  // delete unessesary keys
+  delete coWrf.type
 
-  coWrf["workflows"] = conf.selector.workflow
-  return {
-    docType: toSnakeCase(conf.type),
-    doc: {}
-  }
+  return coWrf
 }
 
 /**
@@ -211,13 +233,64 @@ const loadWorkflowDoc = (conf) => {
  * document.
  *
  * @param {object} conf - YAML config.
+ * @param {object} apps - Map of all applications.
+ * @param {object} appActions - Map of all app actions.
+ * @param {object} workflows - Map of all workflows.
  * @returns {object} - Firestore document.
  */
-const loadOperationDoc = (conf) => {
-  return {
-    docType: toSnakeCase(conf.type),
-    doc: {}
+const loadOperationDoc = (conf, apps, appActions, workflows) => {
+  // deep config copy
+  let coOp = { ...conf }
+
+  // delete unessesary keys
+  delete coOp.type
+  delete coOp.selector
+  delete coOp.next_operation
+  delete coOp.on_error
+
+  // attach workflows
+  coOp["workflows"] = conf.selector.workflow
+
+  // find related app id
+  coOp["app_id"] = Object.keys(apps).find(key => {
+    return apps[key].system_key === conf.selector.app
+  })
+
+  // attach app action if exists
+  coOp["action"] = {
+    id: Object.keys(appActions).find(key => {
+      return appActions[key].operation_key === conf.selector.app_action
+    }),
+    type: "app_action"
   }
+
+  // destract next operations and on errors
+  const nextOpSelector = (conf.next_operation || {}).selector || []
+  const onErrorSelector = (conf.on_error || {}).selector || []
+
+  // attach next operation
+  nextOpSelector.forEach(select => {
+    coOp["next_operation"] = { ...coOp["next_operation"] }
+    coOp["next_operation"][select.workflow] = select.operation
+  })
+
+  // attach on error
+  onErrorSelector.forEach(select => {
+    coOp["on_error"] = { ...coOp["on_error"] }
+    coOp["on_error"][select.workflow] = select.operation
+  })
+
+  // error handling
+  if (!coOp.app_id) {
+    throw new Error(`unable to find related app with system key = ${conf.selector.app}`)
+  }
+
+  if (!coOp.action.id) {
+    throw new Error(`unable to find related app action with operation key = ${conf.selector.app_action}`)
+  }
+
+  // return formatted operation
+  return coOp
 }
 
 /**
@@ -228,8 +301,11 @@ const loadOperationDoc = (conf) => {
  * @returns {object} - Firestore document.
  */
 const loadTranslationDoc = (conf) => {
-  return {
-    docType: toSnakeCase(conf.type),
-    doc: {}
-  }
+  // deep config copy
+  let coTrns = { ...conf }
+
+  // delete unessesary keys
+  delete coTrns.type
+
+  return coTrns
 }
