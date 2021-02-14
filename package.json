@@ -11,10 +11,10 @@
     "@oclif/dev-cli": "^1.26.0",
     "@oclif/test": "^1.2.8",
     "chai": "^4.3.0",
-    "eslint": "^7.19.0",
+    "eslint": "^7.20.0",
     "eslint-config-oclif": "^3.1.0",
     "globby": "^11.0.2",
-    "mocha": "^8.2.1",
+    "mocha": "^8.3.0",
     "nyc": "^15.1.0"
   },
   "engines": {
@@ -56,6 +56,7 @@
     "cli-ux": "^5.5.1",
     "consolidate": "^0.16.0",
     "download-git-repo": "^3.0.2",
+    "express": "^4.17.1",
     "grpc": "^1.24.5",
     "handlebars": "^4.7.6",
     "inquirer": "^7.3.3",
@@ -63,7 +64,7 @@
     "js-yaml": "^4.0.0",
     "jwt-decode": "^3.1.2",
     "metalsmith": "^2.3.0",
-    "open": "^7.4.0",
+    "open": "^7.4.1",
     "rimraf": "^3.0.2"
   }
 }
