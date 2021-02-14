@@ -8,3 +8,12 @@ module.exports.flatten = (arr) => {
     return flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten)
   }, [])
 }
+
+// map conf keys
+exports.CONF_KEYS_MAP = {
+  apps: "system_key",
+  app_actions: "operation_key",
+  operations: "key",
+  workflows: "key",
+  translations: "key",
+}
