@@ -2,7 +2,6 @@ const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
-const { CONF_KEYS_MAP } = require("../utils/formatters")
 const { toSnakeCase, docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const {WorkflowsClient, AppsClient, TranslationsClient, AppActionsClient} = require("../../lib/components")
@@ -83,10 +82,10 @@ class ApplyCommand extends BaseCommand {
 
     // return clients
     return {
-      Workflow: new WorkflowsClient(user, accessToken),
-      App: new AppsClient(user, accessToken),
-      Translation: new TranslationsClient(user, accessToken),
-      AppAction: new AppActionsClient(user, accessToken)
+      Workflow: new WorkflowsClient(accessToken),
+      App: new AppsClient(accessToken),
+      Translation: new TranslationsClient(accessToken),
+      AppAction: new AppActionsClient(accessToken)
     }
   }
 
