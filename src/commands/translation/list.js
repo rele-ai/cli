@@ -26,10 +26,10 @@ class ListCommand extends BaseCommand {
     // try to pull translations
     try {
       // resolve access token and user info
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // init translations client
-      const client = new TranslationsClient(user, accessToken)
+      const client = new TranslationsClient(accessToken)
 
       // create conditions
       const conds = this.args.key ? [["key", "==", this.args.key]] : []

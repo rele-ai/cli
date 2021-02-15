@@ -79,7 +79,7 @@ class ApplyCommand extends BaseCommand {
    */
   async _initClients() {
     // resolve access token and user info
-    const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+    const accessToken = await this.accessToken
 
     // return clients
     return {

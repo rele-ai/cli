@@ -16,11 +16,11 @@ class ListCommand extends BaseCommand {
 
     // try to pull apps
     try {
-      // resolve access token and user info
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // resolve access token
+      const accessToken = await this.accessToken
 
       // init apps client
-      const appsClient = new AppsClient(user, accessToken)
+      const appsClient = new AppsClient(accessToken)
 
       // apps records
       const apps = await appsClient.list()

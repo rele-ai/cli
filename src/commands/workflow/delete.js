@@ -28,11 +28,11 @@ class DeleteCommand extends BaseCommand {
 
     // try to delete the workflow
     try {
-      // resolve access token and user
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // resolve access token
+      const accessToken = await this.accessToken
 
       // init workflows client
-      const client = new WorkflowsClient(user, accessToken)
+      const client = new WorkflowsClient(accessToken)
 
       // delete workflow by key
       await client.deleteByKey(key)

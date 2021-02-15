@@ -28,11 +28,11 @@ class DeleteCommand extends BaseCommand {
 
     // try to delete the application
     try {
-      // resolve access token and user
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // resolve access token
+      const accessToken = await this.accessToken
 
       // init apps client
-      const client = new AppsClient(user, accessToken)
+      const client = new AppsClient(accessToken)
 
       // delete application by key
       await client.deleteByKey(key)

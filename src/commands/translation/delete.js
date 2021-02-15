@@ -29,10 +29,10 @@ class DeleteCommand extends BaseCommand {
     // try to delete the translations
     try {
       // resolve access token and user
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // init apps client
-      const client = new TranslationsClient(user, accessToken)
+      const client = new TranslationsClient(accessToken)
 
       // collect translations records
       const translations = await client.list([["key", "==", this.args.key]])

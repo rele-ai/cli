@@ -16,11 +16,11 @@ class ListCommand extends BaseCommand {
 
     // try to pull workflows
     try {
-      // resolve access token and user info
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // resolve access token
+      const accessToken = await this.accessToken
 
       // init workflows client
-      const client = new WorkflowsClient(user, accessToken)
+      const client = new WorkflowsClient(accessToken)
 
       // collect workflows records
       const workflows = await client.list()
