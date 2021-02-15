@@ -1,5 +1,5 @@
 const glob = require("glob")
-const findPkg = require("pkg-dir")
+const childProcess = require("child_process")
 
 /**
  * Assign value to nested path.
@@ -25,8 +25,11 @@ const _assign = (obj, keyPath, value) => {
  * command groups.
  */
 const generatePluginApi = () => {
+  // global root
+  const npmRoot = childProcess.execSync("npm root -g").toString().trim()
+
   // load all files from rele.ai CLI commands
-  const files = glob.sync(`${findPkg.sync()}/node_modules/@releai/cli/src/commands/**/*.js`)
+  const files = glob.sync(`${npmRoot}/@releai/cli/src/commands/**/*.js`)
 
   // groups and build API
   let api = {}

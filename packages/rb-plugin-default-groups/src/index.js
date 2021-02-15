@@ -63,10 +63,18 @@ const groupOperations = (payload) => {
  * Export default plugin callback
  */
 module.exports = declare((api) => {
-	// // handler group destructuring on apply
-	// api.apply.on("load", destructGroups)
+	// example
+	api.translation.list.on("load", (payload) => {
+		console.log("payload from list before write", payload)
+	})
 
-	// // handler group structuing on list
-	// api.app_action.list.on("load", groupAppActions)
-	// api.operation.list.on("load", groupOperations)
+	// handler group destructuring on apply
+	api.apply.on("load", destructGroups)
+
+	// handler group structuing on list
+	api.app_action.list.on("load", groupAppActions)
+	api.operation.list.on("load", groupOperations)
+
+	// return api
+	return api
 })
