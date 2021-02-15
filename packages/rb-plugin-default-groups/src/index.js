@@ -65,7 +65,10 @@ const groupOperations = (payload) => {
 module.exports = declare((api) => {
 	// example
 	api.translation.list.on("load", (payload) => {
-		console.log("payload from list before write", payload)
+		payload.translations = payload.translations.map((t) => ({
+			...t,
+			_name: "matan"
+		}))
 	})
 
 	// handler group destructuring on apply

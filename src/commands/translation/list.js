@@ -35,15 +35,17 @@ class ListCommand extends BaseCommand {
       const conds = this.args.key ? [["key", "==", this.args.key]] : []
 
       // collect translations records
-      const translations = await client.list(conds)
-
-      // execute before write
-      plugins.translation.list._execute("load", {})
+      const data = {
+        translations: await client.list(conds)
+      }
 
       // check response
-      if (translations && translations.length) {
+      if (data.translations && data.translations.length) {
+        // execute before write
+        plugins.translation.list._execute("load", data)
+
         // return translation records
-        const yamlConf = translations.map((translation) => docToConf("translation", translation)).join("---\n")
+        const yamlConf = data.translations.map((translation) => docToConf("translation", translation)).join("---\n")
 
         // log to user
         this.log(yamlConf)
