@@ -38,9 +38,7 @@ class ListCommand extends BaseCommand {
       const translations = await client.list(conds)
 
       // execute before write
-      plugins.translation.list._execute("beforeWrite", {
-        translation: "translations data"
-      })
+      plugins.translation.list._execute("beforeWrite", {})
 
       // check response
       if (translations && translations.length) {
@@ -54,22 +52,15 @@ class ListCommand extends BaseCommand {
         cli.ux.action.stop()
 
         // execute success
-        plugins.translation.list._execute("success", {
-          translation: "translations data"
-        })
+        plugins.translation.list._execute("success", {})
       } else {
         // execute success
-        plugins.translation.list._execute("error", {
-          translation: "translations data"
-        })
-
+        plugins.translation.list._execute("error", {})
         cli.ux.action.stop("no translations found")
       }
     } catch(error) {
       // execute success
-      plugins.translation.list._execute("error", {
-        translation: "translations data"
-      })
+      plugins.translation.list._execute("error", {})
 
       // handle errors
       cli.ux.action.stop("failed")
