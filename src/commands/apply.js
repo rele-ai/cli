@@ -5,7 +5,7 @@ const { confToDoc } = require("../utils/parser")
 const { CONF_KEYS_MAP } = require("../utils/formatters")
 const { toSnakeCase, docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
-const Clients = require("../../lib/components")
+const {WorkflowsClient, AppsClient, TranslationsClient, AppActionsClient} = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
   // command flags
@@ -20,16 +20,19 @@ class ApplyCommand extends BaseCommand {
   /**
    * Load all selectors data
    */
-  loadSelectorsData(clients) {
+  async loadSelectorsData() {
+    const clients = await this._clients
+
+    // return selector data
     return [
       // load workflow data
-      clients["WorkflowsClient"].list(),
+      clients.Workflow.list(),
 
       // load apps data
-      clients["AppsClient"].list(),
+      clients.App.list(),
 
       // load app actions data
-      clients["AppActionsClient"].list(),
+      clients.AppAction.list(),
     ]
   }
 
@@ -37,30 +40,21 @@ class ApplyCommand extends BaseCommand {
    * generate config record on firestore.
    */
   async _generateRecord(object) {
-    // resolve access token and user info
-    const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
-
-    // init clients
-    let clients = {}
-    Object.keys(Clients).forEach(key => {
-      clients[key] = new Clients[key](user, accessToken)
-    })
+    // get clients
+    const clients = await this._clients
 
     // load selectors data
-    const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(clients))
+    const [workflows, apps, appActions] = await Promise.all(await this.loadSelectorsData())
 
     // pull client by type
-    const client = clients[`${object.type}sClient`]
-
-    // define snakeCase config type
-    const snakeCaseType = toSnakeCase(object.type)
+    const client = clients[object.type]
 
     // check if the config is already exists
     const config = await client.getByKey(object.key)
 
     // define the data object
     const data = {
-      [snakeCaseType]: confToDoc(
+      [toSnakeCase(object.type)]: confToDoc(
         object.type,
         object,
         {
@@ -80,35 +74,53 @@ class ApplyCommand extends BaseCommand {
     }
   }
 
+  /**
+   * Init clients
+   */
+  async _initClients() {
+    // resolve access token and user info
+    const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+
+    // return clients
+    return {
+      Workflow: new WorkflowsClient(user, accessToken),
+      App: new AppsClient(user, accessToken),
+      Translation: new TranslationsClient(user, accessToken),
+      AppAction: new AppActionsClient(user, accessToken)
+    }
+  }
+
   async run() {
     try {
       // start spinner
       cli.ux.action.start("Applying configuration file...")
+
+      // collect init clients promises
+      this._clients = this._initClients()
 
       // destract path
       const { path } = this.flags
 
       // format yaml to array of objects
       const yamlData = readConfig(path)
+      // const docs = yamlData.map(toDoc)
 
       // destract stages
       const [firstStage = [], secondStage = []] = stagesByTypes(yamlData)
 
       // collect first stage promises
-      const firstStagePrm = firstStage.map(async object => {
-        return this._generateRecord(object)
-      })
-
-      // resolve first stage promises
-      await Promise.all(firstStagePrm)
+      await Promise.all(
+        firstStage.map(async object => {
+          return this._generateRecord(object)
+        })
+      )
 
       // collect second stage promises
-      const secondStagePrm = secondStage.map(async object => {
-        return this._generateRecord(object)
-      })
-
-      // resolve first stage promises
-      await Promise.all(secondStagePrm)
+      await Promise.all(
+        secondStage.map(async object => {
+          return this._generateRecord(object)
+        })
+      )
 
       // stop spinner
       cli.ux.action.stop()
