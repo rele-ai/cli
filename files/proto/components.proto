@@ -614,6 +614,8 @@ message Workflow {
 message WorkflowMatch {
   string callback = 1;
   string input = 2;
+  string payload = 3;
+  int32 weight = 4;
 }
 
 // message AppAction
