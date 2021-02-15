@@ -21,10 +21,10 @@ class ListCommand extends BaseCommand {
   /**
    * Load all selectors data
    */
-  loadSelectorsData(user, accessToken) {
+  loadSelectorsData(accessToken) {
     // load apps data
     return [
-      (new AppsClient(user, accessToken)).list()
+      (new AppsClient(accessToken)).list()
     ]
   }
 
@@ -48,13 +48,13 @@ class ListCommand extends BaseCommand {
     // try to pull apps
     try {
       // resolve access token and user info
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // load selectors data
-      const [apps] = await Promise.all(this.loadSelectorsData(user, accessToken))
+      const [apps] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init app actions client
-      const client = new AppActionsClient(user, accessToken)
+      const client = new AppActionsClient(accessToken)
 
       // build conditions
       const conds = this.flags.appKey ? [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]] : []

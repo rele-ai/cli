@@ -38,16 +38,16 @@ class GetCommand extends BaseCommand {
   /**
    * Load all selectors data
    */
-  loadSelectorsData(user, accessToken) {
+  loadSelectorsData(accessToken) {
     return [
       // load workflow data
-      (new WorkflowsClient(user, accessToken)).list(),
+      (new WorkflowsClient(accessToken)).list(),
 
       // load apps data
-      (new AppsClient(user, accessToken)).list(),
+      (new AppsClient(accessToken)).list(),
 
       // load app actions data
-      (new AppActionsClient(user, accessToken)).list(),
+      (new AppActionsClient(accessToken)).list(),
     ]
   }
 
@@ -77,13 +77,13 @@ class GetCommand extends BaseCommand {
       cli.ux.action.start(`Pulling operation ${key}`)
 
       // resolve access token
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(user, accessToken))
+      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init operation client
-      const client = new OperationsClient(user, accessToken)
+      const client = new OperationsClient(accessToken)
 
       // get operation record
       const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])

@@ -21,16 +21,16 @@ class ListCommand extends BaseCommand {
   /**
    * Load all selectors data
    */
-  loadSelectorsData(user, accessToken) {
+  loadSelectorsData(accessToken) {
     return [
       // load workflow data
-      (new WorkflowsClient(user, accessToken)).list(),
+      (new WorkflowsClient(accessToken)).list(),
 
       // load apps data
-      (new AppsClient(user, accessToken)).list(),
+      (new AppsClient(accessToken)).list(),
 
       // load app actions data
-      (new AppActionsClient(user, accessToken)).list(),
+      (new AppActionsClient(accessToken)).list(),
     ]
   }
 
@@ -53,14 +53,14 @@ class ListCommand extends BaseCommand {
 
     // try to pull operations
     try {
-      // resolve access token and user info
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // resolve access token
+      const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(user, accessToken))
+      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init operations client
-      const client = new OperationsClient(user, accessToken)
+      const client = new OperationsClient(accessToken)
 
       // build conditions
       const conds = this.flags.workflowKey ? [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]] : []

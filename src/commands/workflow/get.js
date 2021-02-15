@@ -43,10 +43,10 @@ class GetCommand extends BaseCommand {
       cli.ux.action.start(`Pulling workflow ${key}`)
 
       // resolve access token
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // init workflow client
-      const client = new WorkflowsClient(user, accessToken)
+      const client = new WorkflowsClient(accessToken)
 
       // get workflow record
       const workflow = await client.getByKey(key)

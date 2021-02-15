@@ -43,10 +43,10 @@ class GetCommand extends BaseCommand {
       cli.ux.action.start(`Pulling application ${key}`)
 
       // resolve access token
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // init apps client
-      const appsClient = new AppsClient(user, accessToken)
+      const appsClient = new AppsClient(accessToken)
 
       // get app record
       const app = await appsClient.getByKey(key)

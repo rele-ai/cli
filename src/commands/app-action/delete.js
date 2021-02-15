@@ -30,10 +30,10 @@ class DeleteCommand extends BaseCommand {
   /**
    * Load all selectors data
    */
-  loadSelectorsData(user, accessToken) {
+  loadSelectorsData(accessToken) {
     // load apps data
     return [
-      (new AppsClient(user, accessToken)).list()
+      (new AppsClient(accessToken)).list()
     ]
   }
 
@@ -59,14 +59,14 @@ class DeleteCommand extends BaseCommand {
 
     // try to delete the app action
     try {
-      // resolve access token and user
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      // resolve access token
+      const accessToken = await this.accessToken
 
       // load selectors data
-      const [apps] = await Promise.all(this.loadSelectorsData(user, accessToken))
+      const [apps] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init apps client
-      const client = new AppActionsClient(user, accessToken)
+      const client = new AppActionsClient(accessToken)
 
       // delete app action by key
       await client.deleteByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]])

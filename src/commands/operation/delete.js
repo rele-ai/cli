@@ -30,10 +30,10 @@ class DeleteCommand extends BaseCommand {
   /**
    * Load all selectors data
    */
-  loadSelectorsData(user, accessToken) {
+  loadSelectorsData(accessToken) {
     return [
       // load workflow data
-      (new WorkflowsClient(user, accessToken)).list(),
+      (new WorkflowsClient(accessToken)).list(),
     ]
   }
 
@@ -60,13 +60,13 @@ class DeleteCommand extends BaseCommand {
     // try to delete the operation
     try {
       // resolve access token and user
-      const [accessToken, { user }] = await Promise.all([this.accessToken, this.user])
+      const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows] = await Promise.all(this.loadSelectorsData(user, accessToken))
+      const [workflows] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init operations client
-      const client = new OperationsClient(user, accessToken)
+      const client = new OperationsClient(accessToken)
 
       // delete operation by key
       await client.deleteByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
