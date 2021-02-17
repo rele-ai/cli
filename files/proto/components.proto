@@ -251,6 +251,9 @@ message UpdateRequest {
 
   // ignore flatten function
   bool ignore_flatten = 11;
+
+  // override record
+  bool override = 12;
 }
 
 // object id message
