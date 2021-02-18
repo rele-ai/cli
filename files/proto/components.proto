@@ -244,7 +244,7 @@ message UpdateRequest {
     Workflow workflow = 5;
     App app = 6;
     Trigger trigger = 7;
-    google.protobuf.Value operation = 8;
+    Operation operation = 8;
     AppAction app_action = 9;
     Translation translation = 10;
   }
@@ -518,9 +518,9 @@ message App {
 
 // message AppRequest
 message AppRequest {
-  map<string, OperationPayload> headers = 1;
-  map<string, OperationPayload> query = 2;
-  map<string, OperationPayload> body = 3;
+  map<string, AppRequestPayload> headers = 1;
+  map<string, AppRequestPayload> query = 2;
+  map<string, AppRequestPayload> body = 3;
 }
 
 // message ConfigBuild
@@ -540,7 +540,7 @@ message Operation {
   OperationAction action = 2;
   bool is_root = 3;
   OperationRedis redis = 4;
-  map<string,OperationPayload> payload = 5;
+  map<string, OperationPayload> payload = 5;
   OperationOutput output = 6;
   repeated string workflows = 7;
   map<string, string> next_operation = 8;
@@ -558,10 +558,18 @@ message OperationRedis {
 
 // message OperationPayload
 message OperationPayload {
-  string data = 1;
+  google.protobuf.Value data = 1;
   string type = 2;
   string rkey_type = 3;
   map<string, OperationPayload> vars = 4;
+}
+
+// message AppRequestPayload
+message AppRequestPayload {
+  string data = 1;
+  string type = 2;
+  string rkey_type = 3;
+  map<string, AppRequestPayload> vars = 4;
 }
 
 // message OperationOutput
@@ -582,6 +590,12 @@ message FormatFunctionObj {
   string operation = 1;
   string output = 2;
   OperationPayload value = 3;
+  FormatFunctionArgs args = 4;
+}
+
+// message FormatFunctionArgs
+message FormatFunctionArgs {
+  int32 amount = 1;
 }
 
 // message RedisFunctionsObj
@@ -635,9 +649,9 @@ message AppAction {
 // message AppActionRequest
 message AppActionRequest {
   string method = 1;
-  map<string,OperationPayload> headers = 2;
-  map<string,OperationPayload> body = 3;
-  map<string,OperationPayload> query = 4;
+  map<string,AppRequestPayload> headers = 2;
+  map<string,AppRequestPayload> body = 3;
+  map<string,AppRequestPayload> query = 4;
 }
 
 // load app keys request message
@@ -732,7 +746,7 @@ message GetOperationRequest {
 }
 
 message GetOperationResponse {
-  google.protobuf.Value operation = 1;
+  Operation operation = 1;
 }
 
 message ListOperationRequest {
@@ -740,11 +754,11 @@ message ListOperationRequest {
 }
 
 message ListOperationResponse {
-  repeated google.protobuf.Value operations = 1;
+  repeated Operation operations = 1;
 }
 
 message CreateOperationRequest {
-  google.protobuf.Value operation = 1;
+  Operation operation = 1;
 }
 
 message CreateOperationResponse {
