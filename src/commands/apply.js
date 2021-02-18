@@ -4,7 +4,13 @@ const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const { toSnakeCase, docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
-const {WorkflowsClient, AppsClient, TranslationsClient, AppActionsClient} = require("../../lib/components")
+const {
+  WorkflowsClient,
+  AppsClient,
+  TranslationsClient,
+  AppActionsClient,
+  OperationsClient
+} = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
   // command flags
@@ -85,7 +91,8 @@ class ApplyCommand extends BaseCommand {
       Workflow: new WorkflowsClient(accessToken),
       App: new AppsClient(accessToken),
       Translation: new TranslationsClient(accessToken),
-      AppAction: new AppActionsClient(accessToken)
+      AppAction: new AppActionsClient(accessToken),
+      Operation: new OperationsClient(accessToken),
     }
   }
 

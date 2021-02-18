@@ -3,7 +3,7 @@ syntax = "proto3";
 package components;
 
 option go_package = "github.com/rele-ai/rb/src/integrations-gw/internal/components";
-
+import "google/protobuf/struct.proto";
 
 // ------------ Users Service -------------
 service Users {
@@ -244,7 +244,7 @@ message UpdateRequest {
     Workflow workflow = 5;
     App app = 6;
     Trigger trigger = 7;
-    Operation operation = 8;
+    google.protobuf.Value operation = 8;
     AppAction app_action = 9;
     Translation translation = 10;
   }
@@ -732,7 +732,7 @@ message GetOperationRequest {
 }
 
 message GetOperationResponse {
-  Operation operation = 1;
+  google.protobuf.Value operation = 1;
 }
 
 message ListOperationRequest {
@@ -740,11 +740,11 @@ message ListOperationRequest {
 }
 
 message ListOperationResponse {
-  repeated Operation operations = 1;
+  repeated google.protobuf.Value operations = 1;
 }
 
 message CreateOperationRequest {
-  Operation operation = 1;
+  google.protobuf.Value operation = 1;
 }
 
 message CreateOperationResponse {
