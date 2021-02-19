@@ -112,7 +112,7 @@ class ApplyCommand extends BaseCommand {
       // const docs = yamlData.map(toDoc)
 
       // destract stages
-      const [firstStage = [], secondStage = []] = stagesByTypes(yamlData)
+      const [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(yamlData)
 
       // collect first stage promises
       await Promise.all(
@@ -124,6 +124,13 @@ class ApplyCommand extends BaseCommand {
       // collect second stage promises
       await Promise.all(
         secondStage.map(async object => {
+          return this._generateRecord(object)
+        })
+      )
+
+      // collect third stage promises
+      await Promise.all(
+        thirdStage.map(async object => {
           return this._generateRecord(object)
         })
       )
