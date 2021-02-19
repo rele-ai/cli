@@ -562,6 +562,8 @@ message OperationPayload {
   string type = 2;
   string rkey_type = 3;
   map<string, OperationPayload> vars = 4;
+  map<string, string> next_operation = 5;
+  string match_operation = 6;
 }
 
 // message AppRequestPayload
