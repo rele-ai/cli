@@ -249,29 +249,25 @@ const loadWorkflowDoc = (conf) => {
  * @returns {object} - Firestore document.
  */
 const loadOperationDoc = (conf, apps, appActions, workflows) => {
-  // deep config copy
-  let coOp = { ...conf }
-
-  // delete unessesary keys
-  delete coOp.type
-  delete coOp.selector
-  delete coOp.next_operation
-  delete coOp.on_error
-
-  // attach workflows
-  coOp["workflows"] = conf.selector.workflow
-
-  // find related app id
-  coOp["app_id"] = Object.keys(apps).find(key => {
-    return apps[key].system_key === conf.selector.app
-  })
-
-  // attach app action if exists
-  coOp["action"] = {
-    id: Object.keys(appActions).find(key => {
-      return appActions[key].operation_key === conf.selector.app_action
-    }),
-    type: "app_action"
+  // define base json operation
+  const baseOperation = {
+    workflows: Object.keys(workflows).filter(
+      workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
+    ),
+    app_id: Object.keys(apps).find(key => apps[key].system_key === conf.selector.app),
+    payload: conf.payload || {},
+    action: {
+      id: Object.keys(appActions).find(key =>
+        appActions[key].operation_key === conf.selector.app_action
+      ),
+      type: "app_action"
+    },
+    redis: conf.redis || {},
+    input: conf.input || {},
+    output: conf.output || {},
+    next_operation: {},
+    on_error: {},
+    key: conf.key
   }
 
   // destract next operations and on errors
@@ -280,27 +276,37 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
 
   // attach next operation
   nextOpSelector.forEach(select => {
-    coOp["next_operation"] = { ...coOp["next_operation"] }
-    coOp["next_operation"][select.workflow] = select.operation
+    // find workflow id by key
+    const workflowId = Object.keys(workflows || {}).find(
+      workflowId => workflows[workflowId].key === select.workflow
+    )
+
+    // set next operation by workflow id
+    baseOperation.next_operation[workflowId] = select.operation
   })
 
   // attach on error
   onErrorSelector.forEach(select => {
-    coOp["on_error"] = { ...coOp["on_error"] }
-    coOp["on_error"][select.workflow] = select.operation
+    // find workflow id by key
+    const workflowId = Object.keys(workflows || {}).find(
+      workflowId => workflows[workflowId].key === select.workflow
+    )
+
+    // set on error by workflow id
+    baseOperation.on_error[workflowId] = select.operation
   })
 
   // error handling
-  if (!coOp.app_id) {
+  if (!baseOperation.app_id) {
     throw new Error(`unable to find related app with system key = ${conf.selector.app}`)
   }
 
-  if (!coOp.action.id) {
+  if (!baseOperation.action.id) {
     throw new Error(`unable to find related app action with operation key = ${conf.selector.app_action}`)
   }
 
   // return formatted operation
-  return coOp
+  return baseOperation
 }
 
 /**
