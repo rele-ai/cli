@@ -72,9 +72,9 @@ class ImportCommand extends BaseCommand {
 
         // check if translation exists
         if (conf) {
-          return client.updateById(conf.id, translation)
+          return client.updateById(conf.id, { translation })
         } else {
-          return client.create(translation)
+          return client.create({ translation })
         }
       })
     )
