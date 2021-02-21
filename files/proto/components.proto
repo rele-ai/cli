@@ -132,6 +132,9 @@ service Operations {
 
   // create trugger by id
   rpc Create (CreateOperationRequest) returns (CreateOperationResponse) {}
+
+  // create operations endpoint
+  rpc CreateRecords (CreateOperationsRequest) returns (CreateOperationsResponse) {}
 }
 
 // ------------ Workflows Service -------------
@@ -1004,4 +1007,14 @@ message Translation {
   string lang = 2;
   string value = 3;
   string id = 4;
+}
+
+// message CreateOperationsRequest
+message CreateOperationsRequest {
+  repeated Operation records = 1;
+}
+
+// message CreateOperationsResponse
+message CreateOperationsResponse {
+  repeated string ids = 1;
 }
