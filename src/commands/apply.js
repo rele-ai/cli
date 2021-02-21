@@ -50,17 +50,15 @@ class ApplyCommand extends BaseCommand {
     const [workflows, apps, appActions] = await Promise.all(await this.loadSelectorsData())
 
     // define the data object
-    return {
-      [toSnakeCase(object.type)]: confToDoc(
-        object.type,
-        object,
-        {
-          workflows: docListToObj(workflows),
-          apps: docListToObj(apps),
-          appActions: docListToObj(appActions),
-        }
-      )
-    }
+    return confToDoc(
+      object.type,
+      object,
+      {
+        workflows: docListToObj(workflows),
+        apps: docListToObj(apps),
+        appActions: docListToObj(appActions),
+      }
+    )
   }
 
   /**
@@ -72,10 +70,9 @@ class ApplyCommand extends BaseCommand {
 
     // format operations confs to
     // operations docs
-    const operationsDocs = (
-      await Promise.all(
-        operationsConfs.map(conf => this._formatConfToDoc(conf))
-    )).map(opDoc => opDoc.operation)
+    const operationsDocs = await Promise.all(
+      operationsConfs.map(conf => this._formatConfToDoc(conf))
+    )
 
     // create operations records
     await clients.Operation.createRecords(operationsDocs)
