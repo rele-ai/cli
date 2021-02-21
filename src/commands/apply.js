@@ -26,7 +26,7 @@ class ApplyCommand extends BaseCommand {
    * Load all selectors data
    */
   async loadSelectorsData() {
-    const clients = await this._clients
+    const clients = await this._initClients()
 
     // return selector data
     return [
@@ -42,23 +42,15 @@ class ApplyCommand extends BaseCommand {
   }
 
   /**
-   * generate config record on firestore.
+   * _formatConfToDoc takes an object in YAML
+   * format and convert it to JSON.
    */
-  async _generateRecord(object) {
-    // get clients
-    const clients = await this._clients
-
+  async _formatConfToDoc(object) {
     // load selectors data
     const [workflows, apps, appActions] = await Promise.all(await this.loadSelectorsData())
 
-    // pull client by type
-    const client = clients[object.type]
-
-    // check if the config is already exists
-    const config = await client.getByKey(object.key)
-
     // define the data object
-    const data = {
+    return {
       [toSnakeCase(object.type)]: confToDoc(
         object.type,
         object,
@@ -69,6 +61,41 @@ class ApplyCommand extends BaseCommand {
         }
       )
     }
+  }
+
+  /**
+   * generate operations records on firestore.
+   */
+  async _generateOperations(operationsConfs) {
+    // define clients
+    const clients = await this._clients
+
+    // format operations confs to
+    // operations docs
+    const operationsDocs = (
+      await Promise.all(
+        operationsConfs.map(conf => this._formatConfToDoc(conf))
+    )).map(opDoc => opDoc.operation)
+
+    // create operations records
+    await clients.Operation.createRecords(operationsDocs)
+  }
+
+  /**
+   * generate config record on firestore.
+   */
+  async _generateRecord(object) {
+    // get clients
+    const clients = await this._clients
+
+    // pull client by type
+    const client = clients[object.type]
+
+    // format conf to doc
+    const data = await this._formatConfToDoc(object)
+
+    // check if the config is already exists
+    const config = await client.getByKey(object.key)
 
     if (config) {
       // update config
@@ -112,7 +139,7 @@ class ApplyCommand extends BaseCommand {
       // const docs = yamlData.map(toDoc)
 
       // destract stages
-      const [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(yamlData)
+      let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(yamlData)
 
       // collect first stage promises
       await Promise.all(
@@ -129,11 +156,7 @@ class ApplyCommand extends BaseCommand {
       )
 
       // collect third stage promises
-      await Promise.all(
-        thirdStage.map(async object => {
-          return this._generateRecord(object)
-        })
-      )
+      await this._generateOperations(thirdStage)
 
       // stop spinner
       cli.ux.action.stop()
