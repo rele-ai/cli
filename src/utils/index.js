@@ -61,20 +61,25 @@ module.exports.sortByTypes = (data) => {
  */
 module.exports.stagesByTypes = (data) => {
   // define stages
-  let firstStage = [], secondStage = []
+  let firstStage = [], secondStage = [], thirdStage = []
 
   // first stage identifier
   const firstStageIdentifiers = ["App", "Workflow", "Translation"]
+
+  // second stage identifier
+  const secondStageIdentifiers = ["AppAction"]
 
   // add to stages
   data.forEach(object => {
     if (firstStageIdentifiers.includes(object.type)) {
       firstStage.push(object)
-    } else {
+    } else if (secondStageIdentifiers.includes(object.type)) {
       secondStage.push(object)
+    } else {
+      thirdStage.push(object)
     }
   })
 
   // return stages
-  return [firstStage, secondStage]
+  return [firstStage, secondStage, thirdStage]
 }

@@ -4,7 +4,13 @@ const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
 const { toSnakeCase, docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
-const {WorkflowsClient, AppsClient, TranslationsClient, AppActionsClient} = require("../../lib/components")
+const {
+  WorkflowsClient,
+  AppsClient,
+  TranslationsClient,
+  AppActionsClient,
+  OperationsClient
+} = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
   // command flags
@@ -85,7 +91,8 @@ class ApplyCommand extends BaseCommand {
       Workflow: new WorkflowsClient(accessToken),
       App: new AppsClient(accessToken),
       Translation: new TranslationsClient(accessToken),
-      AppAction: new AppActionsClient(accessToken)
+      AppAction: new AppActionsClient(accessToken),
+      Operation: new OperationsClient(accessToken),
     }
   }
 
@@ -105,7 +112,7 @@ class ApplyCommand extends BaseCommand {
       // const docs = yamlData.map(toDoc)
 
       // destract stages
-      const [firstStage = [], secondStage = []] = stagesByTypes(yamlData)
+      const [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(yamlData)
 
       // collect first stage promises
       await Promise.all(
@@ -117,6 +124,13 @@ class ApplyCommand extends BaseCommand {
       // collect second stage promises
       await Promise.all(
         secondStage.map(async object => {
+          return this._generateRecord(object)
+        })
+      )
+
+      // collect third stage promises
+      await Promise.all(
+        thirdStage.map(async object => {
           return this._generateRecord(object)
         })
       )
