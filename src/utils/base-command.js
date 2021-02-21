@@ -64,6 +64,21 @@ class BaseCommand extends Command {
   }
 
   /**
+   * Load user from components service
+   */
+  get user() {
+    return this.jwt
+      .then(async decodeJwt => {
+        const accessToken = await this.accessToken
+        return (new UsersClient(accessToken)).getById(decodeJwt.userFsId)
+      })
+      .then((response) => {
+        return response.user
+      })
+  }
+
+
+  /**
    * Parse default flags and args
    * into this
    */
