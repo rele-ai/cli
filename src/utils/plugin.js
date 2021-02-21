@@ -51,7 +51,7 @@ const _loadPluginsList = () => {
  */
 const loadPlugins = () => {
   // load api
-  let api
+  let api = {}
 
   // collect plugins data from configs
   // load all plugins as callbacks

@@ -18,7 +18,7 @@ const run = () => {
   }
 
   // copy files
-  fs.copySync(LOCAL_CONFIG_DIR, CONFIG_DIR)
+  fs.copySync(`${LOCAL_CONFIG_DIR}/.rbc.js`, CONFIG_DIR, { overwrite: true })
 }
 
 // execute script
