@@ -251,6 +251,7 @@ const loadWorkflowDoc = (conf) => {
 const loadOperationDoc = (conf, apps, appActions, workflows) => {
   // define base json operation
   const baseOperation = {
+    is_root: conf.is_root,
     workflows: Object.keys(workflows).filter(
       workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
     ),
