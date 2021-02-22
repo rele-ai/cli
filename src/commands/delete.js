@@ -54,6 +54,7 @@ class DeleteCommand extends BaseCommand {
     switch (object.type) {
     case "Translation":
       conditions.push(["lang", "==", object.lang])
+      break
     default:
       break
     }
