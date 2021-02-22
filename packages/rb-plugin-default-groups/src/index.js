@@ -1,19 +1,20 @@
+const utils = require("./utils")
+const converters = require("./converters")
 const { declare } = require("@releai/helper-plugin-utils")
 
 /**
  * Destruct given groups into matching objects.
  *
  * @param {object} payload - Command payload.
+ * @param {object} metadata - Additional required resources.
  * @returns {Array.<object>}
  */
-const destructGroups = (payload) => {
-	if (payload.configs) {
-		return payload.configs.flatMap((doc) => {
+const destructGroups = (payload, metadata) => {
+	if (payload.yamlData) {
+		payload.yamlData = payload.yamlData.flatMap((doc) => {
 			switch (doc.type) {
-				case "app_action":
-					return destructAppActions(doc)
-				case "operation":
-					return destructOperations(doc)
+				case "Operation":
+					return destructOperations(doc, metadata)
 				default:
 					return doc
 			}
@@ -24,21 +25,21 @@ const destructGroups = (payload) => {
 }
 
 /**
- * Destruct given app actions into matching objects.
- *
- * @param {object} doc - Config document.
- */
-const destructAppActions = (doc) => {
-	console.log("destruct app action", doc)
-}
-
-/**
  * Destruct given operations into matching objects.
  *
  * @param {object} doc - Config document.
+ * @param {object} metadata - Additional required resources.
  */
-const destructOperations = (doc) => {
-	console.log("destruct operation", doc)
+const destructOperations = (doc, metadata) => {
+	// get group
+	const group = converters(doc, metadata).find((g) => g.filters.reduce((filter => utils.checkFilter(filter))))
+
+	// check if group exists
+	if (group) {
+		return group.convert_with
+	} else {
+		return doc
+	}
 }
 
 /**
@@ -63,14 +64,6 @@ const groupOperations = (payload) => {
  * Export default plugin callback
  */
 module.exports = declare((api) => {
-	// example
-	api.translation.list.on("load", (payload) => {
-		payload.translations = payload.translations.map((t) => ({
-			...t,
-			_name: "matan"
-		}))
-	})
-
 	// handler group destructuring on apply
 	api.apply.on("load", destructGroups)
 

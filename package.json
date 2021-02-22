@@ -60,7 +60,6 @@
     "csv": "^5.3.2",
     "download-git-repo": "^3.0.2",
     "express": "^4.17.1",
-    "fs-extra": "^9.1.0",
     "grpc": "^1.24.5",
     "handlebars": "^4.7.7",
     "inquirer": "^7.3.3",

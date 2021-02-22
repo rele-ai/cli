@@ -1,7 +1,8 @@
 const cli = require("cli-ux")
+const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
-const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
+const { readConfig } = require("../utils/readers")
 const { docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const {
@@ -87,9 +88,6 @@ class ApplyCommand extends BaseCommand {
    * generate operations records on firestore.
    */
   async _generateOperations(operationsConfs) {
-    // define clients
-    const clients = await this._clients
-
     // format operations confs to
     // operations docs
     const operationsDocs = await Promise.all(
@@ -97,18 +95,15 @@ class ApplyCommand extends BaseCommand {
     )
 
     // create operations records
-    await clients.Operation.createRecords(operationsDocs)
+    await this._clients.Operation.createRecords(operationsDocs)
   }
 
   /**
    * generate config record on firestore.
    */
   async _generateRecord(object) {
-    // get clients
-    const clients = await this._clients
-
     // pull client by type
-    const client = clients[object.type]
+    const client = this._clients[object.type]
 
     // format conf to doc
     const data = await this._formatConfToDoc(object)
@@ -148,20 +143,27 @@ class ApplyCommand extends BaseCommand {
   async run() {
     try {
       // start spinner
-      cli.ux.action.start("Applying configuration file...")
+      cli.ux.action.start("Applying configuration file")
 
       // collect init clients promises
-      this._clients = this._initClients()
+      this._clients = await this._initClients()
 
       // destract path
       const { path } = this.flags
 
       // format yaml to array of objects
-      const yamlData = readConfig(path)
-      // const docs = yamlData.map(toDoc)
+      const data = { yamlData: readConfig(path) }
+      plugin.apply._execute(
+        "load",
+        data,
+        {
+          operations: docListToObj(await this._clients.Operation.list()),
+          workflows: docListToObj(await this._clients.Workflow.list())
+        }
+      )
 
       // destract stages
-      let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(yamlData)
+      let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(data.yamlData)
 
       // collect first stage promises
       await Promise.all(
@@ -182,8 +184,8 @@ class ApplyCommand extends BaseCommand {
 
       // stop spinner
       cli.ux.action.stop()
-      this.log("Configuration file applied successfully.")
     } catch (error) {
+      console.error(error)
       cli.ux.action.stop("failed")
       this.error(`Unable to apply configuration file.\n${error}`)
     }

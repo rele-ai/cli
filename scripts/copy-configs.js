@@ -1,6 +1,6 @@
+const fs = require("fs")
 const os = require("os")
 const path = require("path")
-const fs = require("fs-extra")
 
 // global constansts
 const RB_DIR = `${os.homedir()}/.rb`
@@ -18,7 +18,7 @@ const run = () => {
   }
 
   // copy files
-  fs.copySync(`${LOCAL_CONFIG_DIR}/.rbc.js`, CONFIG_DIR, { overwrite: true })
+  fs.copyFileSync(`${LOCAL_CONFIG_DIR}/.rbc.js`, `${CONFIG_DIR}/.rbc.js`)
 }
 
 // execute script
