@@ -2,7 +2,7 @@ const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
-const { toSnakeCase, docListToObj, stagesByTypes } = require("../utils/index")
+const { docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const {
   WorkflowsClient,
@@ -62,6 +62,27 @@ class ApplyCommand extends BaseCommand {
   }
 
   /**
+   * _getConditionsList checks if extra conditions
+   * for getByKey request are nessesary.
+   */
+  _getConditionsList(object) {
+    // defines conditions list
+    let conditions = []
+
+    // checks if extra conditions
+    // needed
+    switch (object.type) {
+    case "Translation":
+      conditions.push(["lang", "==", object.lang])
+    default:
+      break
+    }
+
+    // return extra conditions
+    return conditions
+  }
+
+  /**
    * generate operations records on firestore.
    */
   async _generateOperations(operationsConfs) {
@@ -91,12 +112,15 @@ class ApplyCommand extends BaseCommand {
     // format conf to doc
     const data = await this._formatConfToDoc(object)
 
+    // get additional conditions
+    const conditions = this._getConditionsList(object)
+
     // check if the config is already exists
-    const config = await client.getByKey(object.key)
+    const config = await client.getByKey(object.key, conditions)
 
     if (config) {
       // update config
-      return client.updateByKey(object.key, data)
+      return client.updateById(config.id, data)
     } else {
       // create config
       return client.create(data)

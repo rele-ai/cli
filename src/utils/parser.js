@@ -281,8 +281,12 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
       workflowId => workflows[workflowId].key === select.workflow
     )
 
-    // set next operation by workflow id
-    baseOperation.next_operation[workflowId] = select.operation
+    if (workflowId) {
+      // set next operation by workflow id
+      baseOperation.next_operation[workflowId] = select.operation
+    } else {
+      throw new Error(`You try to upload a operation with unknown workflow with key = ${select.workflow}. please make sure you upload also the workflow that belongs to this operation.`)
+    }
   })
 
   // attach on error
@@ -292,8 +296,12 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
       workflowId => workflows[workflowId].key === select.workflow
     )
 
-    // set on error by workflow id
-    baseOperation.on_error[workflowId] = select.operation
+    if (workflowId) {
+      // set on error by workflow id
+      baseOperation.on_error[workflowId] = select.operation
+    } else {
+      throw new Error(`You try to upload a operation with unknown workflow with key = ${select.workflow}. please make sure you upload also the workflow that belongs to this operation.`)
+    }
   })
 
   // error handling
