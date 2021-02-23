@@ -31,8 +31,8 @@ module.exports = async (config, { accessToken }) => {
                         operation: (operationsMap[config.key] || {})[selector.workflow] ? operationsMap[config.key][selector.workflow] : `${uuidv4()}_get_notification`
                     }))
                 },
-                output: {},
-                redis: {},
+                output: ((config.next_operation || {}).selector || []).length === 0 ? config.output : {},
+                redis: ((config.next_operation || {}).selector || []).length === 0 ? config.redis : {},
             }
 
             const item = {
