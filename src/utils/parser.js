@@ -274,12 +274,26 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
       ),
       type: "app_action"
     },
-    redis: conf.redis || {},
+    redis: {},
     input: conf.input || {},
     output: conf.output || {},
     next_operation: {},
     on_error: {},
     key: conf.key
+  }
+
+  // attach redis field
+  if ((conf.redis || {}).field) {
+    baseOperation.redis.field = conf.redis.field
+  } else {
+    baseOperation.redis.field = conf.key
+  }
+
+  // attach redis type
+  if ((conf.redis || {}).type) {
+    baseOperation.redis.type = conf.redis.type
+  } else {
+    baseOperation.redis.type = "hash_map"
   }
 
   // destract next operations and on errors
