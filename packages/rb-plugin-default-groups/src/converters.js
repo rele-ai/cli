@@ -28,7 +28,7 @@ module.exports = async (config, { accessToken }) => {
                 next_operation: {
                     selector: ((config.next_operation || {}).selector || []).map((selector) => ({
                         workflow: selector.workflow,
-                        operation: (operationsMap[config.key] || {})[selector.workflow] ? operationsMap[config.key][selector.workflow] : `${uuidv4()}_get_notification`
+                        operation: (operationsMap[config.key] || {})[selector.workflow] ? operationsMap[config.key][selector.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
                     }))
                 },
                 output: ((config.next_operation || {}).selector || []).length === 0 ? config.output : {},
@@ -46,13 +46,49 @@ module.exports = async (config, { accessToken }) => {
                         type: "raw"
                     }
                 },
-                convert_with: [
+                ungroup: [
                     baseOperation
-                ]
+                ],
+                group(operationsToGroup) {
+                    let payload = {}
+                    let rootOperation = {}
+                    let internalOperations = []
+
+                    operationsToGroup.forEach((op) => {
+                        // structure operations
+                        if (op.key.startsWith("__rb_internal")) {
+                            internalOperations.push(op)
+                        } else {
+                            rootOperation = op
+                        }
+
+                        // build payload
+                        payload = {
+                            ...payload,
+                            ...op.payload
+                        }
+                    })
+
+                    // return grouped operation
+                    return {
+                        type: "Operation",
+                        selector: rootOperation.selector,
+                        is_root: rootOperation.is_root,
+                        next_operation: {
+                            selector: internalOperations.map((io) => io.next_operation.selector).flat()
+                        },
+                        on_error: rootOperation.on_error,
+                        output: internalOperations.length ? internalOperations[0].output : rootOperation.output,
+                        input: rootOperation.input,
+                        redis: internalOperations.length ? internalOperations[0].redis : rootOperation.redis,
+                        payload,
+                        key: rootOperation.key
+                    }
+                }
             }
 
             baseOperation.next_operation.selector.forEach((selector) => {
-                item.convert_with.push({
+                item.ungroup.push({
                     type: "Operation",
                     selector: {
                         app: "clara",

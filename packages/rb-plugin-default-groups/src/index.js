@@ -40,19 +40,10 @@ const destructOperations = async (doc, metadata) => {
 
 	// check if group exists
 	if (group) {
-		return group.convert_with
+		return group.ungroup
 	} else {
 		return doc
 	}
-}
-
-/**
- * Group app actions objects into a single config.
- *
- * @param {object} payload - Command payload.
- */
-const groupAppActions = (payload) => {
-	console.log("group app action", payload)
 }
 
 /**
@@ -60,8 +51,33 @@ const groupAppActions = (payload) => {
  *
  * @param {object} payload - Command payload.
  */
-const groupOperations = (payload) => {
-	console.log("group operations", payload)
+const groupOperations = async (payload, metadata) => {
+	const operationsAsMap = utils.configAsMapByKey(payload.operations)
+
+	// check if operations exists
+	if (payload.operations && payload.operations.length) {
+		// group all operations
+		const promises = payload.operations.map(async (doc) => {
+			// get group
+			const group = (await converters(doc, metadata)).find((g) => g.filters.reduce((filter => utils.checkFilter(filter))))
+
+			// check if group exists
+			if (group) {
+				// get all relevant operations by next_operation __rb_internal
+				const operationsToGroup = utils.getOperationsToGroup(doc, operationsAsMap)
+
+				// return grouped document
+				return group.group(operationsToGroup)
+			} else if (doc.key.startsWith("__rb_internal")) {
+				return null
+			} else {
+				return doc
+			}
+		})
+
+		// pudate the operations payload
+		payload.operations = (await Promise.all(promises)).flat().filter(elem => !!elem)
+	}
 }
 
 /**
@@ -72,7 +88,6 @@ module.exports = declare((api) => {
 	api.apply.on("load", destructGroups)
 
 	// handler group structuing on list
-	api.app_action.list.on("load", groupAppActions)
 	api.operation.list.on("load", groupOperations)
 
 	// return api

@@ -1,5 +1,7 @@
 const cli = require("cli-ux")
+const yaml = require("js-yaml")
 const { flags } = require("@oclif/command")
+const plugin = require("../../utils/plugin")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
@@ -71,18 +73,31 @@ class ListCommand extends BaseCommand {
       // check results
       if (operations && operations.length) {
         // return operations records
-        const yamlConf = operations.map((operation) => docToConf(
-          "operation",
-          operation,
+        const data = {
+          operations: operations.map((operation) => docToConf(
+            "operation",
+            operation,
+            {
+              workflows: docListToObj(workflows),
+              apps: docListToObj(apps),
+              appActions: docListToObj(appActions),
+              operations: docListToObj(operations),
+              shouldDump: false,
+            }
+          ))
+        }
+
+        // execute operations load plugin
+        await plugin.operation.list._execute(
+          "load",
+          data,
           {
-            workflows: docListToObj(workflows),
-            apps: docListToObj(apps),
-            appActions: docListToObj(appActions),
+            accessToken: await this.accessToken
           }
-        )).join("---\n")
+        )
 
         // log to user
-        this.log(yamlConf)
+        this.log(data.operations.map(yaml.dump).join("---\n"))
 
         // stop spinner
         cli.ux.action.stop()

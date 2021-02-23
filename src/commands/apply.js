@@ -158,8 +158,6 @@ class ApplyCommand extends BaseCommand {
         data,
         {
           accessToken: await this.accessToken
-          // operations: docListToObj(await this._clients.Operation.list()),
-          // workflows: docListToObj(await this._clients.Workflow.list())
         }
       )
 
