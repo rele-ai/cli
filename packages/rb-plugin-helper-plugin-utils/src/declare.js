@@ -48,10 +48,10 @@ const generatePluginApi = () => {
         _callbacks: {},
 
         // executions function
-        _execute(event, ...args) {
+        async _execute(event, ...args) {
           // check even callbacks before execute
           if (this._callbacks[event] && this._callbacks[event].length) {
-            return this._callbacks[event].map((cb) => cb(...args))
+            return await Promise.all(this._callbacks[event].map((cb) => cb(...args)))
           }
 
           // return empty callbacks if no even was found

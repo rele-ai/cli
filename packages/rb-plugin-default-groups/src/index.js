@@ -9,16 +9,20 @@ const { declare } = require("@releai/helper-plugin-utils")
  * @param {object} metadata - Additional required resources.
  * @returns {Array.<object>}
  */
-const destructGroups = (payload, metadata) => {
+const destructGroups = async (payload, metadata) => {
 	if (payload.yamlData) {
-		payload.yamlData = payload.yamlData.flatMap((doc) => {
+		// destruct all operations and collect promises
+		const promises = payload.yamlData.map(async (doc) => {
 			switch (doc.type) {
 				case "Operation":
-					return destructOperations(doc, metadata)
+					return await destructOperations(doc, metadata)
 				default:
 					return doc
 			}
 		})
+
+		// update paylaod yaml data
+		payload.yamlData = (await Promise.all(promises)).flat()
 	} else {
 		throw new Error("unable to destruct groups. missing payload config")
 	}
@@ -30,9 +34,9 @@ const destructGroups = (payload, metadata) => {
  * @param {object} doc - Config document.
  * @param {object} metadata - Additional required resources.
  */
-const destructOperations = (doc, metadata) => {
+const destructOperations = async (doc, metadata) => {
 	// get group
-	const group = converters(doc, metadata).find((g) => g.filters.reduce((filter => utils.checkFilter(filter))))
+	const group = (await converters(doc, metadata)).find((g) => g.filters.reduce((filter => utils.checkFilter(filter))))
 
 	// check if group exists
 	if (group) {

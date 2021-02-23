@@ -1,17 +1,22 @@
 const uuidv4 = require("uuid").v4
+const { docListToObj } = require("@releai/cli/src/utils")
+const { WorkflowsClient, OperationsClient } = require("@releai/cli/lib/components")
 
-module.exports = (config, metadata) => {
+module.exports = async (config, { accessToken }) => {
+    const operations = docListToObj((await (new OperationsClient(accessToken).list())))
+    const workflows = docListToObj((await (new WorkflowsClient(accessToken).list())))
+
     return [
         () => {
             const operationsMap = {}
 
-            Object.values(metadata.operations).forEach((operation) => {
+            Object.values(operations).forEach((operation) => {
                 if (!operationsMap[operation.key]) {
                     operationsMap[operation.key] = {}
                 }
 
                 Object.entries((operation.next_operation || {})).forEach(([workflowId, operationId]) => {
-                    operationsMap[operation.key][metadata.workflows[workflowId].key] = metadata.operations[operationId].key
+                    operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
                 })
             })
 

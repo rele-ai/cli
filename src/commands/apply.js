@@ -153,12 +153,13 @@ class ApplyCommand extends BaseCommand {
 
       // format yaml to array of objects
       const data = { yamlData: readConfig(path) }
-      plugin.apply._execute(
+      await plugin.apply._execute(
         "load",
         data,
         {
-          operations: docListToObj(await this._clients.Operation.list()),
-          workflows: docListToObj(await this._clients.Workflow.list())
+          accessToken: await this.accessToken
+          // operations: docListToObj(await this._clients.Operation.list()),
+          // workflows: docListToObj(await this._clients.Workflow.list())
         }
       )
 
