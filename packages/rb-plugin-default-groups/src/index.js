@@ -87,6 +87,9 @@ module.exports = declare((api) => {
 	// handler group destructuring on apply
 	api.apply.on("load", destructGroups)
 
+	// handler group destructuring on delete
+	api.delete.on("load", destructGroups)
+
 	// handler group structuing on list
 	api.operation.list.on("load", groupOperations)
 

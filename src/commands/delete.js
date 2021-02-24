@@ -1,4 +1,5 @@
 const cli = require("cli-ux")
+const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
 const { confToDoc } = require("../utils/parser")
@@ -84,7 +85,9 @@ class DeleteCommand extends BaseCommand {
       return client.deleteById(config.id)
     } else {
       // config is not founded
-      this.log(`Deletion not completed for ${object.key}, no ${object.type} found with key = ${object.key}`)
+      if (!object.key.startsWith("__rb_internal")) {
+        this.log(`Deletion not completed for ${object.key}, no ${object.type} found with key = ${object.key}`)
+      }
       return
     }
   }
@@ -118,11 +121,20 @@ class DeleteCommand extends BaseCommand {
       const { path } = this.flags
 
       // format yaml to array of objects
-      const yamlData = readConfig(path)
+      const data = { yamlData: readConfig(path) }
+
+      // execute on delete
+      await plugin.delete._execute(
+        "load",
+        data,
+        {
+          accessToken: await this.accessToken
+        }
+      )
 
       // delete records and resolve all promises
       await Promise.all(
-        yamlData.map(async object => {
+        data.yamlData.map(async object => {
           return this._deleteRecord(object)
         })
       )
