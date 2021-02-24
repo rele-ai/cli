@@ -1,19 +1,16 @@
 /**
- * Flatten array
+ * cleanEmptyFields takes an object
+ * and remove from it all empty object fields
  *
- * @param {Array} arr - array to flatten
+ * @param {Object} object
  */
-module.exports.flatten = (arr) => {
-  return arr.reduce((flat, toFlatten) => {
-    return flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten)
-  }, [])
-}
+module.exports.cleanEmptyFields = (object) => {
+  for (let propName in object) {
+    if (typeof(object[propName]) === "object" && Object.keys(object[propName] || {}).length === 0) {
+      delete object[propName]
+    }
+  }
 
-// map conf keys
-exports.CONF_KEYS_MAP = {
-  apps: "system_key",
-  app_actions: "operation_key",
-  operations: "key",
-  workflows: "key",
-  translations: "key",
+  // return object without empty fields
+  return object
 }

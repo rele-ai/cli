@@ -1,5 +1,6 @@
 const uuidv4 = require("uuid").v4
 const { docListToObj } = require("@releai/cli/src/utils")
+const { cleanEmptyFields } = require("@releai/cli/src/utils/formatters")
 const { WorkflowsClient, OperationsClient } = require("@releai/cli/lib/components")
 
 module.exports = async (config, { accessToken }) => {
@@ -7,6 +8,7 @@ module.exports = async (config, { accessToken }) => {
   const workflows = docListToObj((await (new WorkflowsClient(accessToken).list())))
 
   return [
+    // convert send message
     () => {
       const operationsMap = {}
 
@@ -70,7 +72,7 @@ module.exports = async (config, { accessToken }) => {
           })
 
           // return grouped operation
-          return {
+          return cleanEmptyFields({
             type: "Operation",
             selector: rootOperation.selector,
             is_root: rootOperation.is_root,
@@ -83,7 +85,7 @@ module.exports = async (config, { accessToken }) => {
             redis: internalOperations.length ? internalOperations[0].redis : rootOperation.redis,
             payload,
             key: rootOperation.key
-          }
+          })
         }
       }
 
@@ -112,6 +114,72 @@ module.exports = async (config, { accessToken }) => {
 
         item.ungroup.push(baseNextOp)
       })
+
+      return item
+    },
+    // convert queue messages
+    () => {
+      const item = {
+        filters: [
+          [(config.selector || {}).app_action || "", "==", "queue"],
+          [(config.selector || {}).app || "", "==", "clara"]
+        ],
+        defaults: {
+          redis: {
+            type: "array"
+          },
+          queue_timeout: {
+            data: 5,
+            type: "raw"
+          }
+        },
+        group([operation]) {
+          let formattedInput = {
+            ...(operation.input || {}),
+            format_function: ((operation.input || {}).format_function || []).filter(func => {
+              return func.operation !== "encode_base64"
+            })
+          }
+
+          if (!formattedInput.format_function.length) delete formattedInput.format_function
+
+          return cleanEmptyFields({
+            type: "Operation",
+            selector: operation.selector,
+            is_root: operation.is_root,
+            output: config.output || {},
+            input: formattedInput,
+            next_operation: operation.next_operation || {},
+            payload: operation.payload,
+            key: operation.key,
+          })
+        }
+      }
+
+      const baseOperation = {
+        ...config,
+        payload: {
+          queue_timeout: (config.payload || {}).queue_timeout || item.defaults.queue_timeout
+        },
+        output: config.output || {},
+        input: {
+          ...(config.input || {}),
+          format_function: [
+            ...((config.input || {}).format_function || []),
+            {
+              operation: "encode_base64",
+              output: "messages:messages_b64",
+              value: {
+                data: "message_data.message",
+                type: "request"
+              }
+            }
+          ]
+        },
+        redis: config.redis || { field: config.key, type: "array" } || {}
+      }
+
+      item.ungroup = [baseOperation]
 
       return item
     }
