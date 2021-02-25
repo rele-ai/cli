@@ -7,21 +7,31 @@ module.exports = async (config, { accessToken }) => {
   const operations = docListToObj((await (new OperationsClient(accessToken).list())))
   const workflows = docListToObj((await (new WorkflowsClient(accessToken).list())))
 
+  const operationsMap = {}
+
+  Object.values(operations).forEach((operation) => {
+    if (!operationsMap[operation.key]) {
+      operationsMap[operation.key] = {}
+    }
+
+    Object.entries((operation.next_operation || {})).forEach(([workflowId, operationId]) => {
+      operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
+    })
+
+    if (operation.action.id === "Vu8jltdA6N6Dn3OKR0jr") {
+      Object.keys(operation.payload || {}).forEach(key => {
+        if (key.startsWith("case_")) {
+          Object.entries(operation.payload[key].next_operation || {}).forEach(([workflowId, operationId]) => {
+            operationsMap[operation.key][`${key}_${workflows[workflowId].key}`] = operations[operationId].key
+          })
+        }
+      })
+    }
+  })
+
   return [
     // convert send message
     () => {
-      const operationsMap = {}
-
-      Object.values(operations).forEach((operation) => {
-        if (!operationsMap[operation.key]) {
-          operationsMap[operation.key] = {}
-        }
-
-        Object.entries((operation.next_operation || {})).forEach(([workflowId, operationId]) => {
-          operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
-        })
-      })
-
       const baseOperation = {
         ...config,
         payload: {
@@ -182,6 +192,99 @@ module.exports = async (config, { accessToken }) => {
       item.ungroup = [baseOperation]
 
       return item
-    }
+    },
+    // // convert releai active integrations
+    // () => {
+    //   const item = {
+    //     filters: [
+    //       [(config.selector || {}).app_action || "", "==", "releai_active_integrations"],
+    //       [(config.selector || {}).app || "", "==", "clara"]
+    //     ]
+    //   }
+
+    //   const baseOperation = {
+    //     redis: {},
+    //     is_root: config.is_root || false,
+    //     selector: {
+    //       workflow: config.selector.workflow,
+    //       app: "clara",
+    //       app_action: "switch_condition"
+    //     },
+    //     key: config.key,
+    //     payload: {
+    //       condition: {
+    //         data: "Org.Hubspot.ApiKey",
+    //         type: "struct"
+    //     },
+    //     case_1: {
+    //         match_operation: "!=",
+    //         next_operation: {
+    //           selector: (((config.payload || {}).case_1 || {}).selector || []).map((selector) => ({
+    //             workflow: selector.workflow,
+    //             operation: (operationsMap[config.key] || {})[`case_1_${selector.workflow}`] ? operationsMap[config.key][`case_1_${selector.workflow}`] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_active_integrations`
+    //           }))
+    //         },
+    //         type: "raw",
+    //         data: ""
+    //       }
+    //     },
+    //     input: {},
+    //     output: {},
+    //   }
+
+    //   const op2 = {
+    //     selector: {
+    //       workflow: config.selector.workflow,
+    //       app: "clara",
+    //       app_action: "update_session"
+    //     },
+    //     input: {},
+    //     is_root: false,
+    //     key: "",
+    //     redis: {},
+    //     output: {},
+    //     payload: {
+    //       option: {
+    //         data: "HubSpot",
+    //         type: "raw"
+    //       }
+    //     },
+    //   }
+
+    //   const op3 = {
+    //     redis: {},
+    //     is_root: false,
+    //     selector: {
+    //       workflow: config.selector.workflow,
+    //       app: "clara",
+    //       app_action: "switch_condition"
+    //     },
+    //     output: {},
+    //     key: "",
+    //     payload: {
+    //       case_1: {
+    //         type: "raw",
+    //         data: "",
+    //         match_operation: "!=",
+    //         next_operation: {}
+    //       },
+    //       condition: {
+    //         vars: {
+    //         org_id: {
+    //         type: "struct",
+    //         data: "Org.Id"
+    //                   }
+    //                 },
+    //         data: "User.Hubspot.$org_id",
+    //         type: "struct"
+    //       }
+    //     }
+    //   }
+
+
+    //   item.ungroup = [baseOperation]
+
+    //   return item
+    // }
   ].map(fn => fn())
 }
