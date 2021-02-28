@@ -1,5 +1,5 @@
 const yaml = require("js-yaml")
-const { toSnakeCase } = require("./index")
+const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 
 /**
 * Configuration data from YAML.
@@ -134,18 +134,8 @@ const loadOperationConf = (doc, apps, appActions, workflows, operations, shouldD
       app: apps[doc.app_id].system_key,
       app_action: appActions[doc.action.id].operation_key
     },
-    next_operation: {
-      selector: Object.entries((doc.next_operation || {})).map(([wid, oid]) => ({
-        workflow: workflows[wid].key,
-        operation: operations[oid].key
-      }))
-    },
-    on_error: {
-      selector: Object.entries((doc.on_error || {})).map(([wid, oid]) => ({
-        workflow: workflows[wid].key,
-        operation: operations[oid].key
-      }))
-    },
+    next_operation: doc.next_operation || {},
+    on_error: doc.on_error || {},
     payload: doc.payload,
     is_root: doc.is_root || false,
     input: doc.input,
@@ -153,6 +143,9 @@ const loadOperationConf = (doc, apps, appActions, workflows, operations, shouldD
     redis: doc.redis,
     key: doc.key
   }
+
+  // attach next operations and on error
+  loadConfNextOperations(data, workflows, operations)
 
   return shouldDump ? yaml.dump(data) : data
 }
@@ -277,8 +270,8 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
     redis: {},
     input: conf.input || {},
     output: conf.output || {},
-    next_operation: {},
-    on_error: {},
+    next_operation: conf.next_operation || {},
+    on_error: conf.on_error || {},
     key: conf.key
   }
 
@@ -296,39 +289,8 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
     baseOperation.redis.type = "hash_map"
   }
 
-  // destract next operations and on errors
-  const nextOpSelector = (conf.next_operation || {}).selector || []
-  const onErrorSelector = (conf.on_error || {}).selector || []
-
-  // attach next operation
-  nextOpSelector.forEach(select => {
-    // find workflow id by key
-    const workflowId = Object.keys(workflows || {}).find(
-      workflowId => workflows[workflowId].key === select.workflow
-    )
-
-    if (workflowId) {
-      // set next operation by workflow id
-      baseOperation.next_operation[workflowId] = select.operation
-    } else {
-      throw new Error(`You try to upload a operation with unknown workflow with key = ${select.workflow}. please make sure you upload also the workflow that belongs to this operation.`)
-    }
-  })
-
-  // attach on error
-  onErrorSelector.forEach(select => {
-    // find workflow id by key
-    const workflowId = Object.keys(workflows || {}).find(
-      workflowId => workflows[workflowId].key === select.workflow
-    )
-
-    if (workflowId) {
-      // set on error by workflow id
-      baseOperation.on_error[workflowId] = select.operation
-    } else {
-      throw new Error(`You try to upload a operation with unknown workflow with key = ${select.workflow}. please make sure you upload also the workflow that belongs to this operation.`)
-    }
-  })
+  // load doc next operations
+  loadDocNextOperations(baseOperation, workflows)
 
   // error handling
   if (!baseOperation.app_id) {
