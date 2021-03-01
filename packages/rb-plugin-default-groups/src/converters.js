@@ -204,25 +204,32 @@ module.exports = async (config, { accessToken }) => {
       }
 
       let isExists = false
-      ((config.selector || []).workflows || []).forEach(workflowKey => {
+      for (const workflowKey in (config.selector || []).workflow || []) {
         if ((operationsMap[config.key] || {})[workflowKey]) {
           isExists = true
           break
         }
-      })
+      }
 
       if (isExists) {
         console.log("releai_active_integrations Exists!")
       } else {
         console.log("genereate new items")
+        let uuidMap = {}
+        for (let i = 1; i <= 16; i++) {
+          uuidMap[`rb_internal_key_${i}`] = `__rb_internal_${uuidv4().replace(/-/g, "_")}_releai_active_intergations`
+        }
+
         const baseOperations = [
           // 0 wmTSPt0RLortgvKt1XzP
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "switch_condition"
             },
+            is_root: config.is_root || false,
             key: config.key,
             input: {},
             redis: {},
@@ -235,29 +242,30 @@ module.exports = async (config, { accessToken }) => {
                 match_operation: "!=",
                 data: "",
                 next_operation: {
-                  selector: config.selector.workflows.map(workflowKey => ({
+                  selector: config.selector.workflow.map(workflowKey => ({
                     workflow: workflowKey,
-                    operation: 1
+                    operation: "rb_internal_key_1"
                   }))
                 },
                 type: "raw"
               }
             },
             next_operation: {
-              selector: config.selector.workflows.map(workflowKey => ({
+              selector: config.selector.workflow.map(workflowKey => ({
                 workflow: workflowKey,
-                operation: 3
+                operation: "rb_internal_key_3"
               }))
             },
           },
           // 1 Ohj8MzuedAwBriCeSeqA
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_1",
             payload: {
               option: {
                 type: "raw",
@@ -265,25 +273,26 @@ module.exports = async (config, { accessToken }) => {
               }
             },
             next_operation: {
-              selector: config.selector.workflows.map(workflowKey => ({
+              selector: config.selector.workflow.map(workflowKey => ({
                 workflow: workflowKey,
-                operation: 2
+                operation: "rb_internal_key_2"
               }))
             },
             redis: {
-              field: 2,
+              field: "integration_options",
               type: "array"
             },
             output: {},
           },
           // 2 lifDOcWYsvQPoF9jCJHh
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_2",
             redis: {
               field: "integration_options",
               type: "hash_map"
@@ -310,22 +319,22 @@ module.exports = async (config, { accessToken }) => {
                 }
               ]
             },
-            payload: {},
             next_operation: {
-              selector: config.selector.workflows.map(workflowKey => ({
+              selector: config.selector.workflow.map(workflowKey => ({
                 workflow: workflowKey,
-                operation: 3
+                operation: "rb_internal_key_3"
               }))
             },
           },
           // 3 APKeOUITJymF6TxMXQbv
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "switch_condition"
             },
-            key: "",
+            key: "rb_internal_key_3",
             payload: {
             condition: {
               type: "struct",
@@ -339,7 +348,10 @@ module.exports = async (config, { accessToken }) => {
             },
               case_1: {
                 next_operation: {
-                  Xmr52oMiiQt9M8eQZdYQ: 4,
+                  selector: config.selector.workflow.map(workflowKey => ({
+                    workflow: workflowKey,
+                    operation: "rb_internal_key_4"
+                  }))
                 },
                 data: "",
                 type: "raw",
@@ -348,25 +360,32 @@ module.exports = async (config, { accessToken }) => {
             },
             output: {},
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 5,
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_5"
+              }))
             },
             redis: {}
           },
           // 4 kmkwgDnjYs03tckh0xKe
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_4",
             output: {},
             redis: {
               type: "array",
               field: "integration_options"
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 16
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_16"
+              }))
             },
             input: {},
             payload: {
@@ -378,19 +397,23 @@ module.exports = async (config, { accessToken }) => {
           },
           // 5 apxCjjsRN4qL2z1BAOVD
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "switch_condition"
             },
-            key: "",
+            key: "rb_internal_key_5",
             redis: {},
             payload: {
               case_1: {
                 type: "raw",
-                next_operation: {
-                Xmr52oMiiQt9M8eQZdYQ: 6
-              },
+            next_operation: {
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_6"
+              }))
+            },
               match_operation: ">",
               data: 0
               },
@@ -401,7 +424,10 @@ module.exports = async (config, { accessToken }) => {
               }
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 8
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_8"
+              }))
             },
             output: {},
             input: {
@@ -425,12 +451,13 @@ module.exports = async (config, { accessToken }) => {
           },
           // 6 2e11fnoxvAGurcKr3QBw
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_6",
             output: {},
             payload: {
               option: {
@@ -439,7 +466,10 @@ module.exports = async (config, { accessToken }) => {
               }
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 7
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_7"
+              }))
             },
             input: {},
             redis: {
@@ -449,16 +479,19 @@ module.exports = async (config, { accessToken }) => {
           },
           // 7 q5LGP3iQkZFnIfXj8xgl
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_7",
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 8
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_8"
+              }))
             },
-            payload: {},
             input: {
               format_function: [
                 {
@@ -487,19 +520,23 @@ module.exports = async (config, { accessToken }) => {
           },
           // 8 cojkBCspYzPdEV3F54hs
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "switch_condition"
             },
-            key: "",
+            key: "rb_internal_key_8",
             redis: { },
             payload: {
               case_1: {
               match_operation: "!=",
               type: "raw",
               next_operation: {
-                Xmr52oMiiQt9M8eQZdYQ: 9,
+                selector: config.selector.workflow.map(workflowKey => ({
+                  workflow: workflowKey,
+                  operation: "rb_internal_key_9"
+                }))
               },
               data: ""
               },
@@ -516,21 +553,28 @@ module.exports = async (config, { accessToken }) => {
             },
             output: {},
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: "j9r3ACYKGiII3tWk2AKE"
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_11"
+              }))
             },
           },
           // 9 mZpSztQsXIMKBPWDhv9f
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
-              app_action: "switch_condition"
+              app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_9",
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 11,
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_11"
+              }))
             },
-            output: { },
+            output: {},
             redis: {
               type: "array",
               field: "integration_options"
@@ -544,18 +588,22 @@ module.exports = async (config, { accessToken }) => {
           },
           // 10 jxOhDycxUnMA0KGJAFbP
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
+            key: "rb_internal_key_10",
             redis: {
-              field: "integration_options",
+              field: "rb_internal_key_1",
               type: "hash_map"
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 11,
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_11"
+              }))
             },
             input: {
               format_function: [
@@ -563,9 +611,9 @@ module.exports = async (config, { accessToken }) => {
                 args: {
                   amount: 1
                 },
-                output: "integration_options:length",
+                output: "rb_internal_key_1:length",
                 value: {
-                  data: "integration_options:integration_options:length",
+                  data: "rb_internal_key_1:rb_internal_key_1:length",
                   default: {
                     data: 0,
                     type: "raw"
@@ -577,17 +625,17 @@ module.exports = async (config, { accessToken }) => {
                 }
               ]
             },
-            output: { },
-            payload: { }
+            output: {}
           },
           // 11 j9r3ACYKGiII3tWk2AKE
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "switch_condition"
             },
-            key: "",
+            key: "rb_internal_key_11",
             input: { },
             payload: {
               condition: {
@@ -598,14 +646,20 @@ module.exports = async (config, { accessToken }) => {
               case_2: {
                 data: 2,
                 next_operation: {
-                  Xmr52oMiiQt9M8eQZdYQ: 13,
+                  selector: config.selector.workflow.map(workflowKey => ({
+                    workflow: workflowKey,
+                    operation: "rb_internal_key_13"
+                  }))
                 },
                 match_operation: ">=",
                 type: "raw"
               },
               case_1: {
                 next_operation: {
-                  Xmr52oMiiQt9M8eQZdYQ: 15,
+                  selector: config.selector.workflow.map(workflowKey => ({
+                    workflow: workflowKey,
+                    operation: "rb_internal_key_15"
+                  }))
                 },
                 match_operation: "==",
                 data: 1,
@@ -617,22 +671,26 @@ module.exports = async (config, { accessToken }) => {
               type: "array"
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 12
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_12"
+              }))
             },
             output: {},
           },
           // 12 oy3m63KISNrwno19wxHD
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "whatsapp",
               app_action: "send_message"
             },
-            key: "",
+            key: "rb_internal_key_12",
             output: {
               operation_type: "drop_session"
             },
-            next_operation: { },
+            next_operation: {},
             payload: {
               content: {
                 data: "missing_integration",
@@ -646,14 +704,15 @@ module.exports = async (config, { accessToken }) => {
           },
           // 13 xQKGcxepoYXvoOngvRSP
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "whatsapp",
               app_action: "send_message"
             },
-            key: "",
-            redis: { },
-            output: { },
+            key: "rb_internal_key_13",
+            redis: {},
+            output: {},
             payload: {
               content: {
                 data: "request_target_crm",
@@ -670,7 +729,10 @@ module.exports = async (config, { accessToken }) => {
               }
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 14
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_14"
+              }))
             },
             input: {
               redis_functions: [
@@ -683,18 +745,22 @@ module.exports = async (config, { accessToken }) => {
           },
           // 14 MDUil4OCMeyXQ6RYOi7e
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "get_notification"
             },
-            key: "",
+            key: "rb_internal_key_14",
             redis: {
               type: "hash_map",
-              field: "get_integration_selection"
+              field: "rb_internal_key_14"
             },
             next_operation: {
-              XYdqWKFzaup3nAuJ2egP: 15
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_15"
+              }))
             },
             payload: {
               timeout: {
@@ -705,13 +771,13 @@ module.exports = async (config, { accessToken }) => {
           },
           // 16 0f5DTkJyukJjIsSGpyCi
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
               app_action: "update_session"
             },
-            key: "",
-            payload: { },
+            key: "rb_internal_key_16",
             input: {
               format_function: [
                 {
@@ -737,31 +803,41 @@ module.exports = async (config, { accessToken }) => {
               type: "hash_map"
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: 5
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_5"
+              }))
             },
-            output: { }
+            output: {}
           },
           // 15 O5o4z3hn2Pv9SqIvj6UR
           {
+            type: "Operation",
             selector: {
-              workflows: config.selector.workflows,
+              workflow: config.selector.workflow,
               app: "clara",
-              app_action: "switch_case"
+              app_action: "switch_condition"
             },
-            key: "",
+            key: "rb_internal_key_15",
             output: { },
             payload: {
               case_1: {
                 type: "raw",
                 data: "HubSpot",
                 next_operation: {
-                  Xmr52oMiiQt9M8eQZdYQ: "fC72UyUOu8qZOcSfRaSm", // on hubspot
+                  selector: config.selector.workflow.map(workflowKey => ({
+                    workflow: workflowKey,
+                    operation: ((config.payload || {}).on_hubspot || {}).data || ""
+                  }))
                 },
                 match_operation: "=="
               },
               case_3: {
                 next_operation: {
-                  Xmr52oMiiQt9M8eQZdYQ: "06XXMEnvjmCabCvDMM83" // on mailing
+                  selector: config.selector.workflow.map(workflowKey => ({
+                    workflow: workflowKey,
+                    operation: ((config.payload || {}).on_mailing || {}).data || ""
+                  }))
                 },
                 match_operation: "==",
                 data: "Mailing",
@@ -779,7 +855,7 @@ module.exports = async (config, { accessToken }) => {
                   },
                   rkey_type: "hash_map",
                   type: "redis",
-                  data: "get_integration_selection:message_data:message:body"
+                  data: "rb_internal_key_14:message_data:message:body"
                   }
                 },
                 data: "integration_options:option:$user_index"
@@ -787,14 +863,20 @@ module.exports = async (config, { accessToken }) => {
               case_2: {
                 type: "raw",
                 next_operation: {
-                  Xmr52oMiiQt9M8eQZdYQ: "CMOBXj0SKVV9NDx2DiFk", // on salesforce
+                  selector: config.selector.workflow.map(workflowKey => ({
+                    workflow: workflowKey,
+                    operation: ((config.payload || {}).on_salesforce || {}).data || ""
+                  }))
                 },
                 match_operation: "==",
                 data: "Salesforce"
               }
             },
             next_operation: {
-              Xmr52oMiiQt9M8eQZdYQ: "oy3m63KISNrwno19wxHD",
+              selector: config.selector.workflow.map(workflowKey => ({
+                workflow: workflowKey,
+                operation: "rb_internal_key_12"
+              }))
             },
             input: {
               format_function: [
@@ -813,12 +895,36 @@ module.exports = async (config, { accessToken }) => {
             },
             redis: {
               type: "hash_map",
-              field: "integration_switch_case"
+              field: "rb_internal_key_15"
             },
           },
         ]
-      }
 
+        const formatOperation = (operation, uuidMap) => {
+          Object.keys(operation).forEach(key => {
+            // replace keys
+            if (typeof operation[key] === "string") {
+              if (operation[key].includes("rb_internal_key_")) {
+                const [keyIndex] = /(?!x)\d+/.exec(operation[key])
+                const replacedString = operation[key].replace(`rb_internal_key_${keyIndex}`, uuidMap[`rb_internal_key_${keyIndex}`])
+                operation[key] = replacedString
+              }
+            }
+
+            if (typeof operation[key] === "object") {
+              formatOperation(operation[key], uuidMap)
+            }
+          })
+        }
+
+        baseOperations.forEach(operation => {
+          formatOperation(operation, uuidMap)
+        })
+
+        item.ungroup = baseOperations
+
+        return item
+      }
     }
   ].map(fn => fn())
 }
