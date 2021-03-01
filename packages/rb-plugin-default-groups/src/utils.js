@@ -57,3 +57,39 @@ module.exports.getOperationsToGroup = (config, configMap, operationsToGroup={ da
 
     return operationsToGroup.data
 }
+
+/**
+ * loadConfNextOperations recursively loop over
+ * the object and formats each instance of next operation
+ * or on error to conf format.
+ *
+ * @param {object} data - base data object before format
+ * @param {object} workflows - all workflows
+ * @param {object} operations - all operations
+ */
+module.exports.loadConfNextOperations = (data, workflows, operations) => {
+    Object.keys(data).forEach(key => {
+      // check if recursion reaches next operation
+      // or on error instances and format it
+      if (key === "next_operation" || key === "on_error") {
+        // take deep copy of next operation
+        const nextOp = { ...(data[key] || {}) }
+
+        // reset next operations
+        data[key] = {}
+
+        // add next operation
+        data[key].selector = Object.entries(nextOp).map(([wid, oid]) => {
+          return {
+            workflow: workflows[wid].key,
+            operation: operations[oid].key
+          }
+        })
+      }
+
+      // go nested
+      if (typeof data[key] === "object") {
+        this.loadConfNextOperations(data[key], workflows, operations)
+      }
+    })
+  }
