@@ -182,6 +182,205 @@ module.exports = async (config, { accessToken }) => {
       item.ungroup = [baseOperation]
 
       return item
+    },
+    () => {
+      const item = {
+        filters: [
+          [(config.selector || {}).app_action || "", "==", "releai_active_integrations"]
+        ],
+      }
+
+      const baseOperations = [
+        // rb_internal_key_1 - wmTSPt0RLortgvKt1XzP
+        {
+          type: "Operation",
+          selector: {
+            workflow: config.selector.workflow,
+            app: "clara",
+            app_action: "switch_condition"
+          },
+          key: "rb_internal_key_1",
+          is_root: config.is_root || false,
+          next_operation: {
+            selector: config.selector.workflow.map(workflowKey => ({
+              workflow: workflowKey,
+              operation: "rb_internal_key_4"
+            }))
+          },
+          payload: {
+            case_1: {
+              data: "",
+              type: "raw",
+              match_operation: "!=",
+              next_operation: {
+                selector: config.selector.workflow.map(workflowKey => ({
+                  workflow: workflowKey,
+                  operation: "rb_internal_key_2"
+                }))
+              },
+            },
+            condition: {
+              data: "Org.Hubspot.ApiKey",
+              type: "struct"
+            },
+          },
+           redis: {}
+        },
+        // rb_internal_key_2 - Ohj8MzuedAwBriCeSeqA
+        {
+          type: "Operation",
+          selector: {
+            workflow: config.selector.workflow,
+            app: "clara",
+            app_action: "update_session"
+          },
+          key: "rb_internal_key_2",
+          next_operation: {
+            selector: config.selector.workflow.map(workflowKey => ({
+              workflow: workflowKey,
+              operation: "rb_internal_key_3"
+            }))
+          },
+          payload: {
+            option: {
+              data: "HubSpot",
+              type: "raw"
+            }
+          },
+          redis: {
+            field: "integration_options",
+            type: "array"
+          }
+        },
+        // rb_internal_key_3 lifDOcWYsvQPoF9jCJHh
+        {
+          type: "Operation",
+          selector: {
+            workflow: config.selector.workflow,
+            app: "clara",
+            app_action: "update_session"
+          },
+          next_operation: {
+            selector: config.selector.workflow.map(workflowKey => ({
+              workflow: workflowKey,
+              operation: "rb_internal_key_4"
+            }))
+          },
+          key: "rb_internal_key_3",
+          input: {
+            format_function: [
+              {
+                args: {
+                  amount: 1
+                },
+                operation: "increment",
+                output: "integration_options:length",
+                value: {
+                  data: "integration_options:integration_options:length",
+                  rkey_type: "hash_map",
+                  type: "redis",
+                  default: {
+                    data: 0,
+                    type: "raw"
+                  }
+                }
+              }
+            ]
+          },
+          redis: {
+            field: "integration_options",
+            type: "hash_map"
+          }
+        },
+        // rb_internal_key_4 - xQKGcxepoYXvoOngvRSP
+        {
+          type: "Operation",
+          selector: {
+            workflow: config.selector.workflow,
+            app: "whatsapp",
+            app_action: "send_message"
+          },
+          key: "rb_internal_key_4",
+          next_operation: {
+            selector: config.selector.workflow.map(workflowKey => ({
+              workflow: workflowKey,
+              operation: "rb_internal_key_5"
+            }))
+          },
+          input: {
+            redis_functions: [
+              {
+                operation: "delete_key",
+                path: "integration_options*"
+              }
+            ]
+          },
+          payload: {
+            content: {
+              data: "request_target_crm",
+              type: "get_by_lang"
+            },
+            options: {
+              data: "integration_options:option",
+              rkey_type: "array",
+              type: "redis"
+            },
+            userFsId: {
+              data: "User.Id",
+              type: "struct"
+            }
+          }
+        },
+        // rb_internal_key_5 - MDUil4OCMeyXQ6RYOi7e
+        {
+          type: "Operation",
+          selector: {
+            workflow: config.selector.workflow,
+            app: "clara",
+            app_action: "get_notification"
+          },
+          key: "rb_internal_key_5",
+          next_operation: {
+            selector: config.selector.workflow.map(workflowKey => ({
+              workflow: workflowKey,
+              operation: "rb_internal_key_6"
+            }))
+          },
+          payload: {
+            timeout: {
+              data: 60,
+              type: "raw"
+            }
+          },
+          redis: {
+            field: "get_integration_selection",
+            type: "hash_map"
+          }
+        },
+        // rb_internal_key_6 done
+        {
+          type: "Operation",
+          key: "rb_internal_key_6",
+          selector: {
+            workflow: config.selector.workflow,
+            app: "whatsapp",
+            app_action: "send_message"
+          },
+          payload: {
+            content: {
+              data: "DONE",
+              type: "raw"
+            },
+            userFsId: {
+              data: "User.Id",
+              type: "struct"
+            }
+          }
+        }
+      ]
+
+      item.ungroup = baseOperations
+      return item
     }
   ].map(fn => fn())
 }

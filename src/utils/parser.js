@@ -254,6 +254,7 @@ const loadWorkflowDoc = (conf) => {
  */
 const loadOperationDoc = (conf, apps, appActions, workflows) => {
   // define base json operation
+  console.log("conf:", conf)
   const baseOperation = {
     is_root: conf.is_root,
     workflows: Object.keys(workflows).filter(
@@ -274,7 +275,7 @@ const loadOperationDoc = (conf, apps, appActions, workflows) => {
     on_error: conf.on_error || {},
     key: conf.key
   }
-
+  console.log("baseOperation:", baseOperation)
   // attach redis field
   if ((conf.redis || {}).field) {
     baseOperation.redis.field = conf.redis.field
