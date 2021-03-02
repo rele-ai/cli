@@ -36,7 +36,15 @@ const destructGroups = async (payload, metadata) => {
  */
 const destructOperations = async (doc, metadata) => {
 	// get group
-	const group = (await converters(doc, metadata)).find((g) => g.filters.reduce((filter => utils.checkFilter(filter))))
+	const group = (await converters(doc, metadata)).find(g => {
+		// check if all filters matches
+		const filterMatcher = g.filters.map(filter => {
+			return utils.checkFilter(filter)
+		})
+
+		// if not include false, there is a match
+		return !filterMatcher.includes(false)
+	})
 
 	// check if group exists
 	if (group) {

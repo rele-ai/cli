@@ -567,6 +567,7 @@ message OperationPayload {
   map<string, OperationPayload> vars = 4;
   map<string, string> next_operation = 5;
   string match_operation = 6;
+  OperationPayload default = 7;
 }
 
 // message AppRequestPayload
