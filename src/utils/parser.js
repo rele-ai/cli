@@ -35,18 +35,18 @@ module.exports.confToDoc = (confType, conf, { apps, appActions, workflows } = {}
 * @param {object} options - additional params.
 * @returns {object} conf - YAML config
 */
-module.exports.docToConf = (docType, doc, { apps, appActions, workflows, operations, shouldDump } = {}) => {
+module.exports.docToConf = (docType, doc, { apps, appActions, workflows, operations, versions, shouldDump } = {}) => {
   switch(docType) {
     case "app":
-      return loadAppConf(doc, shouldDump)
+      return loadAppConf(doc, versions, shouldDump)
     case "app_action":
-      return loadAppActionConf(doc, apps, shouldDump)
+      return loadAppActionConf(doc, apps, versions, shouldDump)
     case "workflow":
-      return loadWorkflowConf(doc, shouldDump)
+      return loadWorkflowConf(doc, versions, shouldDump)
     case "operation":
-      return loadOperationConf(doc, apps, appActions, workflows, operations, shouldDump)
+      return loadOperationConf(doc, apps, appActions, workflows, operations, versions, shouldDump)
     case "translation":
-      return loadTranslationConf(doc, shouldDump)
+      return loadTranslationConf(doc, versions, shouldDump)
     default:
       throw new Error(`unsupported document type: ${docType}`)
   }
@@ -57,15 +57,17 @@ module.exports.docToConf = (docType, doc, { apps, appActions, workflows, operati
  * Load the app config from the firestore document.
  *
  * @param {object} doc - Firestore document.
+ * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadAppConf = (doc, shouldDump=true) => {
+const loadAppConf = (doc, versions, shouldDump=true) => {
   const data = {
     type: "App",
     base_url: doc.base_url,
     tls: doc.tls || false,
     display_name: doc.display_name,
     protocol: doc.protocol,
+    version: (versions[doc.version] || {}).key,
     request: doc.request,
     key: doc.system_key,
     is_global: doc.org === "global"
@@ -79,13 +81,15 @@ const loadAppConf = (doc, shouldDump=true) => {
  *
  * @param {object} doc - Firestore document.
  * @param {object} apps - Map of all the applications.
+ * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadAppActionConf = (doc, apps, shouldDump=true) => {
+const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
   const data = {
     type: "AppAction",
     request: doc.request,
     display_name: doc.display_name,
+    version: (versions[doc.version] || {}).key,
     metadata: doc.metadata,
     key: doc.operation_key,
     selector: {
@@ -100,13 +104,15 @@ const loadAppActionConf = (doc, apps, shouldDump=true) => {
  * Load the workflow config from the firestore document.
  *
  * @param {object} doc - Firestore document.
+ * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadWorkflowConf = (doc, shouldDump=true) => {
+const loadWorkflowConf = (doc, versions, shouldDump=true) => {
   const data = {
     type: "Workflow",
     display_name: doc.display_name,
     key: doc.key,
+    version: (versions[doc.version] || {}).key,
     match: {
       ...doc.match,
       input: (doc.match.input || "").indexOf(",") !== -1 ? doc.match.input.split(",") : doc.match.input
@@ -124,9 +130,10 @@ const loadWorkflowConf = (doc, shouldDump=true) => {
  * @param {object} appActions - Map of all app actions.
  * @param {object} workflows - Map of all workflows.
  * @param {object} operations - Map of all operations.
+ * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadOperationConf = (doc, apps, appActions, workflows, operations, shouldDump=true) => {
+const loadOperationConf = (doc, apps, appActions, workflows, operations, versions, shouldDump=true) => {
   const data = {
     type: "Operation",
     selector: {
@@ -141,6 +148,7 @@ const loadOperationConf = (doc, apps, appActions, workflows, operations, shouldD
     input: doc.input,
     output: doc.output,
     redis: doc.redis,
+    version: (versions[doc.version] || {}).key,
     key: doc.key
   }
 
@@ -154,14 +162,16 @@ const loadOperationConf = (doc, apps, appActions, workflows, operations, shouldD
  * Load the translation config from the firestore document.
  *
  * @param {object} doc - Firestore document.
+ * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadTranslationConf = (doc, shouldDump=true) => {
+const loadTranslationConf = (doc, versions, shouldDump=true) => {
   const data = {
     type: "Translation",
     key: doc.key,
     lang: doc.lang,
-    value: doc.value
+    value: doc.value,
+    version: (versions[doc.version] || {}).key,
   }
 
   return shouldDump ? yaml.dump(data) : data

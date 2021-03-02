@@ -3,7 +3,7 @@ const { flags } = require("@oclif/command")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient, AppActionsClient } = require("../../../lib/components")
+const { AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * List all global and org releated app actions.
@@ -22,9 +22,12 @@ class ListCommand extends BaseCommand {
    * Load all selectors data
    */
   loadSelectorsData(accessToken) {
-    // load apps data
     return [
-      (new AppsClient(accessToken)).list()
+      // load apps data
+      (new AppsClient(accessToken)).list(),
+
+      // load versions data
+      (new VersionsClient(accessToken)).list(),
     ]
   }
 
@@ -51,7 +54,7 @@ class ListCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [apps] = await Promise.all(this.loadSelectorsData(accessToken))
+      const [apps, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init app actions client
       const client = new AppActionsClient(accessToken)
@@ -65,7 +68,16 @@ class ListCommand extends BaseCommand {
       // check results
       if (appActions && appActions.length) {
         // return app records
-        const yamlConf = appActions.map((appAction) => docToConf("app_action", appAction, { apps: docListToObj(apps) })).join("---\n")
+        const yamlConf = appActions.map((appAction) => {
+          return docToConf(
+            "app_action",
+            appAction,
+            {
+              apps: docListToObj(apps),
+              versions: docListToObj(versions)
+            }
+          )
+        }).join("---\n")
 
         // log to user
         this.log(yamlConf)

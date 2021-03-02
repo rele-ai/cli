@@ -5,7 +5,7 @@ const plugin = require("../../utils/plugin")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient } = require("../../../lib/components")
+const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * List all global and org releated operations.
@@ -33,6 +33,9 @@ class ListCommand extends BaseCommand {
 
       // load app actions data
       (new AppActionsClient(accessToken)).list(),
+
+      // load versions data
+      (new VersionsClient(accessToken)).list()
     ]
   }
 
@@ -59,7 +62,7 @@ class ListCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(accessToken))
+      const [workflows, apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init operations client
       const client = new OperationsClient(accessToken)
@@ -82,6 +85,7 @@ class ListCommand extends BaseCommand {
               apps: docListToObj(apps),
               appActions: docListToObj(appActions),
               operations: docListToObj(operations),
+              versions: docListToObj(versions),
               shouldDump: false,
             }
           ))

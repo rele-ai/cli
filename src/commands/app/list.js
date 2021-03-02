@@ -1,12 +1,23 @@
 const cli = require("cli-ux")
 const { docToConf } = require("../../utils/parser")
+const { docListToObj } = require("../../utils")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient } = require("../../../lib/components")
+const { AppsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * List all global and org releated apps.
  */
 class ListCommand extends BaseCommand {
+  /**
+   * Load all selectors data
+   */
+  loadSelectorsData(accessToken) {
+    return [
+      // load versions data
+      (new VersionsClient(accessToken)).list()
+    ]
+  }
+
   /**
    * Execute the list apps command
    */
@@ -19,6 +30,9 @@ class ListCommand extends BaseCommand {
       // resolve access token
       const accessToken = await this.accessToken
 
+      // load selectors data
+      const [versions] = await Promise.all(this.loadSelectorsData(accessToken))
+
       // init apps client
       const appsClient = new AppsClient(accessToken)
 
@@ -28,7 +42,15 @@ class ListCommand extends BaseCommand {
       // check results
       if (apps && apps.length) {
         // return app records
-        const yamlConf = apps.map((app) => docToConf("app", app)).join("---\n")
+        const yamlConf = apps.map((app) => {
+          return docToConf(
+            "app",
+            app,
+            {
+              versions: docListToObj(versions)
+            }
+          )
+        }).join("---\n")
 
         // log to user
         this.log(yamlConf)

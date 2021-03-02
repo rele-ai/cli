@@ -153,6 +153,9 @@ service Workflows {
 
   // create trugger by id
   rpc Create (CreateWorkflowRequest) returns (CreateWorkflowResponse) {}
+
+  // activate workflow
+  rpc ActivateWorkflow(ActivateWorkflowRequest) returns (ActivateWorkflowResponse) {}
 }
 
 // ------------ AppActions Service -------------
@@ -171,6 +174,24 @@ service AppActions {
 
   // create trugger by id
   rpc Create (CreateAppActionRequest) returns (CreateAppActionResponse) {}
+}
+
+// ------------ Versions Service -------------
+service Versions {
+  // list of Versions
+  rpc List (ListVersionRequest) returns (ListVersionResponse) {}
+
+  // get Versions by id
+  rpc Get (GetVersionRequest) returns (GetVersionResponse) {}
+
+  // update Versions by id
+  rpc Update (UpdateRequest) returns (UpdateVersionResponse) {}
+
+  // delete Versions by id
+  rpc Delete (DeleteVersionRequest) returns (DeleteVersionResponse) {}
+
+  // create Versions by id
+  rpc Create (CreateVersionRequest) returns (CreateVersionResponse) {}
 }
 
 // ------------ Translations Service -------------
@@ -250,13 +271,14 @@ message UpdateRequest {
     Operation operation = 8;
     AppAction app_action = 9;
     Translation translation = 10;
+    Version version = 11;
   }
 
   // ignore flatten function
-  bool ignore_flatten = 11;
+  bool ignore_flatten = 12;
 
   // override record
-  bool override = 12;
+  bool override = 13;
 }
 
 // object id message
@@ -341,6 +363,9 @@ message User {
 
   // zapier integrations
   map<string, string> zapier = 18;
+
+  // user workflows
+  map<string, bool> workflows = 19;
 }
 
 // describe an org
@@ -512,6 +537,7 @@ message App {
   map<string, string> display_name = 7;
   AppRequest request = 8;
   bool tls = 9;
+  string version = 10;
 }
 
 // // message AppActionMetadata
@@ -551,6 +577,7 @@ message Operation {
   string key = 10;
   string id = 11;
   map<string, string> on_error = 12;
+  string version = 13;
 }
 
 // message OperationRedis
@@ -631,6 +658,7 @@ message Workflow {
   map<string, string> display_name = 7;
   string key = 8;
   string id = 9;
+  string version = 10;
 }
 
 // message WorkflowMatch
@@ -650,6 +678,7 @@ message AppAction {
   string app_id = 5;
   map<string, bool> metadata = 6;
   string id = 7;
+  string version = 8;
 }
 
 // message AppActionRequest
@@ -1008,6 +1037,7 @@ message Translation {
   string lang = 2;
   string value = 3;
   string id = 4;
+  string version = 5;
 }
 
 // message CreateOperationsRequest
@@ -1018,4 +1048,70 @@ message CreateOperationsRequest {
 // message CreateOperationsResponse
 message CreateOperationsResponse {
   repeated string ids = 1;
+}
+
+// message ListVersionRequest
+message ListVersionRequest {
+  repeated bytes conditions = 1;
+}
+
+// message ListVersionResponse
+message ListVersionResponse {
+  repeated Version versions = 1;
+}
+
+// message GetVersionRequest
+message GetVersionRequest {
+  string id = 1;
+}
+
+// message GetVersionResponse
+message GetVersionResponse {
+  Version version = 1;
+}
+
+// message UpdateVersionResponse
+message UpdateVersionResponse {
+  string id = 1;
+}
+
+// message DeleteVersionRequest
+message DeleteVersionRequest {
+  string id = 1;
+}
+
+// message DeleteVersionResponse
+message DeleteVersionResponse {}
+
+// message CreateVersionRequest
+message CreateVersionRequest {
+  Version version = 1;
+}
+
+// message CreateVersionResponse
+message CreateVersionResponse {
+  string id = 1;
+}
+
+// message Version
+message Version {
+  string key = 1;
+  string id = 2;
+}
+
+// message ActivateWorkflowRequest
+message ActivateWorkflowRequest {
+  ActivateWorkflowObject user = 1;
+  ActivateWorkflowObject org = 2;
+}
+
+// message ActivateWorkflowResponse
+message ActivateWorkflowResponse {
+  bool updated = 1;
+}
+
+// message ActivateWorkflowObject
+message ActivateWorkflowObject {
+  repeated string append = 1;
+  repeated string remove = 2;
 }
