@@ -1,5 +1,6 @@
 const fs = require("fs")
 const os = require("os")
+const pkgDir = require("pkg-dir")
 const jwtDecode = require("jwt-decode")
 const {Command} = require("@oclif/command")
 const { UsersClient } = require("../../lib/components")
@@ -75,6 +76,13 @@ class BaseCommand extends Command {
       .then((response) => {
         return response.user
       })
+  }
+
+  /**
+   * Returns the package version
+   */
+  get pkgVersion() {
+    return require(`${pkgDir.sync(__dirname)}/package.json`).version
   }
 
 
