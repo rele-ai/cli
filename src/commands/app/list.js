@@ -8,6 +8,11 @@ const { AppsClient, VersionsClient } = require("../../../lib/components")
  * List all global and org releated apps.
  */
 class ListCommand extends BaseCommand {
+  static flags = {
+    // append base command flags
+    ...BaseCommand.flags
+  }
+
   /**
    * Load all selectors data
    */

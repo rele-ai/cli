@@ -7,6 +7,11 @@ const { WorkflowsClient } = require("../../../lib/components")
  * List all global and org releated workflows.
  */
 class ListCommand extends BaseCommand {
+  static flags = {
+    // append base command flags
+    ...BaseCommand.flags
+  }
+
   /**
    * Execute the list workflow command
    */

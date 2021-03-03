@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient, AppActionsClient } = require("../../../lib/components")
+const { AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * Get a specific user by the selector key.
@@ -12,6 +12,9 @@ const { AppsClient, AppActionsClient } = require("../../../lib/components")
 class GetCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // write to output path
     output: flags.string({
       char: "o",
@@ -42,8 +45,39 @@ class GetCommand extends BaseCommand {
   loadSelectorsData(accessToken) {
     // load apps data
     return [
-      (new AppsClient(accessToken)).list()
+      // load apps data
+      (new AppsClient(accessToken)).list(),
+
+      // load versions data
+      (new VersionsClient(accessToken)).list(),
     ]
+  }
+
+  /**
+   * Returns the list conditions matrix.
+   *
+   * @param {Array.<object>} apps - List of apps.
+   */
+  async getListConditions(apps) {
+    // define conditions
+    let conds = []
+
+    // get version id
+    const vid = await this.versionId
+
+    // query by version
+    if (vid) {
+      conds.push(["version", "==", vid])
+    }
+
+    // get app id
+    const appId = (apps.find(app => app.system_key === this.flags.appKey)).id
+
+    // add to condition matrix
+    conds.push(["app_id", "==", appId])
+
+    // return conditions matrix
+    return conds
   }
 
   /**
@@ -75,18 +109,28 @@ class GetCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [apps] = await Promise.all(this.loadSelectorsData(accessToken))
+      const [apps, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init app actions client
       const client = new AppActionsClient(accessToken)
 
+      // get conditions list
+      const conds  = await this.getListConditions(apps)
+
       // get app actions record
-      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]])
+      const appAction = await client.getByKey(key, conds)
 
       // check response
       if (appAction) {
         // convert to yaml
-        const yamlConf = docToConf("app_action", appAction, { apps: docListToObj(apps) })
+        const yamlConf = docToConf(
+          "app_action",
+          appAction,
+          {
+            apps: docListToObj(apps),
+            versions: docListToObj(versions)
+          }
+        )
 
         // write output if path provided
         if (output) {

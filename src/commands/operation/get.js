@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient } = require("../../../lib/components")
+const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * Get a specific operation by the selector key.
@@ -12,6 +12,9 @@ const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient } = requ
 class GetCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // write to output path
     output: flags.string({
       char: "o",
@@ -48,17 +51,47 @@ class GetCommand extends BaseCommand {
 
       // load app actions data
       (new AppActionsClient(accessToken)).list(),
+
+      // load versions data
+      (new VersionsClient(accessToken)).list(),
     ]
   }
 
+  // /**
+  //  * Find workflow based on key.
+  //  *
+  //  * @param {Array.<object>} workflows - List of workflows.
+  //  * @param {string} key - Workflow key.
+  //  */
+  // getWorkflowKey(workflows, key) {
+  //   return workflows.find(workflow => workflow.key === key)
+  // }
+
   /**
-   * Find workflow based on key.
+   * Returns the list conditions matrix.
    *
    * @param {Array.<object>} workflows - List of workflows.
-   * @param {string} key - Workflow key.
    */
-  getWorkflowKey(workflows, key) {
-    return workflows.find(workflow => workflow.key === key)
+  async getListConditions(workflows) {
+    // define conditions
+    let conds = []
+
+    // get version id
+    const vid = await this.versionId
+
+    // query by version
+    if (vid) {
+      conds.push(["version", "==", vid])
+    }
+
+    // get workflow id
+    const workflowId = (workflows.find(workflowObj => workflowObj.key === this.flags.workflowKey)).id
+
+    // add to condition matrix
+    conds.push(["workflows", "array-contains", workflowId])
+
+    // return conditions matrix
+    return conds
   }
 
   /**
@@ -80,13 +113,16 @@ class GetCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(accessToken))
+      const [workflows, apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init operation client
       const client = new OperationsClient(accessToken)
 
+      // get conditions list
+      const conds  = await this.getListConditions(workflows)
+
       // get operation record
-      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
+      const operation = await client.getByKey(key, conds)
 
       // check response
       if (operation) {
@@ -98,6 +134,7 @@ class GetCommand extends BaseCommand {
             workflows: docListToObj(workflows),
             apps: docListToObj(apps),
             appActions: docListToObj(appActions),
+            versions: docListToObj(versions),
           }
         )
 
