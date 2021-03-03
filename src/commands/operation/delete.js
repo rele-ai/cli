@@ -10,6 +10,9 @@ const { WorkflowsClient, OperationsClient } = require("../../../lib/components")
 class DeleteCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // filter by workflow key
     workflowKey: flags.string({
       char: "w",
@@ -43,8 +46,10 @@ class DeleteCommand extends BaseCommand {
    * @param {Array.<object>} workflows - List of workflows.
    * @param {string} key - Workflow key.
    */
-  getWorkflowKey(workflows, key) {
-    return workflows.find(workflow => workflow.key === key)
+  async getWorkflowKey(workflows, key) {
+    const vid = await this.versionId
+
+    return workflows.find(workflow => workflow.key === key && workflow.version === vid)
   }
 
   /**
@@ -68,8 +73,17 @@ class DeleteCommand extends BaseCommand {
       // init operations client
       const client = new OperationsClient(accessToken)
 
+      // get workflow key
+      const workflowKey = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+
+      // check for matching workflows
+      if (!workflowKey) {
+        cli.ux.action.stop("couldn't find matching operations.")
+        return
+      }
+
       // delete operation by key
-      await client.deleteByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
+      await client.deleteByKey(key, [["workflows", "array-contains", workflowKey.id]])
 
       // stop spinner
       cli.ux.action.stop()

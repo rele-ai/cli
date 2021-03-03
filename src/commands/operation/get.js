@@ -63,8 +63,10 @@ class GetCommand extends BaseCommand {
    * @param {Array.<object>} workflows - List of workflows.
    * @param {string} key - Workflow key.
    */
-  getWorkflowKey(workflows, key) {
-    return workflows.find(workflow => workflow.key === key)
+  async getWorkflowKey(workflows, key) {
+    const vid = await this.versionId
+
+    return workflows.find(workflow => workflow.key === key && workflow.version === vid)
   }
 
   /**
@@ -75,7 +77,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output, version } = this.flags
+    const { output } = this.flags
 
     // try to pull operation
     try {
@@ -91,8 +93,17 @@ class GetCommand extends BaseCommand {
       // init operation client
       const client = new OperationsClient(accessToken)
 
+      // get workflow key
+      const workflowKey = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+
+      // check for matching workflows
+      if (!workflowKey) {
+        cli.ux.action.stop("couldn't find matching operations.")
+        return
+      }
+
       // get operation record
-      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]], version)
+      const operation = await client.getByKey(key, [["workflows", "array-contains", workflowKey.id]], (await this.version))
 
       // check response
       if (operation) {

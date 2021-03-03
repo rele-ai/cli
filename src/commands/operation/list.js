@@ -85,7 +85,18 @@ class ListCommand extends BaseCommand {
       const client = new OperationsClient(accessToken)
 
       // build conditions
-      const conds = this.flags.workflowKey ? [["workflows", "array-contains", (await this.getWorkflowKey(workflows, this.flags.workflowKey)).id]] : []
+      let conds = []
+
+      if (this.flags.workflowKey) {
+        const workflowKey = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+
+        if (workflowKey) {
+          conds.push(["workflows", "array-contains", workflowKey.id])
+        } else {
+          cli.ux.action.stop("coludn't find matching operations")
+          return
+        }
+      }
 
       // list operations records
       const operations = await client.list(conds)
