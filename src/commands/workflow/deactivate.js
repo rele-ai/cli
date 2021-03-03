@@ -33,9 +33,9 @@ class DeactivateCommand extends BaseCommand {
   /**
    * Deactivate the selected workflow from the organization.
    *
-   * @param {string} key - Workflow Key
+   * @param {string} workflows - Workflow keys.
    */
-  async _deactivateWorkflow(key) {
+  async _deactivateWorkflow(workflows) {
     // resolve access token
     const accessToken = await this.accessToken
 
