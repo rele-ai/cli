@@ -75,19 +75,21 @@ class ListCommand extends BaseCommand {
 
       // check results
       if (operations && operations.length) {
+        const metadata = {
+          workflows: docListToObj(workflows),
+          apps: docListToObj(apps),
+          appActions: docListToObj(appActions),
+          operations: docListToObj(operations),
+          versions: docListToObj(versions),
+          shouldDump: false,
+        }
+
         // return operations records
         const data = {
           operations: operations.map((operation) => docToConf(
             "operation",
             operation,
-            {
-              workflows: docListToObj(workflows),
-              apps: docListToObj(apps),
-              appActions: docListToObj(appActions),
-              operations: docListToObj(operations),
-              versions: docListToObj(versions),
-              shouldDump: false,
-            }
+            metadata
           ))
         }
 
