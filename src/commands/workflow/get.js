@@ -65,7 +65,7 @@ class GetCommand extends BaseCommand {
       const client = new WorkflowsClient(accessToken)
 
       // get workflow record
-      const workflow = await client.getByKey(key, [], true, version)
+      const workflow = await client.getByKey(key, [], version)
 
       // convert to yaml
       const yamlConf = docToConf("workflow", workflow, { versions: docListToObj(versions) })

@@ -16,6 +16,12 @@ class DeleteCommand extends BaseCommand {
     }
   ]
 
+  // command flags
+  static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+  }
+
   /**
    * Execute the delete command
    */
@@ -35,7 +41,7 @@ class DeleteCommand extends BaseCommand {
       const client = new AppsClient(accessToken)
 
       // delete application by key
-      await client.deleteByKey(key)
+      await client.deleteByKey(key, [], await this.version)
 
       // stop spinner
       cli.ux.action.stop()

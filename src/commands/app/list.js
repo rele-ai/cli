@@ -46,14 +46,16 @@ class ListCommand extends BaseCommand {
 
       // check results
       if (apps && apps.length) {
+        const metadata = {
+          versions: docListToObj(versions)
+        }
+
         // return app records
         const yamlConf = apps.map((app) => {
           return docToConf(
             "app",
             app,
-            {
-              versions: docListToObj(versions)
-            }
+            metadata
           )
         }).join("---\n")
 

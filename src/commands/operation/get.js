@@ -92,7 +92,7 @@ class GetCommand extends BaseCommand {
       const client = new OperationsClient(accessToken)
 
       // get operation record
-      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]], true, version)
+      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]], version)
 
       // check response
       if (operation) {

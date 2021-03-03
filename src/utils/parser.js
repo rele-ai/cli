@@ -69,8 +69,7 @@ const loadAppConf = (doc, versions, shouldDump=true) => {
     protocol: doc.protocol,
     version: (versions[doc.version] || {}).key,
     request: doc.request,
-    key: doc.system_key,
-    is_global: doc.org === "global"
+    key: doc.system_key
   }
 
   return shouldDump ? yaml.dump(data) : data

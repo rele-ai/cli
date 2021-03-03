@@ -49,7 +49,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output, version } = this.flags
+    const { output } = this.flags
 
     // try to pull app
     try {
@@ -66,7 +66,7 @@ class GetCommand extends BaseCommand {
       const appsClient = new AppsClient(accessToken)
 
       // get app record
-      const app = await appsClient.getByKey(key, [], true, version)
+      const app = await appsClient.getByKey(key, [], await this.version)
 
       // check yaml config
       if (app) {

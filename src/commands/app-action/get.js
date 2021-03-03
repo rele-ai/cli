@@ -88,7 +88,7 @@ class GetCommand extends BaseCommand {
       const client = new AppActionsClient(accessToken)
 
       // get app actions record
-      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]], true, version)
+      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]], version)
 
       // check response
       if (appAction) {
