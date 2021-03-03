@@ -67,14 +67,17 @@ class ImportCommand extends BaseCommand {
     // it exists and update or create
     return await Promise.all(
       translations.flatMap(async (translation) => {
+        // update version id
+        const versionId = await client.getVersionId(translation.version)
+
         // try to get translation by key
-        const conf = await client.getByKey(translation.key, [["lang", "==", translation.lang]])
+        const conf = await client.getByKey(translation.key, [["lang", "==", translation.lang], ["version", "==", versionId]])
 
         // check if translation exists
         if (conf) {
           return client.updateById(conf.id, translation)
         } else {
-          return client.create(translation)
+          return client.create(translation, translation.version)
         }
       })
     )

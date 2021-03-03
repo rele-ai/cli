@@ -7,6 +7,11 @@ const { TranslationsClient } = require("../../../lib/components")
  * that are related to the user's organization can be deleted.
  */
 class DeleteCommand extends BaseCommand {
+  static flags = {
+    // append base command flags
+    ...BaseCommand.flags
+  }
+
   // define the command arguments
   static args = [
     {
@@ -35,7 +40,7 @@ class DeleteCommand extends BaseCommand {
       const client = new TranslationsClient(accessToken)
 
       // collect translations records
-      const translations = await client.list([["key", "==", this.args.key]])
+      const translations = await client.list([["key", "==", this.args.key], ["version", "==", (await this.versionId)]])
 
       // delete translation by key
       await Promise.all(translations.map((translation) => client.deleteById(translation.id)))

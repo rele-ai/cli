@@ -3,9 +3,10 @@ const csv = require("csv")
 const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 // const plugins = require("../../utils/plugin")
+const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
-const { TranslationsClient } = require("../../../lib/components")
+const { TranslationsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * List all global and org releated translations.
@@ -47,7 +48,8 @@ class ListCommand extends BaseCommand {
     const columns = {
       lang: "lang",
       value: "value",
-      key: "key"
+      key: "key",
+      version: "version"
     }
 
     // return csv stringify
@@ -64,6 +66,16 @@ class ListCommand extends BaseCommand {
   }
 
   /**
+   * Load all selectors data
+   */
+  loadSelectorsData(accessToken) {
+    return [
+      // load versions data
+      (new VersionsClient(accessToken)).list()
+    ]
+  }
+
+  /**
    * Execute the list translations command
    */
   async run() {
@@ -75,11 +87,15 @@ class ListCommand extends BaseCommand {
       // resolve access token and user info
       const accessToken = await this.accessToken
 
+      // load selectors data
+      const [versions] = await Promise.all(this.loadSelectorsData(accessToken))
+      const vers = docListToObj(versions)
+
       // init translations client
       const client = new TranslationsClient(accessToken)
 
       // create conditions
-      const conds = this.args.key ? [["key", "==", this.args.key]] : []
+      const conds = this.args.key ? [["key", "==", this.args.key], ["version", "==", (await this.versionId)]] : []
 
       // collect translations records
       const data = {
@@ -95,10 +111,10 @@ class ListCommand extends BaseCommand {
         let confs
         switch (this.flags.format) {
           case "yaml":
-            confs = data.translations.map((translation) => docToConf("translation", translation)).join("---\n")
+            confs = data.translations.map((translation) => docToConf("translation", translation, { versions: vers })).join("---\n")
             break
           case "csv":
-            confs = await this.exportTranslationsToCSV(data.translations)
+            confs = await this.exportTranslationsToCSV(data.translations.map((t) => ({...t, version: vers[t.version].key})))
             break
           default:
             throw new Error(`unexpected format: ${this.flags.format}`)
