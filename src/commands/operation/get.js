@@ -52,46 +52,19 @@ class GetCommand extends BaseCommand {
       // load app actions data
       (new AppActionsClient(accessToken)).list(),
 
-      // load versions data
+      // load app actions data
       (new VersionsClient(accessToken)).list(),
     ]
   }
 
-  // /**
-  //  * Find workflow based on key.
-  //  *
-  //  * @param {Array.<object>} workflows - List of workflows.
-  //  * @param {string} key - Workflow key.
-  //  */
-  // getWorkflowKey(workflows, key) {
-  //   return workflows.find(workflow => workflow.key === key)
-  // }
-
   /**
-   * Returns the list conditions matrix.
+   * Find workflow based on key.
    *
    * @param {Array.<object>} workflows - List of workflows.
+   * @param {string} key - Workflow key.
    */
-  async getListConditions(workflows) {
-    // define conditions
-    let conds = []
-
-    // get version id
-    const vid = await this.versionId
-
-    // query by version
-    if (vid) {
-      conds.push(["version", "==", vid])
-    }
-
-    // get workflow id
-    const workflowId = (workflows.find(workflowObj => workflowObj.key === this.flags.workflowKey)).id
-
-    // add to condition matrix
-    conds.push(["workflows", "array-contains", workflowId])
-
-    // return conditions matrix
-    return conds
+  getWorkflowKey(workflows, key) {
+    return workflows.find(workflow => workflow.key === key)
   }
 
   /**
@@ -118,11 +91,8 @@ class GetCommand extends BaseCommand {
       // init operation client
       const client = new OperationsClient(accessToken)
 
-      // get conditions list
-      const conds  = await this.getListConditions(workflows)
-
       // get operation record
-      const operation = await client.getByKey(key, conds)
+      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
 
       // check response
       if (operation) {

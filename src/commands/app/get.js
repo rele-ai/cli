@@ -42,25 +42,6 @@ class GetCommand extends BaseCommand {
   }
 
   /**
-   * Returns the list conditions matrix.
-   */
-  async getListConditions() {
-    // define conditions
-    let conds = []
-
-    // get version id
-    const vid = await this.versionId
-
-    // query by version
-    if (vid) {
-      conds.push(["version", "==", vid])
-    }
-
-    // return conditions matrix
-    return conds
-  }
-
-  /**
    * Run the get command that loads the application
    */
   async run() {
@@ -84,11 +65,8 @@ class GetCommand extends BaseCommand {
       // init apps client
       const appsClient = new AppsClient(accessToken)
 
-      // get conditions list
-      const conds  = await this.getListConditions()
-
       // get app record
-      const app = await appsClient.getByKey(key, conds)
+      const app = await appsClient.getByKey(key)
 
       // check yaml config
       if (app) {

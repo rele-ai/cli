@@ -41,25 +41,6 @@ class GetCommand extends BaseCommand {
   }
 
   /**
-   * Returns the list conditions matrix.
-   */
-  async getListConditions() {
-    // define conditions
-    let conds = []
-
-    // get version id
-    const vid = await this.versionId
-
-    // query by version
-    if (vid) {
-      conds.push(["version", "==", vid])
-    }
-
-    // return conditions matrix
-    return conds
-  }
-
-  /**
    * Run the get command that loads the workflows
    */
   async run() {
@@ -83,11 +64,8 @@ class GetCommand extends BaseCommand {
       // init workflow client
       const client = new WorkflowsClient(accessToken)
 
-      // get conditions list
-      const conds = await this.getListConditions()
-
       // get workflow record
-      const workflow = await client.getByKey(key, conds)
+      const workflow = await client.getByKey(key)
 
       // convert to yaml
       const yamlConf = docToConf("workflow", workflow, { versions: docListToObj(versions) })

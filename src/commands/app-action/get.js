@@ -54,33 +54,6 @@ class GetCommand extends BaseCommand {
   }
 
   /**
-   * Returns the list conditions matrix.
-   *
-   * @param {Array.<object>} apps - List of apps.
-   */
-  async getListConditions(apps) {
-    // define conditions
-    let conds = []
-
-    // get version id
-    const vid = await this.versionId
-
-    // query by version
-    if (vid) {
-      conds.push(["version", "==", vid])
-    }
-
-    // get app id
-    const appId = (apps.find(app => app.system_key === this.flags.appKey)).id
-
-    // add to condition matrix
-    conds.push(["app_id", "==", appId])
-
-    // return conditions matrix
-    return conds
-  }
-
-  /**
    * Pull application from list by key.
    *
    * @param {Array.<object>} apps - List of apps.
@@ -114,11 +87,8 @@ class GetCommand extends BaseCommand {
       // init app actions client
       const client = new AppActionsClient(accessToken)
 
-      // get conditions list
-      const conds  = await this.getListConditions(apps)
-
       // get app actions record
-      const appAction = await client.getByKey(key, conds)
+      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]])
 
       // check response
       if (appAction) {
