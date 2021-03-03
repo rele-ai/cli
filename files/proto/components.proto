@@ -1098,7 +1098,6 @@ message CreateVersionResponse {
 message Version {
   string key = 1;
   string id = 2;
-  string version = 3;
 }
 
 // message ActivateWorkflowRequest
