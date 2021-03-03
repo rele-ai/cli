@@ -10,7 +10,8 @@ const {
   AppsClient,
   TranslationsClient,
   AppActionsClient,
-  OperationsClient
+  OperationsClient,
+  VersionsClient
 } = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
@@ -123,10 +124,10 @@ class ApplyCommand extends BaseCommand {
 
     if (config) {
       // update config
-      return client.updateById(config.id, data)
+      return client.updateById(config.id, { ...data, version: config.version })
     } else {
       // create config
-      return client.create(data)
+      return client.create(data, version)
     }
   }
 
@@ -144,6 +145,7 @@ class ApplyCommand extends BaseCommand {
       Translation: new TranslationsClient(accessToken),
       AppAction: new AppActionsClient(accessToken),
       Operation: new OperationsClient(accessToken),
+      Version: new VersionsClient(accessToken)
     }
   }
 
