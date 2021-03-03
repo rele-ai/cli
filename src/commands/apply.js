@@ -93,22 +93,27 @@ class ApplyCommand extends BaseCommand {
    * generate operations records on firestore.
    */
   async _generateOperations(operationsConfs) {
+    // destract version
+    const version = await this.version
+
     // format operations confs to
     // operations docs
     const operationsDocs = await Promise.all(
       operationsConfs.map(conf => this._formatConfToDoc(conf))
     )
 
-    // create operations records
-    await this._clients.Operation.createRecords(operationsDocs)
+    if (operationsDocs.length) {
+      // create operations records
+      await this._clients.Operation.createRecords(operationsDocs, version)
+    }
   }
 
   /**
    * generate config record on firestore.
    */
   async _generateRecord(object) {
-    // pull version
-    const { version } = this.flags
+    // destract version
+    const version = await this.version
 
     // pull client by type
     const client = this._clients[object.type]

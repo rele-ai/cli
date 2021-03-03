@@ -1043,6 +1043,7 @@ message Translation {
 // message CreateOperationsRequest
 message CreateOperationsRequest {
   repeated Operation records = 1;
+  string version = 2;
 }
 
 // message CreateOperationsResponse
