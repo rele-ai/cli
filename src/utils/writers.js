@@ -16,12 +16,15 @@ module.exports.writeConfig = (object, output) => {
   // check output ext
   if ([".yaml", ".yml"].includes(parsed.ext)) {
     // check if dir path exists
-    if (!fs.existsSync(parsed.dir)) {
+    if (parsed.dir && !fs.existsSync(parsed.dir)) {
       fs.mkdirSync(parsed.dir, { recursive: true })
     }
 
     // write file
-    fs.writeFileSync(output, yaml.dump(object))
+    if (object && object.constructor === Object) {
+      object = yaml.dump(object)
+    }
+    fs.writeFileSync(output, object)
   } else {
     // handle error
     throw new Error("provided output path must be of a YAML file.")
