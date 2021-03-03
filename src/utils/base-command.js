@@ -2,9 +2,10 @@ const fs = require("fs")
 const os = require("os")
 const pkgDir = require("pkg-dir")
 const jwtDecode = require("jwt-decode")
-const {Command} = require("@oclif/command")
-const { UsersClient } = require("../../lib/components")
 const AuthClient = require("../../lib/auth")
+const { Command, flags } = require("@oclif/command")
+const versionSort = require("../../lib/utils/version-sort")
+const { UsersClient, VersionsClient } = require("../../lib/components")
 
 // pull the homr dir
 const HOME = os.homedir()
@@ -23,10 +24,20 @@ class BaseCommand extends Command {
     ? "https://console.dev.bot.rele.ai"
     : "https://console.rele.ai"
 
+
+  // define global flags
+  static flags = {
+    // get config version from user
+    version: flags.string({
+      char: "v",
+      description: "Config version"
+    }),
+  }
+
   /**
   * Extend the default init function
   */
-  async init() {
+  init() {
     // parse flags and args
     this._parseFlagsArgs()
   }
@@ -81,10 +92,61 @@ class BaseCommand extends Command {
   /**
    * Returns the package version
    */
-  get pkgVersion() {
-    return require(`${pkgDir.sync(__dirname)}/package.json`).version
+  get version() {
+    // prioritize user args
+    if (this.flags.version) {
+      return Promise.resolve(this.flags.version)
+    }
+
+    // get version from closes package.json
+    const pkg = pkgDir.sync(process.cwd())
+
+    if (pkg) {
+      return Promise.resolve(require(`${pkgDir.sync(process.cwd())}/package.json`).version)
+    } else {
+      return this.latestVersion.then(version => version.key).then((key) => {
+        if (key) {
+          return key
+        } else {
+          throw new Error("Couldn't find package.json version, or latest version. Please provide -v/--version flag with the proper version.")
+        }
+      })
+    }
   }
 
+  /**
+   * Returns the version ID from firestore.
+   */
+  get versionId() {
+    return this.accessToken.then((at) => {
+      // init client
+      const client = new VersionsClient(at)
+
+      // get id by the version number
+      return this.version.then((version) => {
+        return client.getVersionId(version)
+      })
+    })
+  }
+
+  /**
+   * Return the latest version object from firestore.
+   */
+  get latestVersion() {
+    return this.accessToken.then((at) => {
+      // init client
+      const client = new VersionsClient(at)
+
+      // get id by the version number
+      return client.list()
+    }).then((versions) => {
+      if (versions && versions.length) {
+        return versionSort(versions, { nested: "key" })[versions.length - 1]
+      }
+
+      return {}
+    })
+  }
 
   /**
    * Parse default flags and args

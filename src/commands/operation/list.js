@@ -11,13 +11,28 @@ const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, Version
  * List all global and org releated operations.
  */
 class ListCommand extends BaseCommand {
-  // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // filter by workflow key
     workflowKey: flags.string({
       char: "w",
       description: "Filter by an workflow key",
     })
+  }
+
+  /**
+   * check for version on init
+   */
+  async init() {
+    // parse flags
+    super.init()
+
+    // check version
+    if (this.flags.workflowKey) {
+      await this.version
+    }
   }
 
   /**
@@ -45,8 +60,10 @@ class ListCommand extends BaseCommand {
    * @param {Array.<object>} workflows - List of workflows.
    * @param {string} key - Workflow key.
    */
-  getWorkflowKey(workflows, key) {
-    return workflows.find(workflow => workflow.key === key)
+  async getWorkflowKey(workflows, key) {
+    const vid = await this.versionId
+
+    return workflows.find(workflow => workflow.key === key && workflow.version === vid)
   }
 
   /**
@@ -68,7 +85,7 @@ class ListCommand extends BaseCommand {
       const client = new OperationsClient(accessToken)
 
       // build conditions
-      const conds = this.flags.workflowKey ? [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]] : []
+      const conds = this.flags.workflowKey ? [["workflows", "array-contains", (await this.getWorkflowKey(workflows, this.flags.workflowKey)).id]] : []
 
       // list operations records
       const operations = await client.list(conds)
