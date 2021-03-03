@@ -1,6 +1,7 @@
 const cli = require("cli-ux")
+const { flags } = require("@oclif/command")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient, OrgsClient } = require("../../../lib/components")
+const { WorkflowsClient } = require("../../../lib/components")
 
 /**
  * Deactivate a given workflow from the user's organization
@@ -9,59 +10,24 @@ class DeactivateCommand extends BaseCommand {
   // command arguments
   static args = [
     {
-      name: "key",
+      name: "workflows",
       required: true,
-      description: "Workflow selector key."
+      description: "List of workflow keys seperated by a comma.",
+      parse: input => input.trim().split(",")
     }
   ]
 
-  /**
-   * Search the workflows by the selector key
-   *
-   * @param {string} key - Workflow selector key.
-   * @returns {string} - Workflow ID.
-   */
-  async _getWorkflowId(key) {
-    // resolve access token
-    const accessToken = await this.accessToken
+  static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
 
-    // init workflow client
-    const client = new WorkflowsClient(accessToken)
-
-    // get workflow key
-    const workflow = await client.getByKey(key)
-
-    // return workflow id
-    return workflow.id
-  }
-
-  /**
-   * Updates the organization active workflows.
-   *
-   * @param {string} orgId - Organization ID.
-   * @param {string} workflowId - Workflow ID.
-   */
-  async _updateOrgWorkflows(orgId, workflowId) {
-    // resolve access token
-    const accessToken = await this.accessToken
-
-    // init orgs client
-    const client = new OrgsClient(accessToken)
-
-    // update active workflows
-    return await client.updateById(
-      orgId,
-      {
-        org: {
-          workflows: {
-            [workflowId]: false,
-          }
-        }
-      },
-      {
-        override: false,
-      }
-    )
+    // append base command flags
+    destination: flags.string({
+      char: "d",
+      description: "Destination config - user or org",
+      options: ["user", "org"],
+      required: true
+    })
   }
 
   /**
@@ -70,19 +36,31 @@ class DeactivateCommand extends BaseCommand {
    * @param {string} key - Workflow Key
    */
   async _deactivateWorkflow(key) {
+    // resolve access token
+    const accessToken = await this.accessToken
+
+    // init workflow client
+    const client = new WorkflowsClient(accessToken)
+
     // get workflow id
-    const workflowId = await this._getWorkflowId(key)
+    const workflowIds = await Promise.all(
+      workflows.map(async (key) => {
+        const workflow = await client.getByKey(key, [], await this.version)
 
-    // get user's organization
-    const { orgs } = await this.user
+        if (workflow) {
+          return workflow.id
+        } else {
+          throw new Error(`couldn't find workflow key: ${key}`)
+        }
+      })
+    )
 
-    // make sure we have one organization in the list
-    if (orgs && orgs.length === 1) {
-      // update organization with workflow id
-      await this._updateOrgWorkflows(orgs[0], workflowId)
-    } else {
-      throw new Error("unexpected amount of organization.")
-    }
+    // make request to activate endpoint
+    await client.updateActiveWorkflows({
+      [this.flags.destination]: {
+        remove: workflowIds
+      }
+    })
   }
 
   /**
@@ -90,14 +68,14 @@ class DeactivateCommand extends BaseCommand {
    */
   async run() {
     // get key
-    const { key } = this.args
+    const { workflows } = this.args
 
     // start spinner
-    cli.ux.action.start(`Deactivating workflow ${key}`)
+    cli.ux.action.start(`Deactivating workflows: ${workflows.join(",")}`)
 
     try {
       // update the user's organization
-      await this._deactivateWorkflow(key)
+      await this._deactivateWorkflow(workflows)
 
       // stop spinner
       cli.ux.action.stop()

@@ -1,7 +1,8 @@
 const cli = require("cli-ux")
+const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient } = require("../../../lib/components")
+const { WorkflowsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * List all global and org releated workflows.
@@ -10,6 +11,16 @@ class ListCommand extends BaseCommand {
   static flags = {
     // append base command flags
     ...BaseCommand.flags
+  }
+
+  /**
+   * Load all selectors data
+   */
+  loadSelectorsData(accessToken) {
+    return [
+      // load versions data
+      (new VersionsClient(accessToken)).list()
+    ]
   }
 
   /**
@@ -24,6 +35,9 @@ class ListCommand extends BaseCommand {
       // resolve access token
       const accessToken = await this.accessToken
 
+      // load selectors data
+      const [versions] = await Promise.all(this.loadSelectorsData(accessToken))
+
       // init workflows client
       const client = new WorkflowsClient(accessToken)
 
@@ -32,8 +46,12 @@ class ListCommand extends BaseCommand {
 
       // check response
       if (workflows && workflows.length) {
+        const metadata = {
+          versions: docListToObj(versions)
+        }
+
         // return workflow records
-        const yamlConf = workflows.map((workflow) => docToConf("workflow", workflow)).join("---\n")
+        const yamlConf = workflows.map((workflow) => docToConf("workflow", workflow, metadata)).join("---\n")
 
         // log to user
         this.log(yamlConf)

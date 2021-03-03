@@ -48,7 +48,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output, version } = this.flags
+    const { output } = this.flags
 
     // try to pull workflows
     try {
@@ -65,21 +65,26 @@ class GetCommand extends BaseCommand {
       const client = new WorkflowsClient(accessToken)
 
       // get workflow record
-      const workflow = await client.getByKey(key, [], version)
+      const workflow = await client.getByKey(key, [], await this.version)
 
-      // convert to yaml
-      const yamlConf = docToConf("workflow", workflow, { versions: docListToObj(versions) })
+      // check if workflow exists
+      if (workflow) {
+        // convert to yaml
+        const yamlConf = docToConf("workflow", workflow, { versions: docListToObj(versions) })
 
-      // write output if path provided
-      if (output) {
-        writeConfig(yamlConf, output)
+        // write output if path provided
+        if (output) {
+          writeConfig(yamlConf, output)
+        } else {
+          // return workflow object
+          this.log(yamlConf)
+        }
+
+        // stop spinner
+        cli.ux.action.stop()
       } else {
-        // return workflow object
-        this.log(yamlConf)
+        cli.ux.action.stop(`couldn't find workflow for key: ${key}`)
       }
-
-      // stop spinner
-      cli.ux.action.stop()
     } catch (error) {
       cli.ux.action.stop("falied")
       this.error(`Unable to get workflow ${key}.\n${error}`)

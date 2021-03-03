@@ -111,7 +111,8 @@ class ListCommand extends BaseCommand {
         let confs
         switch (this.flags.format) {
           case "yaml":
-            confs = data.translations.map((translation) => docToConf("translation", translation, { versions: vers })).join("---\n")
+            const metadata = { versions: vers }
+            confs = data.translations.map((translation) => docToConf("translation", translation, metadata)).join("---\n")
             break
           case "csv":
             confs = await this.exportTranslationsToCSV(data.translations.map((t) => ({...t, version: vers[t.version].key})))
