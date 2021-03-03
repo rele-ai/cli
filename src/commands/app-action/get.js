@@ -71,7 +71,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output } = this.flags
+    const { output, version } = this.flags
 
     // try to pull app
     try {
@@ -88,7 +88,7 @@ class GetCommand extends BaseCommand {
       const client = new AppActionsClient(accessToken)
 
       // get app actions record
-      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]])
+      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]], true, version)
 
       // check response
       if (appAction) {

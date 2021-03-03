@@ -14,8 +14,12 @@ const {
 } = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
+
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     path: flags.string({
       char: "f",
       description: "A path to source yaml file.",
@@ -102,6 +106,9 @@ class ApplyCommand extends BaseCommand {
    * generate config record on firestore.
    */
   async _generateRecord(object) {
+    // pull version
+    const { version } = this.flags
+
     // pull client by type
     const client = this._clients[object.type]
 
@@ -112,7 +119,7 @@ class ApplyCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    const config = await client.getByKey(object.key, conditions)
+    const config = await client.getByKey(object.key, conditions, true, version)
 
     if (config) {
       // update config

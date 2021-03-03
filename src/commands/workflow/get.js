@@ -48,7 +48,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output } = this.flags
+    const { output, version } = this.flags
 
     // try to pull workflows
     try {
@@ -65,7 +65,7 @@ class GetCommand extends BaseCommand {
       const client = new WorkflowsClient(accessToken)
 
       // get workflow record
-      const workflow = await client.getByKey(key)
+      const workflow = await client.getByKey(key, [], true, version)
 
       // convert to yaml
       const yamlConf = docToConf("workflow", workflow, { versions: docListToObj(versions) })

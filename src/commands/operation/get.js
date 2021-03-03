@@ -75,7 +75,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output } = this.flags
+    const { output, version } = this.flags
 
     // try to pull operation
     try {
@@ -92,7 +92,7 @@ class GetCommand extends BaseCommand {
       const client = new OperationsClient(accessToken)
 
       // get operation record
-      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
+      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]], true, version)
 
       // check response
       if (operation) {
