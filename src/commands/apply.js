@@ -10,12 +10,17 @@ const {
   AppsClient,
   TranslationsClient,
   AppActionsClient,
-  OperationsClient
+  OperationsClient,
+  VersionsClient
 } = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
+
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     path: flags.string({
       char: "f",
       description: "A path to source yaml file.",
@@ -88,20 +93,28 @@ class ApplyCommand extends BaseCommand {
    * generate operations records on firestore.
    */
   async _generateOperations(operationsConfs) {
+    // destract version
+    const version = await this.version
+
     // format operations confs to
     // operations docs
     const operationsDocs = await Promise.all(
       operationsConfs.map(conf => this._formatConfToDoc(conf))
     )
 
-    // create operations records
-    await this._clients.Operation.createRecords(operationsDocs)
+    if (operationsDocs.length) {
+      // create operations records
+      await this._clients.Operation.createRecords(operationsDocs, version)
+    }
   }
 
   /**
    * generate config record on firestore.
    */
   async _generateRecord(object) {
+    // destract version
+    const version = await this.version
+
     // pull client by type
     const client = this._clients[object.type]
 
@@ -112,14 +125,14 @@ class ApplyCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    const config = await client.getByKey(object.key, conditions)
+    const config = await client.getByKey(object.key, conditions, true, version)
 
     if (config) {
       // update config
-      return client.updateById(config.id, data)
+      return client.updateById(config.id, { ...data, version: config.version })
     } else {
       // create config
-      return client.create(data)
+      return client.create(data, version)
     }
   }
 
@@ -137,6 +150,7 @@ class ApplyCommand extends BaseCommand {
       Translation: new TranslationsClient(accessToken),
       AppAction: new AppActionsClient(accessToken),
       Operation: new OperationsClient(accessToken),
+      Version: new VersionsClient(accessToken)
     }
   }
 

@@ -13,6 +13,9 @@ const { TranslationsClient } = require("../../../lib/components")
 class ListCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // write to output path
     output: flags.string({
       char: "o",

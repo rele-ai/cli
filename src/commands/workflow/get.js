@@ -1,9 +1,10 @@
 const cli = require("cli-ux")
 const {flags} = require("@oclif/command")
+const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient } = require("../../../lib/components")
+const { WorkflowsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * Get a specific workflow by the selector key.
@@ -11,6 +12,9 @@ const { WorkflowsClient } = require("../../../lib/components")
 class GetCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     output: flags.string({
       char: "o",
       description: "A path to output file.",
@@ -28,6 +32,15 @@ class GetCommand extends BaseCommand {
   ]
 
   /**
+   * Load all selectors data
+   */
+  loadSelectorsData(accessToken) {
+    return [
+      (new VersionsClient(accessToken)).list(),
+    ]
+  }
+
+  /**
    * Run the get command that loads the workflows
    */
   async run() {
@@ -35,7 +48,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output } = this.flags
+    const { output, version } = this.flags
 
     // try to pull workflows
     try {
@@ -45,14 +58,17 @@ class GetCommand extends BaseCommand {
       // resolve access token
       const accessToken = await this.accessToken
 
+      // load selectors data
+      const [versions] = await Promise.all(this.loadSelectorsData(accessToken))
+
       // init workflow client
       const client = new WorkflowsClient(accessToken)
 
       // get workflow record
-      const workflow = await client.getByKey(key)
+      const workflow = await client.getByKey(key, [], true, version)
 
       // convert to yaml
-      const yamlConf = docToConf("workflow", workflow)
+      const yamlConf = docToConf("workflow", workflow, { versions: docListToObj(versions) })
 
       // write output if path provided
       if (output) {

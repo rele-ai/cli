@@ -11,6 +11,9 @@ const { AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/c
 class ListCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // filter by app key
     appKey: flags.string({
       char: "a",

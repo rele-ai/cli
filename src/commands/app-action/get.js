@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient, AppActionsClient } = require("../../../lib/components")
+const { AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * Get a specific user by the selector key.
@@ -12,6 +12,9 @@ const { AppsClient, AppActionsClient } = require("../../../lib/components")
 class GetCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // write to output path
     output: flags.string({
       char: "o",
@@ -42,7 +45,11 @@ class GetCommand extends BaseCommand {
   loadSelectorsData(accessToken) {
     // load apps data
     return [
-      (new AppsClient(accessToken)).list()
+      // load apps data
+      (new AppsClient(accessToken)).list(),
+
+      // load versions data
+      (new VersionsClient(accessToken)).list(),
     ]
   }
 
@@ -64,7 +71,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output } = this.flags
+    const { output, version } = this.flags
 
     // try to pull app
     try {
@@ -75,18 +82,25 @@ class GetCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [apps] = await Promise.all(this.loadSelectorsData(accessToken))
+      const [apps, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init app actions client
       const client = new AppActionsClient(accessToken)
 
       // get app actions record
-      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]])
+      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]], true, version)
 
       // check response
       if (appAction) {
         // convert to yaml
-        const yamlConf = docToConf("app_action", appAction, { apps: docListToObj(apps) })
+        const yamlConf = docToConf(
+          "app_action",
+          appAction,
+          {
+            apps: docListToObj(apps),
+            versions: docListToObj(versions)
+          }
+        )
 
         // write output if path provided
         if (output) {

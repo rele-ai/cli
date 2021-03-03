@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient } = require("../../../lib/components")
+const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * Get a specific operation by the selector key.
@@ -12,6 +12,9 @@ const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient } = requ
 class GetCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // write to output path
     output: flags.string({
       char: "o",
@@ -48,6 +51,9 @@ class GetCommand extends BaseCommand {
 
       // load app actions data
       (new AppActionsClient(accessToken)).list(),
+
+      // load app actions data
+      (new VersionsClient(accessToken)).list(),
     ]
   }
 
@@ -69,7 +75,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output } = this.flags
+    const { output, version } = this.flags
 
     // try to pull operation
     try {
@@ -80,13 +86,13 @@ class GetCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions] = await Promise.all(this.loadSelectorsData(accessToken))
+      const [workflows, apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // init operation client
       const client = new OperationsClient(accessToken)
 
       // get operation record
-      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]])
+      const operation = await client.getByKey(key, [["workflows", "array-contains", this.getWorkflowKey(workflows, this.flags.workflowKey).id]], true, version)
 
       // check response
       if (operation) {
@@ -98,6 +104,7 @@ class GetCommand extends BaseCommand {
             workflows: docListToObj(workflows),
             apps: docListToObj(apps),
             appActions: docListToObj(appActions),
+            versions: docListToObj(versions),
           }
         )
 
