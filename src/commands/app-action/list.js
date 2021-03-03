@@ -22,6 +22,19 @@ class ListCommand extends BaseCommand {
   }
 
   /**
+   * check for version on init
+   */
+  async init() {
+    // parse flags
+    super.init()
+
+    // check version
+    if (this.flags.appKey) {
+      await this.version
+    }
+  }
+
+  /**
    * Load all selectors data
    */
   loadSelectorsData(accessToken) {
@@ -40,8 +53,10 @@ class ListCommand extends BaseCommand {
    * @param {Array.<object>} apps - List of apps.
    * @param {string} key - App system key.
    */
-  getAppSystemKey(apps, key) {
-    return apps.find(app => app.system_key === key)
+  async getAppSystemKey(apps, key) {
+    const vid = await this.versionId
+
+    return apps.find(app => app.system_key === key && app.version === vid)
   }
 
   /**
@@ -63,22 +78,37 @@ class ListCommand extends BaseCommand {
       const client = new AppActionsClient(accessToken)
 
       // build conditions
-      const conds = this.flags.appKey ? [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]] : []
+      let conds = []
+
+      if (this.flags.appKey) {
+        // get app key
+        const appKey = await this.getAppSystemKey(apps, this.flags.appKey)
+
+        // append to conditions if app key exists
+        if (appKey) {
+          conds.push(["app_id", "==", appKey.id])
+        } else {
+          cli.ux.action.stop("no app actions found")
+          return
+        }
+      }
 
       // list app actions records
       const appActions = await client.list(conds)
 
       // check results
       if (appActions && appActions.length) {
+        const metadata = {
+          apps: docListToObj(apps),
+          versions: docListToObj(versions)
+        }
+
         // return app records
         const yamlConf = appActions.map((appAction) => {
           return docToConf(
             "app_action",
             appAction,
-            {
-              apps: docListToObj(apps),
-              versions: docListToObj(versions)
-            }
+            metadata
           )
         }).join("---\n")
 

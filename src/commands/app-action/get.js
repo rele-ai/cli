@@ -59,8 +59,10 @@ class GetCommand extends BaseCommand {
    * @param {Array.<object>} apps - List of apps.
    * @param {string} key - App system key.
    */
-  getAppSystemKey(apps, key) {
-    return apps.find(app => app.system_key === key)
+  async getAppSystemKey(apps, key) {
+    const vid = await this.versionId
+
+    return apps.find(app => app.system_key === key && app.version === vid)
   }
 
   /**
@@ -71,7 +73,7 @@ class GetCommand extends BaseCommand {
     const { key } = this.args
 
     // destract flags object
-    const { output, version } = this.flags
+    const { output } = this.flags
 
     // try to pull app
     try {
@@ -87,8 +89,17 @@ class GetCommand extends BaseCommand {
       // init app actions client
       const client = new AppActionsClient(accessToken)
 
+      // get matching appKey
+      const appKey = await this.getAppSystemKey(apps, this.flags.appKey)
+
+      // check that we found an app
+      if (!appKey) {
+        cli.ux.action.stop("couldn't find matching app actions.")
+        return
+      }
+
       // get app actions record
-      const appAction = await client.getByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]], version)
+      const appAction = await client.getByKey(key, [["app_id", "==", appKey.id]], (await this.version))
 
       // check response
       if (appAction) {

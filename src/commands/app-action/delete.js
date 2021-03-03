@@ -10,6 +10,9 @@ const { AppsClient, AppActionsClient } = require("../../../lib/components")
 class DeleteCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     // filter by app key
     appKey: flags.string({
       char: "a",
@@ -43,8 +46,10 @@ class DeleteCommand extends BaseCommand {
    * @param {Array.<object>} apps - List of apps.
    * @param {string} key - App system key.
    */
-  getAppSystemKey(apps, key) {
-    return apps.find(app => app.system_key === key)
+  async getAppSystemKey(apps, key) {
+    const vid = await this.versionId
+
+    return apps.find(app => app.system_key === key && app.version === vid)
   }
 
   /**
@@ -68,8 +73,17 @@ class DeleteCommand extends BaseCommand {
       // init apps client
       const client = new AppActionsClient(accessToken)
 
+      // get app key
+      const appKey = await this.getAppSystemKey(apps, this.flags.appKey)
+
+      // check that we found an app
+      if (!appKey) {
+        cli.ux.action.stop("couldn't find matching app actions")
+        return
+      }
+
       // delete app action by key
-      await client.deleteByKey(key, [["app_id", "==", this.getAppSystemKey(apps, this.flags.appKey).id]])
+      await client.deleteByKey(key, [["app_id", "==", appKey.id]])
 
       // stop spinner
       cli.ux.action.stop()
