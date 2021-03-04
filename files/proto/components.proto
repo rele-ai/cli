@@ -1054,6 +1054,7 @@ message CreateOperationsResponse {
 // message ListVersionRequest
 message ListVersionRequest {
   repeated bytes conditions = 1;
+  bool is_global_search = 2;
 }
 
 // message ListVersionResponse
