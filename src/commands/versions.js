@@ -1,20 +1,20 @@
-const {Command, flags} = require('@oclif/command')
+const BaseCommand = require("../utils/base-command")
 
-class VersionsCommand extends Command {
+/**
+ * Log all the integration version.
+ */
+class VersionsCommand extends BaseCommand {
+  /**
+   * Execute the versions command
+   */
   async run() {
-    const {flags} = this.parse(VersionsCommand)
-    const name = flags.name || 'world'
-    this.log(`hello ${name} from ./src/commands/hello.js`)
+    this.log(`versions`)
   }
 }
 
-VersionsCommand.description = `Describe the command here
+VersionsCommand.description = `List all user/org related versions.
 ...
-Extra documentation goes here
+Please read more about the deployment process here: https://docs.rele.ai/guide/cli-development.html#rb-version
 `
-
-VersionsCommand.flags = {
-  name: flags.string({char: 'n', description: 'name to print'}),
-}
 
 module.exports = VersionsCommand
