@@ -1115,4 +1115,5 @@ message ActivateWorkflowResponse {
 message ActivateWorkflowObject {
   repeated string append = 1;
   repeated string remove = 2;
+  repeated string emails = 3;
 }
