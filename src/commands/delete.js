@@ -2,8 +2,6 @@ const cli = require("cli-ux")
 const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
-const { confToDoc } = require("../utils/parser")
-const { docListToObj, stagesByTypes } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const {
   WorkflowsClient,
@@ -16,6 +14,9 @@ const {
 class DeleteCommand extends BaseCommand {
   // command flags
   static flags = {
+    // append base command flags
+    ...BaseCommand.flags,
+
     path: flags.string({
       char: "f",
       description: "A path to source yaml file.",
@@ -71,6 +72,9 @@ class DeleteCommand extends BaseCommand {
     // get clients
     const clients = await this._clients
 
+    // destract version
+    const version = await this.version
+
     // pull client by type
     const client = clients[object.type]
 
@@ -78,7 +82,7 @@ class DeleteCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    const config = await client.getByKey(object.key, conditions)
+    const config = await client.getByKey(object.key, conditions, version)
 
     if (config) {
       // update config
