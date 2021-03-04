@@ -161,3 +161,12 @@ module.exports.loadDocNextOperations = (data, workflows) => {
     }
   })
 }
+
+/**
+ * Generate RB tag with a predefined structure.
+ *
+ * @param {string} version - Version tag.
+ */
+module.exports.generateRbTag = (version) => {
+  return `rb-${version}`
+}

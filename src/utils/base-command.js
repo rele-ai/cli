@@ -102,7 +102,7 @@ class BaseCommand extends Command {
     const pkg = pkgDir.sync(process.cwd())
 
     if (pkg) {
-      return Promise.resolve(require(`${pkgDir.sync(process.cwd())}/package.json`).version)
+      return Promise.resolve(require(`${pkg}/package.json`).version)
     } else {
       return this.latestVersion.then(version => version.key).then((key) => {
         if (key) {
