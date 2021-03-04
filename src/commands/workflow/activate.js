@@ -28,6 +28,13 @@ class ActivateCommand extends BaseCommand {
       description: "Destination config - user or org",
       options: ["user", "org"],
       required: true
+    }),
+
+    // collect user emails
+    emails: flags.string({
+      char: "e",
+      default: "",
+      description: "List of emails seperated by comma"
     })
   }
 
@@ -56,12 +63,19 @@ class ActivateCommand extends BaseCommand {
       })
     )
 
-    // make request to activate endpoint
-    await client.updateActiveWorkflows({
+    // build payload
+    const payload = {
       [this.flags.destination]: {
         append: workflowIds
       }
-    })
+    }
+
+    if (this.flags.destination === "user") {
+      payload.user.emails = this.flags.emails.split(/,/g)
+    }
+
+    // make request to activate endpoint
+    await client.updateActiveWorkflows(payload)
   }
 
   /**
