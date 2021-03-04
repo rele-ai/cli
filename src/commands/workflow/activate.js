@@ -71,7 +71,7 @@ class ActivateCommand extends BaseCommand {
     }
 
     if (this.flags.destination === "user") {
-      payload.user.emails = this.flags.emails.split(/,/g)
+      payload.user.emails = this.flags.emails.split(/,/g).filter(email => !!email)
     }
 
     // make request to activate endpoint
