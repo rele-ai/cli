@@ -32,6 +32,7 @@ class DeactivateCommand extends BaseCommand {
     // collect user emails
     emails: flags.string({
       char: "e",
+      default: "",
       description: "List of emails seperated by comma"
     })
   }
