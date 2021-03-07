@@ -40,6 +40,9 @@ class ListCommand extends BaseCommand {
    */
   loadSelectorsData(accessToken) {
     return [
+      // load operations data
+      (new OperationsClient(accessToken)).list(),
+
       // load workflow data
       (new WorkflowsClient(accessToken)).list(),
 
@@ -61,26 +64,16 @@ class ListCommand extends BaseCommand {
    * @param {string} key - Workflow key.
    */
   async getWorkflowKey(workflows, key) {
-    let vid = await this.versions
+    let vids = await this.versions
 
-    if (vid) {
-      if (vid.constructor === Array) {
-        if (vid.length === 2) {
-          const orgVid = vid.find((v) => v.org !== "global")
-          const globalVid = vid.find((v) => v.org === "global")
-          const isValid = orgVid && globalVid
-
-          if (isValid) {
-            vid = orgVid.id
-          } else {
-            throw new Error("found duplicated versions. please contact support@rele.ai")
-          }
-        } else {
-          throw new Error("found too many version. please contact support@rele.ai")
-        }
+    if (vids) {
+      if (vids.constructor !== Array) {
+        vids = [vids]
       }
 
-      return workflows.find(workflow => workflow.key === key && workflow.version === vid).id
+      return workflows.filter(workflow => workflow.key === key && vids.includes(workflow.version)).map((w) => w.id)
+    } else {
+      throw new Error("couldn't find matching version.")
     }
   }
 
@@ -97,27 +90,7 @@ class ListCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
-
-      // init operations client
-      const client = new OperationsClient(accessToken)
-
-      // build conditions
-      let conds = []
-
-      if (this.flags.workflowKey) {
-        const workflowId = await this.getWorkflowKey(workflows, this.flags.workflowKey)
-
-        if (workflowId) {
-          conds.push(["workflows", "array-contains", workflowId])
-        } else {
-          cli.ux.action.stop("coludn't find matching operations")
-          return
-        }
-      }
-
-      // list operations records
-      const operations = await client.list(conds)
+      let [operations, workflows, apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // check results
       if (operations && operations.length) {
@@ -128,6 +101,18 @@ class ListCommand extends BaseCommand {
           operations: docListToObj(operations),
           versions: docListToObj(versions),
           shouldDump: false,
+        }
+
+        // filter out relevant operations
+        if (this.flags.workflowKey) {
+          const workflowIds = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+
+          if (workflowIds.length) {
+            operations = operations.filter((op) => op.workflows.filter(value => workflowIds.includes(value)).length)
+          } else {
+            cli.ux.action.stop("coludn't find matching operations")
+            return
+          }
         }
 
         // return operations records
