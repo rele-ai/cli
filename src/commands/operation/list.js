@@ -61,8 +61,27 @@ class ListCommand extends BaseCommand {
    * @param {string} key - Workflow key.
    */
   async getWorkflowKey(workflows, key) {
-    const vids = await this.versionIds
-    return workflows.filter(workflow => workflow.key === key && vids.includes(workflow.version)).map((workflow) => workflow.id)
+    let vid = await this.versions
+
+    if (vid) {
+      if (vid.constructor === Array) {
+        if (vid.length === 2) {
+          const orgVid = vid.find((v) => v.org !== "global")
+          const globalVid = vid.find((v) => v.org === "global")
+          const isValid = orgVid && globalVid
+
+          if (isValid) {
+            vid = orgVid.id
+          } else {
+            throw new Error("found duplicated versions. please contact support@rele.ai")
+          }
+        } else {
+          throw new Error("found too many version. please contact support@rele.ai")
+        }
+      }
+
+      return workflows.find(workflow => workflow.key === key && workflow.version === vid).id
+    }
   }
 
   /**
@@ -87,10 +106,10 @@ class ListCommand extends BaseCommand {
       let conds = []
 
       if (this.flags.workflowKey) {
-        const workflowIds = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+        const workflowId = await this.getWorkflowKey(workflows, this.flags.workflowKey)
 
-        if (workflowIds.length) {
-          conds.push(["workflows", "array-contains-any", workflowIds])
+        if (workflowId) {
+          conds.push(["workflows", "array-contains", workflowId])
         } else {
           cli.ux.action.stop("coludn't find matching operations")
           return

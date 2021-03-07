@@ -132,7 +132,7 @@ class BaseCommand extends Command {
   /**
    * Return list of matching versions
    */
-  get versionIds() {
+  get versions() {
     return this.accessToken.then((at) => {
       // init client
       const client = new VersionsClient(at)
