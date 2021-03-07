@@ -130,6 +130,21 @@ class BaseCommand extends Command {
   }
 
   /**
+   * Return list of matching versions
+   */
+  get versionIds() {
+    return this.accessToken.then((at) => {
+      // init client
+      const client = new VersionsClient(at)
+
+      // get id by the version number
+      return this.version.then((version) => {
+        return client.getVersionId(version, false, true)
+      })
+    })
+  }
+
+  /**
    * Return the latest version object from firestore.
    */
   get latestVersion() {

@@ -61,9 +61,8 @@ class ListCommand extends BaseCommand {
    * @param {string} key - Workflow key.
    */
   async getWorkflowKey(workflows, key) {
-    const vid = await this.versionId
-
-    return workflows.find(workflow => workflow.key === key && workflow.version === vid)
+    const vids = await this.versionIds
+    return workflows.filter(workflow => workflow.key === key && vids.includes(workflow.version)).map((workflow) => workflow.id)
   }
 
   /**
@@ -88,10 +87,10 @@ class ListCommand extends BaseCommand {
       let conds = []
 
       if (this.flags.workflowKey) {
-        const workflowKey = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+        const workflowIds = await this.getWorkflowKey(workflows, this.flags.workflowKey)
 
-        if (workflowKey) {
-          conds.push(["workflows", "array-contains", workflowKey.id])
+        if (workflowIds.length) {
+          conds.push(["workflows", "array-contains-any", workflowIds])
         } else {
           cli.ux.action.stop("coludn't find matching operations")
           return
