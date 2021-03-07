@@ -1,3 +1,12 @@
+const KEYS_MAP = {
+  app_actions: "operation_key",
+  apps: "system_key",
+  operations: "key",
+  translations: "key",
+  versions: "key",
+  workflows: "key"
+}
+
 /**
 * Converts string to snake case.
 *
@@ -169,4 +178,26 @@ module.exports.loadDocNextOperations = (data, workflows) => {
  */
 module.exports.generateRbTag = (version) => {
   return `rb-${version}`
+}
+
+/**
+ * Returns a matrix of grouped items.
+ *
+ * @param {string} type - Config type
+ * @param {Array.<object>} items - List of configs
+ */
+module.exports.groupByVersion = (type, items) => {
+  let groups = {}
+
+  for (const item of items) {
+    const key = `${item[KEYS_MAP[type]]}__${item.version}`
+
+    if (!groups[key]) {
+      groups[key] = []
+    }
+
+    groups[key].push(item)
+  }
+
+  return Object.values(groups)
 }
