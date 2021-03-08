@@ -1,7 +1,8 @@
 const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient } = require("../../../lib/components")
+const { WorkflowsClient, CONF_KEYS_MAP } = require("../../../lib/components")
+const inquirer = require("inquirer")
 
 /**
  * Activate a given workflow to the user's organization
@@ -39,6 +40,25 @@ class ActivateCommand extends BaseCommand {
   }
 
   /**
+   * Ask the user which workflow should be used.
+   *
+   * @param {Array.<object>} workflows - List of workflows.
+   */
+  async ask(workflows) {
+    const clearWorkflows = workflows.map((w) => ({ data: `Name: ${w.display_name.en}\nIs Global Workflow: ${w.org === "global"}`, id: w.id }))
+    const message = `We found multiple workflows that matched your query. Please select the releavnt workflow`
+
+    return inquirer.prompt([{
+      type: "list",
+      name: "workflow",
+      message,
+      choices: clearWorkflows.map((op) => op.data)
+    }]).then((answer) => {
+      return clearWorkflows.find((op) => op.data === answer.workflow)
+    })
+  }
+
+  /**
    * Activate the selected workflow on the destination.
    *
    * @param {string} workflows - Workflow keys
@@ -51,17 +71,19 @@ class ActivateCommand extends BaseCommand {
     const client = new WorkflowsClient(accessToken)
 
     // get workflow id
-    const workflowIds = await Promise.all(
-      workflows.map(async (key) => {
-        const workflow = await client.getByKey(key, [], await this.version, true)
+    let workflowIds = []
+    for (const key of workflows) {
+      const workflows = await client.list([
+        [CONF_KEYS_MAP["workflows"], "==", key],
+      ])
 
-        if (workflow) {
-          return workflow.id
-        } else {
-          throw new Error(`couldn't find workflow key: ${key}`)
-        }
-      })
-    )
+      if (workflows && workflows.length) {
+        const workflow = workflows.length > 1 ? await this.ask(workflows) : workflows[0]
+        workflowIds.push(workflow.id)
+      } else {
+        throw new Error(`couldn't find workflow key: ${key}`)
+      }
+    }
 
     // build payload
     const payload = {
