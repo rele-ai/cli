@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient, VersionsClient } = require("../../../lib/components")
+const { AppsClient, VersionsClient, CONF_KEYS_MAP } = require("../../../lib/components")
 
 /**
  * Get a specific app by the selector key.
@@ -42,6 +42,25 @@ class GetCommand extends BaseCommand {
   }
 
   /**
+   * Filter apps by matching versions.
+   *
+   * @param {Array.<object>} apps - List of applications.
+   * @param {Array.<string>} versions - List of version IDs.
+   */
+  filterApps(apps, versions) {
+    if (versions) {
+      if (versions.constructor !== Array) {
+        versions = [versions]
+      }
+
+      // filter
+      return apps.filter((app) => versions.includes(app.version))
+    } else {
+      throw new Error("couldn't find matching versions")
+    }
+  }
+
+  /**
    * Run the get command that loads the application
    */
   async run() {
@@ -59,19 +78,28 @@ class GetCommand extends BaseCommand {
       // resolve access token
       const accessToken = await this.accessToken
 
-      // load selectors data
-      const [versions] = await Promise.all(this.loadSelectorsData(accessToken))
-
       // init apps client
       const appsClient = new AppsClient(accessToken)
 
+      // load selectors data
+      const [versions, apps] = await Promise.all([
+        ...this.loadSelectorsData(accessToken),
+        appsClient.list([
+          [CONF_KEYS_MAP["apps"], "==", key]
+        ])
+      ])
+
       // get app record
-      const app = await appsClient.getByKey(key, [], await this.version)
+      const filteredApps = this.filterApps(apps, await this.versions)
 
       // check yaml config
-      if (app) {
+      if (filteredApps && filteredApps.length) {
+        const metadata = {
+          versions: docListToObj(versions)
+        }
+
         // convert to yaml
-        const appConf = docToConf("app", app, { versions: docListToObj(versions) })
+        const appConf = filteredApps.map((app) => docToConf("app", app, metadata)).join("---\n")
 
         // write output if path provided
         if (output) {

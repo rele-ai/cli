@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
+const { AppsClient, AppActionsClient, VersionsClient, CONF_KEYS_MAP } = require("../../../lib/components")
 
 /**
  * Get a specific user by the selector key.
@@ -60,9 +60,28 @@ class GetCommand extends BaseCommand {
    * @param {string} key - App system key.
    */
   async getAppSystemKey(apps, key) {
-    const vid = await this.versionId
+    let vids = await this.versions
 
-    return apps.find(app => app.system_key === key && app.version === vid)
+    if (vids) {
+      if (vids.constructor !== Array) {
+        vids = [vids]
+      }
+
+
+      return apps.filter(app => app.system_key === key && vids.includes(app.version)).map((a) => a.id)
+    } else {
+      throw new Error("couldn't find matching verions")
+    }
+  }
+
+  /**
+   * Filter relevant app actions based on app Ids.
+   *
+   * @param {Array.<object>} appActions - App Actions list
+   * @param {Array.<string>} appIds - List of app actions IDs.
+   */
+  filterAppActions(appActions, appIds) {
+    return appActions.filter((ac) => appIds.includes(ac.app_id))
   }
 
   /**
@@ -83,35 +102,34 @@ class GetCommand extends BaseCommand {
       // resolve access token
       const accessToken = await this.accessToken
 
-      // load selectors data
-      const [apps, versions] = await Promise.all(this.loadSelectorsData(accessToken))
-
       // init app actions client
       const client = new AppActionsClient(accessToken)
 
+      // load selectors data
+      const [apps, versions, appActions] = await Promise.all([
+        ...this.loadSelectorsData(accessToken),
+        client.list([
+          [CONF_KEYS_MAP["app_actions"], "==", key]
+        ])
+      ])
+
       // get matching appKey
-      const appKey = await this.getAppSystemKey(apps, this.flags.appKey)
-
-      // check that we found an app
-      if (!appKey) {
-        cli.ux.action.stop("couldn't find matching app actions.")
-        return
-      }
-
-      // get app actions record
-      const appAction = await client.getByKey(key, [["app_id", "==", appKey.id]], (await this.version))
+      const appIds = await this.getAppSystemKey(apps, this.flags.appKey)
+      const filteredAppActions = this.filterAppActions(appActions, appIds)
 
       // check response
-      if (appAction) {
+      if (filteredAppActions && filteredAppActions.length) {
+        const metadata = {
+          apps: docListToObj(apps),
+          versions: docListToObj(versions)
+        }
+
         // convert to yaml
-        const yamlConf = docToConf(
+        const yamlConf = filteredAppActions.map((ac) => docToConf(
           "app_action",
-          appAction,
-          {
-            apps: docListToObj(apps),
-            versions: docListToObj(versions)
-          }
-        )
+          ac,
+          metadata
+        )).join("---\n")
 
         // write output if path provided
         if (output) {

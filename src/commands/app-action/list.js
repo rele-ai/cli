@@ -42,6 +42,9 @@ class ListCommand extends BaseCommand {
       // load apps data
       (new AppsClient(accessToken)).list(),
 
+      // load app actions data
+      (new AppActionsClient(accessToken)).list(),
+
       // load versions data
       (new VersionsClient(accessToken)).list(),
     ]
@@ -54,9 +57,17 @@ class ListCommand extends BaseCommand {
    * @param {string} key - App system key.
    */
   async getAppSystemKey(apps, key) {
-    const vid = await this.versionId
+    let vids = await this.versions
 
-    return apps.find(app => app.system_key === key && app.version === vid)
+    if (vids) {
+      if (vids.constructor !== Array) {
+        vids = [vids]
+      }
+
+      return apps.filter(app => app.system_key === key && vids.includes(app.version)).map((a) => a.id)
+    } else {
+      throw new Error("couldn't find matching version.")
+    }
   }
 
   /**
@@ -72,35 +83,27 @@ class ListCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [apps, versions] = await Promise.all(this.loadSelectorsData(accessToken))
-
-      // init app actions client
-      const client = new AppActionsClient(accessToken)
-
-      // build conditions
-      let conds = []
-
-      if (this.flags.appKey) {
-        // get app key
-        const appKey = await this.getAppSystemKey(apps, this.flags.appKey)
-
-        // append to conditions if app key exists
-        if (appKey) {
-          conds.push(["app_id", "==", appKey.id])
-        } else {
-          cli.ux.action.stop("no app actions found")
-          return
-        }
-      }
-
-      // list app actions records
-      const appActions = await client.list(conds)
+      let [apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // check results
       if (appActions && appActions.length) {
         const metadata = {
           apps: docListToObj(apps),
           versions: docListToObj(versions)
+        }
+
+        // filter out relevant apps
+        if (this.flags.appKey) {
+          // get app key
+          const appIds = await this.getAppSystemKey(apps, this.flags.appKey)
+
+          // append to conditions if app key exists
+          if (appIds && appIds.length) {
+            appActions = appActions.filter((ac) => appIds.includes(ac.app_id))
+          } else {
+            cli.ux.action.stop("no app actions found")
+            return
+          }
         }
 
         // return app records
