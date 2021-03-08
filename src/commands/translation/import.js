@@ -68,16 +68,21 @@ class ImportCommand extends BaseCommand {
     return await Promise.all(
       translations.flatMap(async (translation) => {
         // update version id
-        const versionId = await client.getVersionId(translation.version)
+        let versionId = await client.getVersionId(translation.version, true, true, false)
+        versionId = versionId.constructor === Array && versionId.length === 2 ? versionId.find(v => v.org === "global").id : versionId
 
-        // try to get translation by key
-        const conf = await client.getByKey(translation.key, [["lang", "==", translation.lang], ["version", "==", versionId]], true)
+        if (versionId) {
+          // try to get translation by key
+          const conf = await client.getByKey(translation.key, [["lang", "==", translation.lang], ["version", "==", versionId]], true)
 
-        // check if translation exists
-        if (conf) {
-          return client.updateById(conf.id, translation)
+          // check if translation exists
+          if (conf) {
+            return client.updateById(conf.id, translation)
+          } else {
+            return client.create(translation, translation.version)
+          }
         } else {
-          return client.create(translation, translation.version)
+          throw new Error("couldn't find matching version")
         }
       })
     )

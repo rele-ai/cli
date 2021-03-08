@@ -87,19 +87,25 @@ class ListCommand extends BaseCommand {
       // resolve access token and user info
       const accessToken = await this.accessToken
 
-      // load selectors data
-      const [versions] = await Promise.all(this.loadSelectorsData(accessToken))
-      const vers = docListToObj(versions)
-
       // init translations client
       const client = new TranslationsClient(accessToken)
 
-      // create conditions
-      const conds = this.args.key ? [["key", "==", this.args.key], ["version", "==", (await this.versionId)]] : []
+      // load selectors data
+      let [versions, translations] = await Promise.all([
+        ...this.loadSelectorsData(accessToken),
+        client.list(
+          this.args.key ? [["key", "==", this.args.key]] : []
+        )
+      ])
+
+      // convert versions to object
+      const vers = docListToObj(versions)
+      const vids = await this.versions
+      translations = translations.filter((t) => vids.includes(t.version))
 
       // collect translations records
       const data = {
-        translations: await client.list(conds)
+        translations
       }
 
       // check response
