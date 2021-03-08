@@ -4,7 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
-const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
+const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient, CONF_KEYS_MAP } = require("../../../lib/components")
 
 /**
  * Get a specific operation by the selector key.
@@ -54,6 +54,9 @@ class GetCommand extends BaseCommand {
 
       // load app actions data
       (new VersionsClient(accessToken)).list(),
+
+      // load operations data
+      (new OperationsClient(accessToken)).list(),
     ]
   }
 
@@ -64,9 +67,28 @@ class GetCommand extends BaseCommand {
    * @param {string} key - Workflow key.
    */
   async getWorkflowKey(workflows, key) {
-    const vid = await this.versionId
+    let vids = await this.versions
 
-    return workflows.find(workflow => workflow.key === key && workflow.version === vid)
+    if (vids) {
+      if (vids.constructor !== Array) {
+        vids = [vids]
+      }
+
+
+      return workflows.filter(workflow => workflow.key === key && vids.includes(workflow.version)).map((w) => w.id)
+    } else {
+      throw new Error("couldn't find matching verions")
+    }
+  }
+
+  /**
+   * Filter relevant operations based on workflow Ids.
+   *
+   * @param {Array.<object>} operations - Operations list
+   * @param {Array.<string>} workflowIds - List of workflow IDs.
+   */
+  filterOperations(operations, workflowIds, key) {
+    return operations.filter((op) => op.key === key && op.workflows.filter(value => workflowIds.includes(value)).length)
   }
 
   /**
@@ -88,36 +110,28 @@ class GetCommand extends BaseCommand {
       const accessToken = await this.accessToken
 
       // load selectors data
-      const [workflows, apps, appActions, versions] = await Promise.all(this.loadSelectorsData(accessToken))
-
-      // init operation client
-      const client = new OperationsClient(accessToken)
+      const [workflows, apps, appActions, versions, operations] = await Promise.all(this.loadSelectorsData(accessToken))
 
       // get workflow key
-      const workflowKey = await this.getWorkflowKey(workflows, this.flags.workflowKey)
-
-      // check for matching workflows
-      if (!workflowKey) {
-        cli.ux.action.stop("couldn't find matching operations.")
-        return
-      }
-
-      // get operation record
-      const operation = await client.getByKey(key, [["workflows", "array-contains", workflowKey.id]], (await this.version))
+      const workflowIds = await this.getWorkflowKey(workflows, this.flags.workflowKey)
+      const filteredOperations = this.filterOperations(operations, workflowIds, key)
 
       // check response
-      if (operation) {
+      if (filteredOperations && filteredOperations.length) {
+        const metadata = {
+          workflows: docListToObj(workflows),
+          apps: docListToObj(apps),
+          appActions: docListToObj(appActions),
+          versions: docListToObj(versions),
+          operations: docListToObj(operations),
+        }
+
         // convert to yaml
-        const yamlConf = docToConf(
+        const yamlConf = filteredOperations.map((op) => docToConf(
           "operation",
-          operation,
-          {
-            workflows: docListToObj(workflows),
-            apps: docListToObj(apps),
-            appActions: docListToObj(appActions),
-            versions: docListToObj(versions),
-          }
-        )
+          op,
+          metadata
+        )).join("---\n")
 
         // write output if path provided
         if (output) {
