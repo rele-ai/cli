@@ -45,7 +45,7 @@ class ActivateCommand extends BaseCommand {
    * @param {Array.<object>} workflows - List of workflows.
    */
   async ask(workflows) {
-    const clearWorkflows = workflows.map((w) => ({ data: `Name: ${w.display_name.en}\n   Is Global Workflow: ${w.org === "global"}`, id: w.id }))
+    const clearWorkflows = workflows.map((w) => ({ data: `Name: ${w.display_name.en}\n  Is Global Workflow: ${w.org === "global"}`, id: w.id }))
     const message = `We found multiple workflows that matched your query. Please select the releavnt workflow`
 
     return inquirer.prompt([{
@@ -108,17 +108,19 @@ class ActivateCommand extends BaseCommand {
     const { workflows } = this.args
 
     // start spinner
-    cli.ux.action.start(`Activating workflows ${workflows.join(",")}`)
+    // cli.ux.action.start(`Activating workflows ${workflows.join(",")}`)
 
     try {
       // update the user's organization
       await this._activateWorkflow(workflows)
 
       // stop spinner
+      cli.ux.action.start(`Activating workflows ${workflows.join(",")}`)
       cli.ux.action.stop()
     } catch (err) {
       // stop spinner fail
-      cli.ux.action.stop("failed")
+      console.error(err)
+      // cli.ux.action.stop("failed")
       this.error(`Unable to activate workflow.\n${err}`)
     }
   }
