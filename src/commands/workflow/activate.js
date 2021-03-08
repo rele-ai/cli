@@ -45,7 +45,7 @@ class ActivateCommand extends BaseCommand {
    * @param {Array.<object>} workflows - List of workflows.
    */
   async ask(workflows) {
-    const clearWorkflows = workflows.map((w) => ({ data: `Name: ${w.display_name.en}\nIs Global Workflow: ${w.org === "global"}`, id: w.id }))
+    const clearWorkflows = workflows.map((w) => ({ data: `Name: ${w.display_name.en}\n   Is Global Workflow: ${w.org === "global"}`, id: w.id }))
     const message = `We found multiple workflows that matched your query. Please select the releavnt workflow`
 
     return inquirer.prompt([{
