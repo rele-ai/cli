@@ -52,7 +52,7 @@ class DeactivateCommand extends BaseCommand {
     // get workflow id
     const workflowIds = await Promise.all(
       workflows.map(async (key) => {
-        const workflow = await client.getByKey(key, [], await this.version)
+        const workflow = await client.getByKey(key, [], await this.version, true)
 
         if (workflow) {
           return workflow.id

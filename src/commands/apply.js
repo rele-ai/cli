@@ -129,7 +129,7 @@ class ApplyCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    const config = await client.getByKey(object.key, conditions, version)
+    const config = await client.getByKey(object.key, conditions, version, true)
 
     if (config) {
       // update config
