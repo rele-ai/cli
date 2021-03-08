@@ -3,7 +3,7 @@ const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
 const { confToDoc } = require("../utils/parser")
 const { readConfig } = require("../utils/readers")
-const { docListToObj, stagesByTypes } = require("../utils/index")
+const { docListToObj, stagesByTypes, toSnakeCase } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const {
   WorkflowsClient,
@@ -11,7 +11,8 @@ const {
   TranslationsClient,
   AppActionsClient,
   OperationsClient,
-  VersionsClient
+  VersionsClient,
+  CONF_KEYS_MAP
 } = require("../../lib/components")
 
 class ApplyCommand extends BaseCommand {
@@ -66,7 +67,8 @@ class ApplyCommand extends BaseCommand {
         workflows: docListToObj(workflows),
         apps: docListToObj(apps),
         appActions: docListToObj(appActions),
-        versions: docListToObj(versions)
+        versions: docListToObj(versions),
+        user: await this.user
       }
     )
   }
@@ -98,7 +100,14 @@ class ApplyCommand extends BaseCommand {
    */
   async _generateOperations(operationsConfs) {
     // destract version
-    const version = await this.version
+    let versions = await this.versions
+    if (versions) {
+      if (versions.constructor !== Array) {
+        versions = [versions]
+      }
+    } else {
+      throw new Error("couldn't find matching versions")
+    }
 
     // format operations confs to
     // operations docs
@@ -108,7 +117,7 @@ class ApplyCommand extends BaseCommand {
 
     if (operationsDocs.length) {
       // create operations records
-      await this._clients.Operation.createRecords(operationsDocs, version)
+      await this._clients.Operation.createRecords(operationsDocs, versions)
     }
   }
 
@@ -117,7 +126,7 @@ class ApplyCommand extends BaseCommand {
    */
   async _generateRecord(object) {
     // destract version
-    const version = await this.version
+    const vids = (await this.versions || [])
 
     // pull client by type
     const client = this._clients[object.type]
@@ -129,15 +138,26 @@ class ApplyCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    const config = await client.getByKey(object.key, conditions, version, true)
+    // const config = await client.getByKey(object.key, conditions, version, true)
+    const configs = ((await client.list([
+      ...conditions,
+      [CONF_KEYS_MAP[`${toSnakeCase(object.type)}s`], "==", object.key]
+    ])) || []).filter((conf) => vids.includes(conf.version))
+
+    if (configs.length > 1) {
+      throw new Error(`found duplicated ${object.type}. please contact support@rele.ai`)
+    }
+
+    const [config] = configs
 
     if (config) {
       // update config
       return client.updateById(config.id, { ...data, version: config.version })
     } else {
       // create config
-      return client.create(data, version)
+      return client.create(data, await this.version)
     }
+
   }
 
   /**

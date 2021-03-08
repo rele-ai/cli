@@ -538,6 +538,7 @@ message App {
   AppRequest request = 8;
   bool tls = 9;
   string version = 10;
+  string org = 11;
 }
 
 // // message AppActionMetadata
@@ -578,6 +579,7 @@ message Operation {
   string id = 11;
   map<string, string> on_error = 12;
   string version = 13;
+  string org = 14;
 }
 
 // message OperationRedis
@@ -1043,7 +1045,7 @@ message Translation {
 // message CreateOperationsRequest
 message CreateOperationsRequest {
   repeated Operation records = 1;
-  string version = 2;
+  repeated string versions = 2;
 }
 
 // message CreateOperationsResponse
@@ -1099,6 +1101,7 @@ message CreateVersionResponse {
 message Version {
   string key = 1;
   string id = 2;
+  string org = 3;
 }
 
 // message ActivateWorkflowRequest

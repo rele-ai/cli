@@ -13,7 +13,7 @@ const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 * @param {object} options - additional params.
 * @returns {object} doc - Firestore doc representation.
 */
-module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions } = {}) => {
+module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user } = {}) => {
   switch(confType) {
     case "App":
       return loadAppDoc(conf)
@@ -22,7 +22,7 @@ module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versi
     case "Workflow":
       return loadWorkflowDoc(conf)
     case "Operation":
-      return loadOperationDoc(conf, apps, appActions, workflows, versions)
+      return loadOperationDoc(conf, apps, appActions, workflows, versions, user)
     case "Translation":
       return loadTranslationDoc(conf)
     default:
@@ -256,16 +256,37 @@ const loadWorkflowDoc = (conf) => {
 }
 
 // get version id
-const _getVersionId = (versions, key) => versions.find((version) => version.key === key && version.org !== "global")
+const _getVersionId = (versions, key, isReleAi) => {
+  const filter = isReleAi
+    ? (version) => version.key === key && version.org === "global"
+    : (version) => version.key === key && version.org !== "global"
 
-const _getAppId = (conf, apps, versions) => {
+  return Object.values(versions).find(filter)
+}
+
+const _mapAppVersions = (apps, versions) => {
+  const _map = {}
+
+  Object.values(apps).forEach((app) => {
+    if (!_map[app.system_key]) {
+      _map[app.system_key] = []
+    }
+
+    _map[app.system_key].push(versions[app.version])
+  })
+
+  return _map
+}
+
+const _getAppId = (conf, apps, versions, user) => {
   // get app details
-  let versionId
+  let versionId = null
+  const isReleAi = user.emails[0].endsWith("@rele.ai")
   const [appKey, appVersion] = conf.selector.app.split(":")
 
   // check if version is provided
   if (appVersion) {
-    versionId = _getVersionId(versions, appVersion)
+    versionId = _getVersionId(versions, appVersion, isReleAi)
   } else {
     // check if the application is within the scope
     const scopeAppKeys = glob.sync(
@@ -283,26 +304,37 @@ const _getAppId = (conf, apps, versions) => {
 
         if (yamls && yamls.length) {
           return yamls.map((conf) => {
-            if (conf.type === "App" && conf.system_key) {
-              return conf.system_key
+            if (conf.type === "App" && conf.key) {
+              return conf.key
             }
           })
         }
       })
+      .flat()
       .filter((key) => !!key)
 
-    if (scopeAppKeys.includes(appKey)) {
+      if (scopeAppKeys.includes(appKey)) {
       // get from flag or from pkg.version
       const flagIndex = process.argv.find((value) => value === "-v" || value === "--version")
-      versionId = process.argv[flagIndex + 1] || require(`${pkgDir.sync(process.cwd())}/package.json`).version
-    } else {
-      // get latest
-      versionId = versionSort(versions.filter((version) => version.org !== "global"), { nested: "key" })
+      versionId = _getVersionId(versions, process.argv[flagIndex + 1] || require(`${pkgDir.sync(process.cwd())}/package.json`).version, isReleAi)
     }
   }
 
   // search for app id
-  return Object.values(apps).find(app => app.system_key === conf.selector.app && app.version === versionId).id
+  const mapAppVersions = _mapAppVersions(apps, versions)
+  const filter = isReleAi
+    ? (version) => version.org === "global"
+    : (version) => version.org !== "global"
+
+  let shouldKeepSearch = !Boolean(versionId)
+  return Object.values(apps).find(app => {
+    if (shouldKeepSearch) {
+      // get app latest version
+      versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).filter(filter).slice(-1)[0] || {}
+    }
+
+    return app.system_key === appKey && app.version === (versionId || {}).id
+  }).id
 }
 
 /**
@@ -315,14 +347,14 @@ const _getAppId = (conf, apps, versions) => {
  * @param {object} workflows - Map of all workflows.
  * @returns {object} - Firestore document.
  */
-const loadOperationDoc = (conf, apps, appActions, workflows, versions) => {
+const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => {
   // define base json operation
   const baseOperation = {
     is_root: conf.is_root,
     workflows: Object.keys(workflows).filter(
       workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
     ),
-    app_id: _getAppId(conf, apps, versions),
+    app_id: _getAppId(conf, apps, versions, user),
     payload: conf.payload || {},
     action: {
       id: Object.keys(appActions).find(key =>
