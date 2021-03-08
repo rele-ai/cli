@@ -44,6 +44,9 @@ class ApplyCommand extends BaseCommand {
 
       // load app actions data
       clients.AppAction.list(),
+
+      // load versions
+      clients.Version.list(),
     ]
   }
 
@@ -53,7 +56,7 @@ class ApplyCommand extends BaseCommand {
    */
   async _formatConfToDoc(object) {
     // load selectors data
-    const [workflows, apps, appActions] = await Promise.all(await this.loadSelectorsData())
+    const [workflows, apps, appActions, versions] = await Promise.all(await this.loadSelectorsData())
 
     // define the data object
     return confToDoc(
@@ -63,6 +66,7 @@ class ApplyCommand extends BaseCommand {
         workflows: docListToObj(workflows),
         apps: docListToObj(apps),
         appActions: docListToObj(appActions),
+        versions: docListToObj(versions)
       }
     )
   }

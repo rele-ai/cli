@@ -1,4 +1,8 @@
+const fs = require("fs")
+const glob = require("glob")
 const yaml = require("js-yaml")
+const pkgDir = require("pkg-dir")
+const versionSort = require("../../lib/utils/version-sort")
 const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 
 /**
@@ -9,7 +13,7 @@ const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 * @param {object} options - additional params.
 * @returns {object} doc - Firestore doc representation.
 */
-module.exports.confToDoc = (confType, conf, { apps, appActions, workflows } = {}) => {
+module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions } = {}) => {
   switch(confType) {
     case "App":
       return loadAppDoc(conf)
@@ -18,7 +22,7 @@ module.exports.confToDoc = (confType, conf, { apps, appActions, workflows } = {}
     case "Workflow":
       return loadWorkflowDoc(conf)
     case "Operation":
-      return loadOperationDoc(conf, apps, appActions, workflows)
+      return loadOperationDoc(conf, apps, appActions, workflows, versions)
     case "Translation":
       return loadTranslationDoc(conf)
     default:
@@ -251,6 +255,56 @@ const loadWorkflowDoc = (conf) => {
   return coWrf
 }
 
+// get version id
+const _getVersionId = (versions, key) => versions.find((version) => version.key === key && version.org !== "global")
+
+const _getAppId = (conf, apps, versions) => {
+  // get app details
+  let versionId
+  const [appKey, appVersion] = conf.selector.app.split(":")
+
+  // check if version is provided
+  if (appVersion) {
+    versionId = _getVersionId(versions, appVersion)
+  } else {
+    // check if the application is within the scope
+    const scopeAppKeys = glob.sync(
+      "**/*.y?(a)ml",
+      {
+        ignore: ["**/node_modules/**", "**/vendor/**"],
+        absolute: true
+      })
+      .map((location) => {
+        // load file
+        const fileData = fs.readFileSync(location, "utf-8")
+
+        // load yamls
+        const yamls = yaml.loadAll(fileData)
+
+        if (yamls && yamls.length) {
+          return yamls.map((conf) => {
+            if (conf.type === "App" && conf.system_key) {
+              return conf.system_key
+            }
+          })
+        }
+      })
+      .filter((key) => !!key)
+
+    if (scopeAppKeys.includes(appKey)) {
+      // get from flag or from pkg.version
+      const flagIndex = process.argv.find((value) => value === "-v" || value === "--version")
+      versionId = process.argv[flagIndex + 1] || require(`${pkgDir.sync(process.cwd())}/package.json`).version
+    } else {
+      // get latest
+      versionId = versionSort(versions.filter((version) => version.org !== "global"), { nested: "key" })
+    }
+  }
+
+  // search for app id
+  return Object.values(apps).find(app => app.system_key === conf.selector.app && app.version === versionId).id
+}
+
 /**
  * Converts the given YAML config to the matchinf firestore
  * document.
@@ -261,14 +315,14 @@ const loadWorkflowDoc = (conf) => {
  * @param {object} workflows - Map of all workflows.
  * @returns {object} - Firestore document.
  */
-const loadOperationDoc = (conf, apps, appActions, workflows) => {
+const loadOperationDoc = (conf, apps, appActions, workflows, versions) => {
   // define base json operation
   const baseOperation = {
     is_root: conf.is_root,
     workflows: Object.keys(workflows).filter(
       workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
     ),
-    app_id: Object.keys(apps).find(key => apps[key].system_key === conf.selector.app),
+    app_id: _getAppId(conf, apps, versions),
     payload: conf.payload || {},
     action: {
       id: Object.keys(appActions).find(key =>
