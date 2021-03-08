@@ -71,7 +71,7 @@ class ImportCommand extends BaseCommand {
         const versionId = await client.getVersionId(translation.version)
 
         // try to get translation by key
-        const conf = await client.getByKey(translation.key, [["lang", "==", translation.lang], ["version", "==", versionId]])
+        const conf = await client.getByKey(translation.key, [["lang", "==", translation.lang], ["version", "==", versionId]], true)
 
         // check if translation exists
         if (conf) {
