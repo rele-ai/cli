@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": [
+      "key"
+  ],
+  "properties": {
+      "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+      },
+      "version": {
+          "type": "string"
+      }
+  }
+}

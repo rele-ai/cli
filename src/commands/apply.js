@@ -1,4 +1,5 @@
 const cli = require("cli-ux")
+const pkgDir = require("pkg-dir")
 const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
 const { confToDoc } = require("../utils/parser")
@@ -124,7 +125,7 @@ class ApplyCommand extends BaseCommand {
   /**
    * generate config record on firestore.
    */
-  async _generateRecord(object) {
+  async _generateRecord(object, versionId) {
     // destract version
     const vids = (await this.versions || [])
 
@@ -155,7 +156,7 @@ class ApplyCommand extends BaseCommand {
       return client.updateById(config.id, { ...data, version: config.version })
     } else {
       // create config
-      return client.create(data, await this.version)
+      return client.create(data, versionId)
     }
 
   }
@@ -176,6 +177,39 @@ class ApplyCommand extends BaseCommand {
       Operation: new OperationsClient(accessToken),
       Version: new VersionsClient(accessToken)
     }
+  }
+
+  /**
+   * Validate version
+   */
+  async _validateVersion() {
+    // package version
+    const packageVersion = require(`${pkgDir.sync(__dirname)}/package.json`).version
+
+    // define version
+    const versionNumber = (await this.version) || packageVersion
+
+    // check if exists
+    let versionId = await this._clients.Version.getVersionId(versionNumber, true, true, false)
+
+    if (versionId && versionId.constructor === Array) {
+      versionId = (versionId.find((v) => v.org !== "global") || {}).id
+    }
+
+    if (!versionId) {
+      // create version
+      const versionRes = await this._clients.Version.create(
+        {
+          key: versionNumber
+        }
+      )
+
+      // replace to new version id
+      versionId = versionRes.id
+    }
+
+    // return the version id
+    return versionId
   }
 
   async run() {
@@ -202,17 +236,21 @@ class ApplyCommand extends BaseCommand {
       // destract stages
       let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(data.yamlData)
 
+      // gets the version, and create it
+      // if nessesary
+      const versionId = await this._validateVersion()
+
       // collect first stage promises
       await Promise.all(
         firstStage.map(async object => {
-          return this._generateRecord(object)
+          return this._generateRecord(object, versionId)
         })
       )
 
       // collect second stage promises
       await Promise.all(
         secondStage.map(async object => {
-          return this._generateRecord(object)
+          return this._generateRecord(object, versionId)
         })
       )
 
