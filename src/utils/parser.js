@@ -1,3 +1,4 @@
+const { version } = require("@oclif/command/lib/flags")
 const fs = require("fs")
 const glob = require("glob")
 const yaml = require("js-yaml")
@@ -322,19 +323,26 @@ const _getAppId = (conf, apps, versions, user) => {
 
   // search for app id
   const mapAppVersions = _mapAppVersions(apps, versions)
-  const filter = isReleAi
-    ? (version) => version.org === "global"
-    : (version) => version.org !== "global"
 
-  let shouldKeepSearch = !Boolean(versionId)
-  return Object.values(apps).find(app => {
-    if (shouldKeepSearch) {
-      // get app latest version
-      versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).filter(filter).slice(-1)[0] || {}
+  // const filter = isReleAi
+  //   ? (version) => version.org === "global"
+  //   : (version) => version.org !== "global"
+
+  // check if already found an version
+  if (Object.keys(versionId || {}).length) {
+    return (Object.values(apps).find(app => app.system_key === appKey && app.version === versionId.id)).id
+  } else {
+    // checks if app exists on user's map app
+    if (mapAppVersions[appKey]) {
+      // pull latest vesion from app
+      const appLatestVersion = versionSort(mapAppVersions[appKey], { nested: "key" }).slice(-1)[0]
+
+      // return latest version id
+      return (Object.values(apps).find(app => app.system_key === appKey && app.version === appLatestVersion.id)).id
+    } else {
+      throw new Error(`unable to find an app with key = ${appKey}`)
     }
-
-    return app.system_key === appKey && app.version === (versionId || {}).id
-  }).id
+  }
 }
 
 /**
