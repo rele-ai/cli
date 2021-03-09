@@ -322,15 +322,15 @@ const _getAppId = (conf, apps, versions, user) => {
 
   // search for app id
   const mapAppVersions = _mapAppVersions(apps, versions)
-  const filter = isReleAi
-    ? (version) => version.org === "global"
-    : (version) => version.org !== "global"
+  // const filter = isReleAi
+  //   ? (version) => version.org === "global"
+  //   : (version) => version.org !== "global"
 
   let shouldKeepSearch = !Boolean(versionId)
   return Object.values(apps).find(app => {
     if (shouldKeepSearch) {
       // get app latest version
-      versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).filter(filter).slice(-1)[0] || {}
+      versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).slice(-1)[0] || {}
     }
 
     return app.system_key === appKey && app.version === (versionId || {}).id
