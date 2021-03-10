@@ -25,6 +25,8 @@ rb create hello-world -t rele-ai/hello-world-integration-template#main
 ```
 
 You can edit the configuration files under `$RB_PROJECT_PATH/configs/*.yaml`.
+
+## Deployment
 After editing configuration files, you can run the deploy command, at the organization level or the user level.
 
 Deploy for specific users:
