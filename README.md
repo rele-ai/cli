@@ -94,7 +94,7 @@ COMMANDS
 ```
 
 ## Help
-For additional info about RELE.AI CLI Tool you can run `rb --help`
+For additional info about RELE.AI CLI Tool run `rb --help`
 ```
 RELE.AI CLI Tool
 
