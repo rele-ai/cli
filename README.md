@@ -45,6 +45,25 @@ rb create hello-world -t rele-ai/hello-world-integration-template#main
 
 You can edit the configuration files under `$RB_PROJECT_PATH/configs/*.yaml`.
 
+#### For additional info run `rb create --help`
+```yaml
+Create a RELE.AI integration project from a template
+
+USAGE
+  $ rb create PATH
+
+ARGUMENTS
+  PATH  Project location path
+
+OPTIONS
+  -c, --clone              Use git clone
+  -t, --template=template  (required) Path to a git repository with the template
+
+DESCRIPTION
+  ...
+  Please read more in our documentation website at docs.rele.ai
+```
+
 ## Deployment
 After editing configuration files, you can run the deploy command, at the organization level or the user level.
 
@@ -57,3 +76,19 @@ Deploy for organization:
 rb deploy:org
 ```
 
+#### For additional info run `rb deploy --help`
+```yaml
+Deploy your integration and configurations to an org level.
+
+USAGE
+  $ rb deploy:COMMAND
+
+DESCRIPTION
+  ...
+  Please read more about the deployment process here: https://docs.rele.ai/guide/cli-development.html#rb-deploy-org
+
+
+COMMANDS
+  deploy:org   Deploy your integration and configurations to an org level.
+  deploy:user  Deploy your integration and configurations to an user level.
+```
