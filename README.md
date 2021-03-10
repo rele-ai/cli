@@ -38,7 +38,7 @@ COMMANDS
   auth:logout  Manage the authorization session to RELE.AI
 ```
 
-## Create an Hello-World Application
+## Create Hello-World Application
 ```yaml
 rb create hello-world -t rele-ai/hello-world-integration-template#main
 ```
