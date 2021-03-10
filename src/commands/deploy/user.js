@@ -263,9 +263,9 @@ class DeployUserCommand extends BaseCommand {
   }
 }
 
-DeployUserCommand.description = `Deploy your integration and configurations to an org level.
+DeployUserCommand.description = `Deploy your integration and configurations to an user level.
 ...
-Please read more about the deployment process here: https://docs.rele.ai/guide/cli-development.html#rb-deploy
+Please read more about the deployment process here: https://docs.rele.ai/guide/cli-development.html#rb-deploy-user
 `
 
 module.exports = DeployUserCommand

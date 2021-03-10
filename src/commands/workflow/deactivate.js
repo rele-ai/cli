@@ -124,7 +124,7 @@ class DeactivateCommand extends BaseCommand {
 
 DeactivateCommand.description = `Deactivates a given workflow from the user's organization.
 ...
-Please read more about the configuration files in the github repository docs.
+Additional information about the workflow:deactivate command can be found at https://docs.rele.ai/guide/cli-config.html#rb-workflow-deactivate
 `
 
 module.exports = DeactivateCommand

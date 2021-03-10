@@ -126,9 +126,9 @@ class ActivateCommand extends BaseCommand {
   }
 }
 
-ActivateCommand.description = `Activates a given workflow to the user's organization.
+ActivateCommand.description = `Activates a given workflow on user or organization level.
 ...
-Please read more about the configuration files in the github repository docs.
+Additional information about the workflow:activate command can be found at https://docs.rele.ai/guide/cli-config.html#rb-workflow-activate
 `
 
 module.exports = ActivateCommand

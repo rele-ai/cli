@@ -220,7 +220,7 @@ class DeployOrgCommand extends BaseCommand {
 
 DeployOrgCommand.description = `Deploy your integration and configurations to an org level.
 ...
-Please read more about the deployment process here: https://docs.rele.ai/guide/cli-development.html#rb-deploy
+Please read more about the deployment process here: https://docs.rele.ai/guide/cli-development.html#rb-deploy-org
 `
 
 module.exports = DeployOrgCommand
