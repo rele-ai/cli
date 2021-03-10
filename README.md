@@ -21,7 +21,7 @@ rb auth:login
 rb auth:logout
 ```
 
-#### For additional info run `rb auth --help`
+For additional info run `rb auth --help`
 ```yaml
 Manage the authorization session to RELE.AI
 
@@ -45,7 +45,7 @@ rb create hello-world -t rele-ai/hello-world-integration-template#main
 
 You can edit the configuration files under `$RB_PROJECT_PATH/configs/*.yaml`.
 
-#### For additional info run `rb create --help`
+For additional info run `rb create --help`
 ```yaml
 Create a RELE.AI integration project from a template
 
@@ -76,7 +76,7 @@ Deploy for organization:
 rb deploy:org
 ```
 
-#### For additional info run `rb deploy --help`
+For additional info run `rb deploy --help`
 ```yaml
 Deploy your integration and configurations to an org level.
 
