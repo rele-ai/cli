@@ -21,6 +21,7 @@ rb auth:login
 rb auth:logout
 ```
 
+#### For additional info run `rb auth --help`
 ```yaml
 Manage the authorization session to RELE.AI
 
