@@ -12,17 +12,17 @@ Visit RELE.AI [documantation](https://docs.rele.ai) for more information!
 
 ## Authentication
 ### Login to CLI Tool
-```yaml
+```sh
 rb auth:login
 ```
 
 ### Logout from CLI Tool
-```yaml
+```sh
 rb auth:logout
 ```
 
 For additional info run `rb auth --help`
-```yaml
+```sh
 Manage the authorization session to RELE.AI
 
 USAGE
@@ -39,14 +39,14 @@ COMMANDS
 ```
 
 ## Create Hello-World Application
-```yaml
+```sh
 rb create hello-world -t rele-ai/hello-world-integration-template#main
 ```
 
 You can edit the configuration files under `$RB_PROJECT_PATH/configs/*.yaml`.
 
 For additional info run `rb create --help`
-```yaml
+```sh
 Create a RELE.AI integration project from a template
 
 USAGE
@@ -68,16 +68,16 @@ DESCRIPTION
 After editing configuration files, you can run the deploy command, at the organization level or the user level.
 
 Deploy for specific users given emails argument seperated by comma:
-```yaml
+```sh
 rb deploy:user -e [USER_EMAILS]
 ```
 Deploy for organization:
-```yaml
+```sh
 rb deploy:org
 ```
 
 For additional info run `rb deploy --help`
-```yaml
+```sh
 Deploy your integration and configurations to an org level.
 
 USAGE
