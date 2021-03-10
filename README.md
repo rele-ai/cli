@@ -92,3 +92,31 @@ COMMANDS
   deploy:org   Deploy your integration and configurations to an org level.
   deploy:user  Deploy your integration and configurations to an user level.
 ```
+
+## Help
+For additional info about RELE.AI CLI Tool you can run `rb --help`
+```
+RELE.AI CLI Tool
+
+VERSION
+  @releai/cli/0.1.0 darwin-x64 node-v14.5.0
+
+USAGE
+  $ rb [COMMAND]
+
+TOPICS
+  app          Delete an application from RELE.AI by the application key.
+  app-action   Delete an application from RELE.AI by the application key.
+  auth         Manage the authorization session to RELE.AI
+  deploy       Deploy your integration and configurations to an org level.
+  operation    Delete an operation from RELE.AI by the operation key.
+  translation  Delete a translation from RELE.AI by the translation key.
+  workflow     Activates a given workflow on user or organization level.
+
+COMMANDS
+  apply     Apply a set of configurations to RELE.AI App
+  create    Create a RELE.AI integration project from a template
+  delete    Delete a set of configurations from RELE.AI App
+  help      display help for rb
+  versions  List all user/org related versions.
+```
