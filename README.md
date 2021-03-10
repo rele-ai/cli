@@ -1,4 +1,4 @@
-@releai/cli
+RELE.AI CLI
 ===========
 [![Version](https://img.shields.io/npm/v/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
 [![Downloads/week](https://img.shields.io/npm/dw/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
