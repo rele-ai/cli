@@ -198,6 +198,25 @@ const loadAppDoc = (conf) => {
   // attach system key
   cpApp.system_key = conf.key
 
+  if (!Object.keys((cpApp.request || {})).length) {
+    cpApp.request = {}
+  }
+
+  // attach body headers and query
+  if (!Object.keys((cpApp.request || {}).headers || {}).length) {
+    cpApp.request.headers = {}
+  }
+
+  // attach body headers and query
+  if (!Object.keys((cpApp.request || {}).body || {}).length) {
+    cpApp.request.body = {}
+  }
+
+  // attach body headers and query
+  if (!Object.keys((cpApp.request || {}).query || {}).length) {
+    cpApp.request.query = {}
+  }
+
   // return formatted app
   return cpApp
 }
@@ -221,6 +240,25 @@ const loadAppActionDoc = (conf, apps) => {
 
   // attach operation type
   cpAppAction.operation_key = conf.key
+
+  if (!Object.keys((cpAppAction.request || {})).length) {
+    cpAppAction.request = {}
+  }
+
+  // attach body headers and query
+  if (!Object.keys((cpAppAction.request || {}).headers || {}).length) {
+    cpAppAction.request.headers = {}
+  }
+
+  // attach body headers and query
+  if (!Object.keys((cpAppAction.request || {}).body || {}).length) {
+    cpAppAction.request.body = {}
+  }
+
+  // attach body headers and query
+  if (!Object.keys((cpAppAction.request || {}).query || {}).length) {
+    cpAppAction.request.query = {}
+  }
 
   // find app id related to app action
   const relatedAppId = Object.keys(apps).find(key => {
@@ -322,15 +360,15 @@ const _getAppId = (conf, apps, versions, user) => {
 
   // search for app id
   const mapAppVersions = _mapAppVersions(apps, versions)
-  const filter = isReleAi
-    ? (version) => version.org === "global"
-    : (version) => version.org !== "global"
+  // const filter = isReleAi
+  //   ? (version) => version.org === "global"
+  //   : (version) => version.org !== "global"
 
   let shouldKeepSearch = !Boolean(versionId)
   return Object.values(apps).find(app => {
     if (shouldKeepSearch) {
       // get app latest version
-      versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).filter(filter).slice(-1)[0] || {}
+      versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).slice(-1)[0] || {}
     }
 
     return app.system_key === appKey && app.version === (versionId || {}).id

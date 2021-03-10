@@ -1,6 +1,6 @@
 const cli = require("cli-ux")
 const BaseCommand = require("../../utils/base-command")
-const { TranslationsClient } = require("../../../lib/components")
+const { TranslationsClient, VersionsClient } = require("../../../lib/components")
 
 /**
  * Delete a translation from RELE.AI. Only translations
@@ -22,6 +22,20 @@ class DeleteCommand extends BaseCommand {
   ]
 
   /**
+   * Init clients
+   */
+   async _initClients() {
+    // resolve access token and user info
+    const accessToken = await this.accessToken
+
+    // return clients
+    return {
+      Translation: new TranslationsClient(accessToken),
+      Version: new VersionsClient(accessToken)
+    }
+  }
+
+  /**
    * Execute the delete command
    */
   async run() {
@@ -33,17 +47,30 @@ class DeleteCommand extends BaseCommand {
 
     // try to delete the translations
     try {
-      // resolve access token and user
-      const accessToken = await this.accessToken
+      // collect init clients promises
+      this._clients = await this._initClients()
 
-      // init apps client
-      const client = new TranslationsClient(accessToken)
+      // pull determine if it's rele.ai user
+      const isRele = (await this.user).emails[0].endsWith("@rele.ai")
+
+      // pull versions
+      const versionId = (await this.versions).find(async vid => {
+        const version = await this._clients.Version.getById(vid)
+        if (isRele) {
+          return version.org === "global"
+        } else return true
+      })
 
       // collect translations records
-      const translations = await client.list([["key", "==", this.args.key], ["version", "==", (await this.versionId)]])
+      const translations = await this._clients.Translation.list([["key", "==", this.args.key], ["version", "==", versionId]])
+
+      // throw an error if there is no translations founded
+      if (!((translations || []).length)) {
+        throw new Error(`unable to find translations with key of ${this.args.key}`)
+      }
 
       // delete translation by key
-      await Promise.all(translations.map((translation) => client.deleteById(translation.id)))
+      await Promise.all((translations || []).map((translation) => this._clients.Translation.deleteById(translation.id)))
 
       // stop spinner
       cli.ux.action.stop()
