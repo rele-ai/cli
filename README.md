@@ -21,6 +21,22 @@ rb auth:login
 rb auth:logout
 ```
 
+```yaml
+Manage the authorization session to RELE.AI
+
+USAGE
+  $ rb auth:COMMAND
+
+DESCRIPTION
+  ...
+  Manage the credentials to access RELE.AI workflows and apps.
+
+
+COMMANDS
+  auth:login   Manage the authorization session to RELE.AI
+  auth:logout  Manage the authorization session to RELE.AI
+```
+
 ## Create an Hello-World Application
 ```yaml
 rb create hello-world -t rele-ai/hello-world-integration-template#main
