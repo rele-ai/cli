@@ -29,7 +29,7 @@ You can edit the configuration files under `$RB_PROJECT_PATH/configs/*.yaml`.
 ## Deployment
 After editing configuration files, you can run the deploy command, at the organization level or the user level.
 
-Deploy for specific users:
+Deploy for specific users given emails argument seperated by comma:
 ```yaml
 rb deploy:user -e [USER_EMAILS]
 ```
