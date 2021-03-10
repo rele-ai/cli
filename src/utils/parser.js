@@ -313,7 +313,7 @@ const _getAppId = (conf, apps, versions, user) => {
       .flat()
       .filter((key) => !!key)
 
-      if (scopeAppKeys.includes(appKey)) {
+    if (scopeAppKeys.includes(appKey)) {
       // get from flag or from pkg.version
       const flagIndex = process.argv.find((value) => value === "-v" || value === "--version")
       versionId = _getVersionId(versions, process.argv[flagIndex + 1] || require(`${pkgDir.sync(process.cwd())}/package.json`).version, isReleAi)
