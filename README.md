@@ -8,9 +8,15 @@ RELE.AI CLI Tool provides an easy interface to create and manage integrations wi
 
 Through the cli tool you can create different workflow for your organization, and create an interface between your application and RELE.AI.
 
-## Login to CLI Tool
+## Authentication
+### Login to CLI Tool
 ```yaml
 rb auth:login
+```
+
+### Logout from CLI Tool
+```yaml
+rb auth:logout
 ```
 
 ## Create an Hello-World Application
