@@ -1,13 +1,12 @@
 @releai/cli
 ===========
+[![Version](https://img.shields.io/npm/v/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
+[![Downloads/week](https://img.shields.io/npm/dw/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
+[![License](https://img.shields.io/npm/l/@releai/cli.svg)](https://github.com/rele-ai/cli/blob/master/package.json)
 
 RELE.AI CLI Tool provides an easy interface to create and manage integrations with the RELE.AI system.
 
 Through the cli tool you can create different workflow for your organization, and create an interface between your application and RELE.AI.
-
-[![Version](https://img.shields.io/npm/v/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
-[![Downloads/week](https://img.shields.io/npm/dw/@releai/cli.svg)](https://npmjs.org/package/@releai/cli)
-[![License](https://img.shields.io/npm/l/@releai/cli.svg)](https://github.com/rele-ai/cli/blob/master/package.json)
 
 ## Login to CLI Tool
 ```yaml
@@ -21,6 +20,7 @@ rb create hello-world -t rele-ai/hello-world-integration-template#main
 
 You can edit the configuration files under `$RB_PROJECT_PATH/configs/*.yaml`.
 After editing configuration files, you can run the deploy command, at the organization level or the user level.
+
 Deploy for specific users:
 ```yaml
 rb deploy:user -e [USER_EMAILS]
