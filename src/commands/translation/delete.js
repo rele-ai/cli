@@ -58,7 +58,9 @@ class DeleteCommand extends BaseCommand {
         const version = await this._clients.Version.getById(vid)
         if (isRele) {
           return version.org === "global"
-        } else return true
+        } else {
+          return version.org !== "global"
+        }
       })
 
       // collect translations records
