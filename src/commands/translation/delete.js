@@ -53,9 +53,17 @@ class DeleteCommand extends BaseCommand {
       // pull determine if it's rele.ai user
       const isRele = (await this.user).emails[0].endsWith("@rele.ai")
 
-      // pull versions
-      const versionId = (await this.versions).find(async vid => {
-        const version = await this._clients.Version.getById(vid)
+      // collect version promises
+      const prms = (await this.versions).map(async vrId => {
+        const { version = {} } = await this._clients.Version.getById(vrId)
+        return version
+      })
+
+      // resolve versions promises
+      const versions = await Promise.all(prms)
+
+      // find version
+      const versionId = versions.find(version => {
         if (isRele) {
           return version.org === "global"
         } else {
@@ -63,8 +71,13 @@ class DeleteCommand extends BaseCommand {
         }
       })
 
+      // version id error handling
+      if (!versionId) {
+        throw new Error("can't find matching version for translation delete.")
+      }
+
       // collect translations records
-      const translations = await this._clients.Translation.list([["key", "==", this.args.key], ["version", "==", versionId]])
+      const translations = await this._clients.Translation.list([["key", "==", this.args.key], ["version", "==", versionId.id]])
 
       // throw an error if there is no translations founded
       if (!((translations || []).length)) {
