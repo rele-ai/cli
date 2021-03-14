@@ -284,13 +284,15 @@ const loadAppActionDoc = (conf, apps) => {
  * @returns {object} - Firestore document.
  */
 const loadWorkflowDoc = (conf) => {
-  // deep config copy
-  let coWrf = { ...conf }
-
-  // delete unessesary keys
-  delete coWrf.type
-
-  return coWrf
+  // return workfllow doc object
+  return {
+    display_name: conf.display_name || {},
+    key: conf.key,
+    match: {
+      ...conf.match,
+      payload: conf.match.callback !== "match_any" ? "message_data.message.body" : ""
+    }
+  }
 }
 
 // get version id
