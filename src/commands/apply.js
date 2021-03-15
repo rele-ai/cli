@@ -260,7 +260,6 @@ class ApplyCommand extends BaseCommand {
       // stop spinner
       cli.ux.action.stop()
     } catch (error) {
-      console.error(error)
       cli.ux.action.stop("failed")
       this.error(`Unable to apply configuration file.\n${error}`)
     }

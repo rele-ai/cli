@@ -188,37 +188,41 @@ const loadTranslationConf = (doc, versions, shouldDump=true) => {
  * @returns {object} - Firestore document.
  */
 const loadAppDoc = (conf) => {
-  // deep config copy
-  let cpApp = { ...conf }
+  try {
+    // deep config copy
+    let cpApp = { ...conf }
 
-  // delete unessesary keys
-  delete cpApp.type
-  delete cpApp.key
+    // delete unessesary keys
+    delete cpApp.type
+    delete cpApp.key
 
-  // attach system key
-  cpApp.system_key = conf.key
+    // attach system key
+    cpApp.system_key = conf.key
 
-  if (!Object.keys((cpApp.request || {})).length) {
-    cpApp.request = {}
+    if (!Object.keys((cpApp.request || {})).length) {
+      cpApp.request = {}
+    }
+
+    // attach body headers and query
+    if (!Object.keys((cpApp.request || {}).headers || {}).length) {
+      cpApp.request.headers = {}
+    }
+
+    // attach body headers and query
+    if (!Object.keys((cpApp.request || {}).body || {}).length) {
+      cpApp.request.body = {}
+    }
+
+    // attach body headers and query
+    if (!Object.keys((cpApp.request || {}).query || {}).length) {
+      cpApp.request.query = {}
+    }
+
+    // return formatted app
+    return cpApp
+  } catch (e) {
+    throw new Error("unable to parse App configuration to document format. Please make sure you have provided all the attributes correctly. For more information visit: https://docs.rele.ai/guide/apps.html")
   }
-
-  // attach body headers and query
-  if (!Object.keys((cpApp.request || {}).headers || {}).length) {
-    cpApp.request.headers = {}
-  }
-
-  // attach body headers and query
-  if (!Object.keys((cpApp.request || {}).body || {}).length) {
-    cpApp.request.body = {}
-  }
-
-  // attach body headers and query
-  if (!Object.keys((cpApp.request || {}).query || {}).length) {
-    cpApp.request.query = {}
-  }
-
-  // return formatted app
-  return cpApp
 }
 
 /**
@@ -230,50 +234,54 @@ const loadAppDoc = (conf) => {
  * @returns {object} - Firestore document.
  */
 const loadAppActionDoc = (conf, apps) => {
-  // deep config copy
-  let cpAppAction = { ...conf }
+  try {
+    // deep config copy
+    let cpAppAction = { ...conf }
 
-  // delete unessesary keys
-  delete cpAppAction.type
-  delete cpAppAction.selector
-  delete cpAppAction.key
+    // delete unessesary keys
+    delete cpAppAction.type
+    delete cpAppAction.selector
+    delete cpAppAction.key
 
-  // attach operation type
-  cpAppAction.operation_key = conf.key
+    // attach operation type
+    cpAppAction.operation_key = conf.key
 
-  if (!Object.keys((cpAppAction.request || {})).length) {
-    cpAppAction.request = {}
+    if (!Object.keys((cpAppAction.request || {})).length) {
+      cpAppAction.request = {}
+    }
+
+    // attach body headers and query
+    if (!Object.keys((cpAppAction.request || {}).headers || {}).length) {
+      cpAppAction.request.headers = {}
+    }
+
+    // attach body headers and query
+    if (!Object.keys((cpAppAction.request || {}).body || {}).length) {
+      cpAppAction.request.body = {}
+    }
+
+    // attach body headers and query
+    if (!Object.keys((cpAppAction.request || {}).query || {}).length) {
+      cpAppAction.request.query = {}
+    }
+
+    // find app id related to app action
+    const relatedAppId = Object.keys(apps).find(key => {
+      return apps[key].system_key === (conf.selector || {}).app
+    })
+
+    if (relatedAppId) {
+      // attach app id
+      cpAppAction.app_id = relatedAppId
+    } else {
+      throw new Error(`unable to find related app with system key = ${(conf.selector || {}).app}`)
+    }
+
+    // return formatted app action
+    return cpAppAction
+  } catch (e) {
+    throw new Error(e.message || "unable to parse App Action configuration to document format. Please make sure you have provided all the attributes correctly. For more information visit: https://docs.rele.ai/guide/app-actions.html")
   }
-
-  // attach body headers and query
-  if (!Object.keys((cpAppAction.request || {}).headers || {}).length) {
-    cpAppAction.request.headers = {}
-  }
-
-  // attach body headers and query
-  if (!Object.keys((cpAppAction.request || {}).body || {}).length) {
-    cpAppAction.request.body = {}
-  }
-
-  // attach body headers and query
-  if (!Object.keys((cpAppAction.request || {}).query || {}).length) {
-    cpAppAction.request.query = {}
-  }
-
-  // find app id related to app action
-  const relatedAppId = Object.keys(apps).find(key => {
-    return apps[key].system_key === (conf.selector || {}).app
-  })
-
-  if (relatedAppId) {
-    // attach app id
-    cpAppAction.app_id = relatedAppId
-  } else {
-    throw new Error(`unable to find related app with system key = ${(conf.selector || {}).app}`)
-  }
-
-  // return formatted app action
-  return cpAppAction
 }
 
 /**
@@ -284,14 +292,18 @@ const loadAppActionDoc = (conf, apps) => {
  * @returns {object} - Firestore document.
  */
 const loadWorkflowDoc = (conf) => {
-  // return workfllow doc object
-  return {
-    display_name: conf.display_name || {},
-    key: conf.key,
-    match: {
-      ...conf.match,
-      payload: conf.match.callback !== "match_any" ? "message_data.message.body" : ""
+  try {
+    // return workfllow doc object
+    return {
+      display_name: conf.display_name || {},
+      key: conf.key,
+      match: {
+        ...conf.match,
+        payload: conf.match.callback !== "match_any" ? "message_data.message.body" : ""
+      }
     }
+  } catch (e) {
+    throw new Error("unable to parse Workflow configuration to document format. Please make sure you have provided all the attributes correctly. For more information visit: https://docs.rele.ai/guide/workflows.html")
   }
 }
 
@@ -388,56 +400,60 @@ const _getAppId = (conf, apps, versions, user) => {
  * @returns {object} - Firestore document.
  */
 const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => {
-  // define base json operation
-  const baseOperation = {
-    is_root: conf.is_root,
-    workflows: Object.keys(workflows).filter(
-      workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
-    ),
-    app_id: _getAppId(conf, apps, versions, user),
-    payload: conf.payload || {},
-    action: {
-      id: Object.keys(appActions).find(key =>
-        appActions[key].operation_key === conf.selector.app_action
+  try {
+    // define base json operation
+    const baseOperation = {
+      is_root: conf.is_root,
+      workflows: Object.keys(workflows).filter(
+        workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
       ),
-      type: "app_action"
-    },
-    redis: {},
-    input: conf.input || {},
-    output: conf.output || {},
-    next_operation: conf.next_operation || {},
-    on_error: conf.on_error || {},
-    key: conf.key
+      app_id: _getAppId(conf, apps, versions, user),
+      payload: conf.payload || {},
+      action: {
+        id: Object.keys(appActions).find(key =>
+          appActions[key].operation_key === conf.selector.app_action
+        ),
+        type: "app_action"
+      },
+      redis: {},
+      input: conf.input || {},
+      output: conf.output || {},
+      next_operation: conf.next_operation || {},
+      on_error: conf.on_error || {},
+      key: conf.key
+    }
+
+    // attach redis field
+    if ((conf.redis || {}).field) {
+      baseOperation.redis.field = conf.redis.field
+    } else {
+      baseOperation.redis.field = conf.key
+    }
+
+    // attach redis type
+    if ((conf.redis || {}).type) {
+      baseOperation.redis.type = conf.redis.type
+    } else {
+      baseOperation.redis.type = "hash_map"
+    }
+
+    // load doc next operations
+    loadDocNextOperations(baseOperation, workflows)
+
+    // error handling
+    if (!baseOperation.app_id) {
+      throw new Error(`unable to find related app with system key = ${conf.selector.app}`)
+    }
+
+    if (!baseOperation.action.id) {
+      throw new Error(`unable to find related app action with operation key = ${conf.selector.app_action}`)
+    }
+
+    // return formatted operation
+    return baseOperation
+  } catch (e) {
+    throw new Error(e.message || "unable to parse Operation configuration to document format. Please make sure you have provided all the attributes correctly. For more information visit: https://docs.rele.ai/guide/workflows.html")
   }
-
-  // attach redis field
-  if ((conf.redis || {}).field) {
-    baseOperation.redis.field = conf.redis.field
-  } else {
-    baseOperation.redis.field = conf.key
-  }
-
-  // attach redis type
-  if ((conf.redis || {}).type) {
-    baseOperation.redis.type = conf.redis.type
-  } else {
-    baseOperation.redis.type = "hash_map"
-  }
-
-  // load doc next operations
-  loadDocNextOperations(baseOperation, workflows)
-
-  // error handling
-  if (!baseOperation.app_id) {
-    throw new Error(`unable to find related app with system key = ${conf.selector.app}`)
-  }
-
-  if (!baseOperation.action.id) {
-    throw new Error(`unable to find related app action with operation key = ${conf.selector.app_action}`)
-  }
-
-  // return formatted operation
-  return baseOperation
 }
 
 /**
@@ -448,11 +464,15 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
  * @returns {object} - Firestore document.
  */
 const loadTranslationDoc = (conf) => {
-  // deep config copy
-  let coTrns = { ...conf }
+  try {
+    // deep config copy
+    let coTrns = { ...conf }
 
-  // delete unessesary keys
-  delete coTrns.type
+    // delete unessesary keys
+    delete coTrns.type
 
-  return coTrns
+    return coTrns
+  } catch (e) {
+    throw new Error("unable to parse Translation configuration to document format. Please make sure you have provided all the attributes correctly. For more information visit: https://docs.rele.ai/guide/translations.html")
+  }
 }
