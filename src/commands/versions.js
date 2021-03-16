@@ -1,5 +1,6 @@
 const cli = require("cli-ux")
 const BaseCommand = require("../utils/base-command")
+const { debugError } = require("../../lib/utils/logger")
 const { docListToObj, groupByVersion } = require("../utils")
 const { WorkflowsClient, OrgsClient, AppsClient, VersionsClient } = require("../../lib/components")
 
@@ -30,63 +31,69 @@ class VersionsCommand extends BaseCommand {
    * Execute the versions command
    */
   async run() {
-    // start spinner
-    cli.ux.action.start("Loading versions")
+    try {
+      // start spinner
+      cli.ux.action.start("Loading versions")
 
-    // resolve access token
-    const user = await this.user
-    const accessToken = await this.accessToken
+      // resolve access token
+      const user = await this.user
+      const accessToken = await this.accessToken
 
-    // load selectors data
-    const [workflows, {org}, apps, versions] = await Promise.all(this.loadSelectorsData(accessToken, user.orgs))
+      // load selectors data
+      const [workflows, {org}, apps, versions] = await Promise.all(this.loadSelectorsData(accessToken, user.orgs))
 
-    // group items by versions
-    const groups = [
-      {
-        data: groupByVersion("workflows", workflows),
-        title: "Workflows"
-      },
-      {
-        data: groupByVersion("apps", apps),
-        title: "Apps"
-      },
-    ]
-    const versionsMap = docListToObj(versions)
+      // group items by versions
+      const groups = [
+        {
+          data: groupByVersion("workflows", workflows),
+          title: "Workflows"
+        },
+        {
+          data: groupByVersion("apps", apps),
+          title: "Apps"
+        },
+      ]
+      const versionsMap = docListToObj(versions)
 
-    // generate output
-    let output = []
-    for (const entry of groups) {
-      output.push("---\n")
-      output.push(`${entry.title}:`)
-      for (const group of entry.data) {
-        output.push(`  ${group[0].display_name.en}:`)
+      // generate output
+      let output = []
+      for (const entry of groups) {
+        output.push("---\n")
+        output.push(`${entry.title}:`)
+        for (const group of entry.data) {
+          output.push(`  ${group[0].display_name.en}:`)
 
-        for (const item of group) {
-          switch (entry.title) {
-            case "Workflows":
-              let mark = []
-              if ((org.workflows || {})[item.id]) {
-                mark.push("company")
-              }
-              if ((user.workflows || {})[item.id]) {
-                mark.push("user")
-              }
-              mark = mark.length ? ` - Used in ${mark.join(", ")} level` : ""
+          for (const item of group) {
+            switch (entry.title) {
+              case "Workflows":
+                let mark = []
+                if ((org.workflows || {})[item.id]) {
+                  mark.push("company")
+                }
+                if ((user.workflows || {})[item.id]) {
+                  mark.push("user")
+                }
+                mark = mark.length ? ` - Used in ${mark.join(", ")} level` : ""
 
-              output.push(`    • Version ${versionsMap[item.version].key}${mark}`)
-              break
-            case "Apps":
-              output.push(`    • Version ${versionsMap[item.version].key}`)
-              break
+                output.push(`    • Version ${versionsMap[item.version].key}${mark}`)
+                break
+              case "Apps":
+                output.push(`    • Version ${versionsMap[item.version].key}`)
+                break
+            }
           }
+
+          output.push("")
         }
-
-        output.push("")
       }
-    }
 
-    cli.ux.action.stop()
-    this.log(output.join("\n"))
+      cli.ux.action.stop()
+      this.log(output.join("\n"))
+    } catch (error) {
+      debugError(error)
+      cli.ux.action.stop("failed")
+      this.error(`Unable to list versions.\n${error}`)
+    }
   }
 }
 

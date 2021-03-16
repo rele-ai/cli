@@ -4,6 +4,7 @@ const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
 const { confToDoc } = require("../utils/parser")
 const { readConfig } = require("../utils/readers")
+const { debugError } = require("../../lib/utils/logger")
 const { docListToObj, stagesByTypes, toSnakeCase } = require("../utils/index")
 const BaseCommand = require("../utils/base-command")
 const {
@@ -260,6 +261,7 @@ class ApplyCommand extends BaseCommand {
       // stop spinner
       cli.ux.action.stop()
     } catch (error) {
+      debugError(error)
       cli.ux.action.stop("failed")
       this.error(`Unable to apply configuration file.\n${error}`)
     }

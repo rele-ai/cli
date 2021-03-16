@@ -143,9 +143,8 @@ class ListCommand extends BaseCommand {
         cli.ux.action.stop("no operations found")
       }
     } catch(error) {
-      debugError(error)
-
       // handle errors
+      debugError(error)
       cli.ux.action.stop("failed")
       this.error(`unable to list operations:\n${error}`)
     }

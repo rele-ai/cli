@@ -4,6 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { AppsClient, VersionsClient, CONF_KEYS_MAP } = require("../../../lib/components")
 
 /**
@@ -115,6 +116,7 @@ class GetCommand extends BaseCommand {
         cli.ux.action.stop(`couldn't find app for key: ${key}`)
       }
     } catch (error) {
+      debugError(error)
       cli.ux.action.stop("falied")
       this.error(`Unable to get application ${key}.\n${error}`)
     }

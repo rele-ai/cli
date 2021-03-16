@@ -3,6 +3,7 @@ const csv = require("csv")
 const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { TranslationsClient } = require("../../../lib/components")
 
 /**
@@ -118,7 +119,7 @@ class ImportCommand extends BaseCommand {
 
       cli.ux.action.stop()
     } catch (err) {
-      console.error(err)
+      debugError(err)
       cli.ux.action.stop("failed")
       this.error(`unable to import translations.\n${err}`)
     }

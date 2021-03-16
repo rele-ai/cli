@@ -120,7 +120,6 @@ class ActivateCommand extends BaseCommand {
       cli.ux.action.stop()
     } catch (err) {
       debugError(err)
-
       this.error(`Unable to activate workflow.\n${err}`)
     }
   }

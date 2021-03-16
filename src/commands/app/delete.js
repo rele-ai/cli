@@ -1,6 +1,7 @@
 const cli = require("cli-ux")
 const BaseCommand = require("../../utils/base-command")
 const { AppsClient } = require("../../../lib/components")
+const { debugError } = require("../../../lib/utils/logger")
 
 /**
  * Delete an application from RELE.AI. Only applications
@@ -46,6 +47,7 @@ class DeleteCommand extends BaseCommand {
       // stop spinner
       cli.ux.action.stop()
     } catch (err) {
+      debugError(err)
       cli.ux.action.stop("failed")
       this.error(`Unable to delete application ${key}.\n${err}`)
     }

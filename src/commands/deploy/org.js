@@ -9,6 +9,7 @@ const git = require("simple-git/promise")()
 const { generateRbTag } = require("../../utils")
 const BaseCommand = require("../../utils/base-command")
 const ActivateCommand = require("../workflow/activate")
+const { debugError } = require("../../../lib/utils/logger")
 
 /**
  * Define the deploy org command
@@ -212,6 +213,7 @@ class DeployOrgCommand extends BaseCommand {
       // git tag
       await this.gitTagVersion()
     } catch (err) {
+      debugError(err)
       cli.ux.action.stop("failed")
       this.error(`Unable to deply integration.\n${err}`)
     }

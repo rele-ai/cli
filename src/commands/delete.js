@@ -2,6 +2,7 @@ const cli = require("cli-ux")
 const plugin = require("../utils/plugin")
 const { flags } = require("@oclif/command")
 const { readConfig } = require("../utils/readers")
+const { debugError } = require("../../lib/utils/logger")
 const BaseCommand = require("../utils/base-command")
 const {
   WorkflowsClient,
@@ -147,6 +148,7 @@ class DeleteCommand extends BaseCommand {
       cli.ux.action.stop()
       this.log("All configs from configuration file deleted successfully.")
     } catch (error) {
+      debugError(error)
       cli.ux.action.stop("failed")
       this.error(`Unable to apply configuration file.\n${error}`)
     }

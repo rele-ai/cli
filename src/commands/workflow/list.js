@@ -2,6 +2,7 @@ const cli = require("cli-ux")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { WorkflowsClient, VersionsClient } = require("../../../lib/components")
 
 /**
@@ -63,6 +64,7 @@ class ListCommand extends BaseCommand {
       }
     } catch(error) {
       // handle errors
+      debugError(error)
       cli.ux.action.stop("failed")
       this.error(`unable to list workflows:\n${error}`)
     }

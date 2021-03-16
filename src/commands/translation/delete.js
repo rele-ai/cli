@@ -1,5 +1,6 @@
 const cli = require("cli-ux")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { TranslationsClient, VersionsClient } = require("../../../lib/components")
 
 /**
@@ -90,6 +91,7 @@ class DeleteCommand extends BaseCommand {
       // stop spinner
       cli.ux.action.stop()
     } catch (err) {
+      debugError(err)
       cli.ux.action.stop("failed")
       this.error(`Unable to delete translation ${key}.\n${err}`)
     }

@@ -6,6 +6,7 @@ const { flags } = require("@oclif/command")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { TranslationsClient, VersionsClient } = require("../../../lib/components")
 
 /**
@@ -150,6 +151,7 @@ class ListCommand extends BaseCommand {
       // plugins.translation.list._execute("error", {})
 
       // handle errors
+      debugError(error)
       cli.ux.action.stop("failed")
       this.error(`unable to list translation:\n${error}`)
     }

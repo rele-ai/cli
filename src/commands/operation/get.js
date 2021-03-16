@@ -4,6 +4,7 @@ const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient, CONF_KEYS_MAP } = require("../../../lib/components")
 
 /**
@@ -147,6 +148,7 @@ class GetCommand extends BaseCommand {
         cli.ux.action.stop(`couldn't find operation for key: ${key}`)
       }
     } catch (error) {
+      debugError(error)
       cli.ux.action.stop("falied")
       this.error(`Unable to get operation ${key}.\n${error}`)
     }

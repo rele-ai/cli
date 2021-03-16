@@ -1,5 +1,6 @@
 const cli = require("cli-ux")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { WorkflowsClient } = require("../../../lib/components")
 
 /**
@@ -46,6 +47,7 @@ class DeleteCommand extends BaseCommand {
       // stop spinner
       cli.ux.action.stop()
     } catch (err) {
+      debugError(err)
       cli.ux.action.stop("failed")
       this.error(`Unable to delete workflow ${key}.\n${err}`)
     }

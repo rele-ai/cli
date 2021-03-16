@@ -125,9 +125,8 @@ class ListCommand extends BaseCommand {
         cli.ux.action.stop("no app actions found")
       }
     } catch(error) {
-      debugError(error)
-
       // handle errors
+      debugError(error)
       cli.ux.action.stop("failed")
       this.error(`unable to list app actions:\n${error}`)
     }
