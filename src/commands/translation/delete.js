@@ -44,12 +44,8 @@ class DeleteCommand extends BaseCommand {
     // pull versions
     const versions = await this.versions
 
-    // attach to array if needed
-    if (versions instanceof Array) {
-      return versions
-    } else {
-      return [versions]
-    }
+    // return as array if needed
+    return versions instanceof Array ? versions : [versions]
   }
 
   /**
