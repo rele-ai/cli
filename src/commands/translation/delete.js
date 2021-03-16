@@ -2,6 +2,7 @@ const cli = require("cli-ux")
 const BaseCommand = require("../../utils/base-command")
 const { debugError } = require("../../../lib/utils/logger")
 const { TranslationsClient, VersionsClient } = require("../../../lib/components")
+const { version } = require("@oclif/command/lib/flags")
 
 /**
  * Delete a translation from RELE.AI. Only translations
@@ -37,6 +38,21 @@ class DeleteCommand extends BaseCommand {
   }
 
   /**
+   * Get versions list
+   */
+  async _getVersions() {
+    // pull versions
+    const versions = await this.versions
+
+    // attach to array if needed
+    if (versions instanceof Array) {
+      return versions
+    } else {
+      return [versions]
+    }
+  }
+
+  /**
    * Execute the delete command
    */
   async run() {
@@ -55,7 +71,7 @@ class DeleteCommand extends BaseCommand {
       const isRele = (await this.user).emails[0].endsWith("@rele.ai")
 
       // collect version promises
-      const prms = (await this.versions).map(async vrId => {
+      const prms = (await this._getVersions()).map(async vrId => {
         const { version = {} } = await this._clients.Version.getById(vrId)
         return version
       })
