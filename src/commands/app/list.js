@@ -2,6 +2,7 @@ const cli = require("cli-ux")
 const { docToConf } = require("../../utils/parser")
 const { docListToObj } = require("../../utils")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { AppsClient, VersionsClient } = require("../../../lib/components")
 
 /**
@@ -68,7 +69,7 @@ class ListCommand extends BaseCommand {
         cli.ux.action.stop("no apps found")
       }
     } catch(error) {
-      console.error(error)
+      debugError(error)
       // handle errors
       cli.ux.action.stop("failed")
       this.error(`unable to list apps:\n${error}`)

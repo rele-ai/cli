@@ -10,6 +10,7 @@ const {flags} = require("@oclif/command")
 const download = require("download-git-repo")
 const {isLocalPath} = require("../utils/local-path")
 const BaseCommand = require("../utils/base-command")
+const { debugError } = require("../../lib/utils/logger")
 const render = require("consolidate").handlebars.render
 
 // Support types from prompt-for which was used before
@@ -387,7 +388,7 @@ class CreateCommand extends BaseCommand {
         return
       }
     } catch (error) {
-      console.error(error)
+      debugError(error)
       this.error(`unable to get template from: ${flags.template}.\n`)
       return
     }

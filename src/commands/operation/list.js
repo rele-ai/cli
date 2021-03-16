@@ -5,6 +5,7 @@ const plugin = require("../../utils/plugin")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
 
 /**
@@ -142,7 +143,8 @@ class ListCommand extends BaseCommand {
         cli.ux.action.stop("no operations found")
       }
     } catch(error) {
-      console.error(error)
+      debugError(error)
+
       // handle errors
       cli.ux.action.stop("failed")
       this.error(`unable to list operations:\n${error}`)

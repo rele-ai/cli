@@ -1,6 +1,7 @@
 const cli = require("cli-ux")
 const { flags } = require("@oclif/command")
 const BaseCommand = require("../../utils/base-command")
+const { debugError } = require("../../../lib/utils/logger")
 const { WorkflowsClient, CONF_KEYS_MAP } = require("../../../lib/components")
 const inquirer = require("inquirer")
 
@@ -118,9 +119,8 @@ class ActivateCommand extends BaseCommand {
       cli.ux.action.start(`Activating workflows ${workflows.join(",")}`)
       cli.ux.action.stop()
     } catch (err) {
-      // stop spinner fail
-      console.error(err)
-      // cli.ux.action.stop("failed")
+      debugError(err)
+
       this.error(`Unable to activate workflow.\n${err}`)
     }
   }
