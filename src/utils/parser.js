@@ -390,6 +390,37 @@ const _getAppId = (conf, apps, versions, user) => {
 }
 
 /**
+ * _getWorkflowId return the relevant
+ * workflow id
+ *
+ * @param {obejct} conf
+ * @param {object} workflows
+ * @param {object} user
+ * @returns
+ */
+ const _getWorkflowId = (conf, workflows, user) => {
+  // determine if user is rele.ai user
+  const isRele = user.emails[0].endsWith("@rele.ai")
+
+  // pull all user workflows
+  const userWorkflows = Object.values(workflows).filter((workflow) => {
+    if (isRele) {
+      return workflow.org === "global" && conf.selector.workflow.includes(workflow.key)
+    } else {
+      return workflow.org === user.orgs[0] && conf.selector.workflow.includes(workflow.key)
+    }
+  })
+
+  // check if found any workflows
+  if (!userWorkflows.length) {
+    throw new Error("unable to find any matching workflows.")
+  }
+
+  // return user workflows
+  return userWorkflows.map(workflow => workflow.id)
+ }
+
+/**
  * Converts the given YAML config to the matchinf firestore
  * document.
  *
@@ -404,9 +435,10 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
     // define base json operation
     const baseOperation = {
       is_root: conf.is_root,
-      workflows: Object.keys(workflows).filter(
-        workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
-      ),
+      // workflows: Object.keys(workflows).filter(
+      //   workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
+      // ),
+      workflows: _getWorkflowId(conf, workflows, user),
       app_id: _getAppId(conf, apps, versions, user),
       payload: conf.payload || {},
       action: {
