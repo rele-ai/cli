@@ -435,10 +435,10 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
     // define base json operation
     const baseOperation = {
       is_root: conf.is_root,
-      workflows: Object.keys(workflows).filter(
-        workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
-      ),
-      // workflows: _getWorkflowId(conf, workflows, user),
+      // workflows: Object.keys(workflows).filter(
+      //   workflowId => conf.selector.workflow.includes(workflows[workflowId].key)
+      // ),
+      workflows: _getWorkflowId(conf, workflows, user),
       app_id: _getAppId(conf, apps, versions, user),
       payload: conf.payload || {},
       action: {
