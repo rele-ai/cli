@@ -95,7 +95,7 @@ module.exports = async (config, { accessToken }) => {
         const baseNextOp = {
           type: "Operation",
           selector: {
-            app: "clara",
+            app: "core",
             app_action: "get_notification",
             workflow: (config.selector || {}).workflow || []
           },
@@ -124,7 +124,7 @@ module.exports = async (config, { accessToken }) => {
       const item = {
         filters: [
           [(config.selector || {}).app_action || "", "==", "queue"],
-          [(config.selector || {}).app || "", "==", "clara"]
+          [(config.selector || {}).app || "", "==", "core"]
         ],
         defaults: {
           redis: {
@@ -188,7 +188,7 @@ module.exports = async (config, { accessToken }) => {
     // () => {
     //   const item = {
     //     filters: [
-    //       [(config.selector || {}).app || "", "==", "clara"],
+    //       [(config.selector || {}).app || "", "==", "core"],
     //       [(config.selector || {}).app_action || "", "==", "releai_active_integrations"]
     //     ],
     //     ungroup: []
@@ -355,7 +355,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "switch_condition"
     //         },
     //         key: config.key || "rb_internal_key_1",
@@ -390,7 +390,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         key: "rb_internal_key_2",
@@ -416,7 +416,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         next_operation: {
@@ -456,7 +456,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "switch_condition"
     //         },
     //         key: "rb_internal_key_4",
@@ -495,7 +495,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         key: "rb_internal_key_5",
@@ -521,7 +521,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         next_operation: {
@@ -561,7 +561,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "switch_condition"
     //         },
     //         redis: {
@@ -617,7 +617,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         key: "rb_internal_key_8",
@@ -643,7 +643,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         next_operation: {
@@ -683,7 +683,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "switch_condition"
     //         },
     //         key: "rb_internal_key_10",
@@ -723,7 +723,7 @@ module.exports = async (config, { accessToken }) => {
     //         key: "rb_internal_key_11",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         next_operation: {
@@ -748,7 +748,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "update_session"
     //         },
     //         next_operation: {
@@ -789,7 +789,7 @@ module.exports = async (config, { accessToken }) => {
     //         key: "rb_internal_key_13",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "switch_condition"
     //         },
     //         next_operation: {
@@ -869,7 +869,7 @@ module.exports = async (config, { accessToken }) => {
     //         key: "rb_internal_key_15",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "get_notification"
     //         },
     //         next_operation: {
@@ -894,7 +894,7 @@ module.exports = async (config, { accessToken }) => {
     //         type: "Operation",
     //         selector: {
     //           workflow: config.selector.workflow,
-    //           app: "clara",
+    //           app: "core",
     //           app_action: "switch_condition"
     //         },
     //         key: "rb_internal_key_16",
