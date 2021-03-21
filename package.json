@@ -6,6 +6,9 @@
   "bin": {
     "rb": "bin/run"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "bugs": "https://github.com/rele-ai/cli/issues",
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
@@ -14,6 +17,7 @@
     "eslint": "^7.20.0",
     "eslint-config-oclif": "^3.1.0",
     "globby": "^11.0.2",
+    "lerna": "^4.0.0",
     "mocha": "^8.3.0",
     "nyc": "^15.1.0"
   },
@@ -46,14 +50,15 @@
     "postinstall": "node ./scripts/copy-configs.js",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif-dev readme && git add README.md",
+    "new-version": "lerna version --conventional-commits --yes"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.6",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
-    "@releai/default-groups": "file:packages/rb-plugin-default-groups",
+    "@releai/default-groups": "latest",
     "axios": "^0.21.1",
     "cli-ux": "^5.5.1",
     "consolidate": "^0.16.0",

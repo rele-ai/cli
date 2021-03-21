@@ -16,8 +16,8 @@
   },
   "license": "Apache License",
   "dependencies": {
-    "@releai/cli": "file:../..",
-    "@releai/helper-plugin-utils": "file:../rb-plugin-helper-plugin-utils",
+    "@releai/cli": "latest",
+    "@releai/helper-plugin-utils": "latest",
     "uuid": "^8.3.2"
   }
 }
