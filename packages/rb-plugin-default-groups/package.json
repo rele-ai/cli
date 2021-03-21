@@ -16,8 +16,8 @@
   },
   "license": "Apache License",
   "dependencies": {
-    "@releai/cli": "latest",
-    "@releai/helper-plugin-utils": "latest",
+    "@releai/cli": "^0.1.5",
+    "@releai/helper-plugin-utils": "^0.1.5",
     "uuid": "^8.3.2"
   }
 }
