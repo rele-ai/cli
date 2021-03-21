@@ -468,6 +468,21 @@ const generateServiceClass = (type) => {
           }
         )
       }
+      break
+    case "apps":
+      componentClass.prototype.getAppHash = function(appHash) {
+        // make the get request
+        return this._request(
+          this._serviceDef.GetAppHash,
+          appHash,
+          {
+            headers: {
+              authorization: `Bearer ${this._accessToken}`
+            }
+          }
+        )
+      }
+      break
   }
 
   return componentClass
