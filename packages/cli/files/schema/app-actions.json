@@ -1,0 +1,71 @@
+{
+    "type": "object",
+    "required": [
+        "type",
+        "selector",
+        "key"
+    ],
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "AppAction"
+            ]
+        },
+        "selector": {
+            "type": "object",
+            "required": [
+                "app"
+            ],
+            "properties": {
+                "app": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_]+$"
+                }
+            }
+        },
+        "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+        },
+        "display_name": {
+            "type": "object",
+            "default": {},
+            "patternProperties": {
+                "^([a-z]{2})(_[a-z]{2})?$": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9\\s-_]+$"
+                }
+            }
+        },
+        "request": {
+            "type": "object",
+            "default": {},
+            "properties": {
+                "method": {
+                    "type": "string",
+                    "enum": [
+                        "GET",
+                        "HEAD",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "CONNECT",
+                        "OPTIONS",
+                        "TRACE",
+                        "PATCH"
+                    ]
+                },
+                "headers": {
+                    "type": "object"
+                },
+                "body": {
+                    "type": "object"
+                },
+                "query": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}

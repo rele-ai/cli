@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package auth;
+
+// ------------ Authentication Service -------------
+service Authentication {
+  // Generates refresh token from code
+  rpc GetRefreshToken(GetRefreshTokenReq) returns (GetRefreshTokenRes);
+
+  // exchange refresh token for access token
+  rpc ExchangeRefreshToken(ExchangeRefreshTokenReq) returns (ExchangeRefreshTokenRes);
+}
+
+// ------------ Messages -------------
+message GetRefreshTokenReq {
+  // user's code
+  string code = 1;
+}
+
+message GetRefreshTokenRes {
+  // refresh token
+  string refresh_token = 1;
+
+  // current active id token
+  string access_token = 2;
+}
+
+message ExchangeRefreshTokenReq {
+  string refresh_token = 1;
+}
+
+message ExchangeRefreshTokenRes {
+  string expires_in = 1;
+  string token_type = 2;
+  string refresh_token = 3;
+  string id_token = 4;
+  string user_id = 5;
+  string project_id = 6;
+}
