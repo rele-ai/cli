@@ -10,6 +10,9 @@
     "releai",
     "rb"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": {
     "name": "Elon Salfati",
     "email": "support@rele.ai",
