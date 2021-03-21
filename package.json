@@ -18,5 +18,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "new-version": "lerna version --conventional-commits --yes"
+  },
+  "devDependencies": {
+    "lerna": "^4.0.0"
   }
 }
