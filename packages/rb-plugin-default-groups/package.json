@@ -1,6 +1,6 @@
 {
   "name": "@releai/default-groups",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Default config groups parser",
   "main": "src/index.js",
   "scripts": {},
