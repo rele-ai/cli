@@ -114,6 +114,9 @@ service Apps {
 
   // load app keys
   rpc LoadAppKeys(LoadAppKeysRequest) returns (stream LoadAppKeysResponse) {}
+
+  // generate app hash
+  rpc GetAppHash(CreateAppHashRequest) returns (CreateAppHashResponse) {}
 }
 
 // ------------ Operations Service -------------
@@ -1121,4 +1124,14 @@ message ActivateWorkflowObject {
   repeated string append = 1;
   repeated string remove = 2;
   repeated string emails = 3;
+}
+
+// message CreateAppHashRequest
+message CreateAppHashRequest {
+  string id = 1;
+}
+
+// message CreateAppHashResponse
+message CreateAppHashResponse {
+  string app_hash = 1;
 }
