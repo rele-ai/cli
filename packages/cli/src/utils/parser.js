@@ -195,7 +195,6 @@ const loadAppDoc = (conf) => {
     // delete unessesary keys
     delete cpApp.type
     delete cpApp.key
-
     // attach system key
     cpApp.system_key = conf.key
 
