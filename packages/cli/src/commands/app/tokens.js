@@ -42,44 +42,44 @@ class TokensCommand extends BaseCommand {
     return versions
   }
 
-    /**
-     * Collect version id
-     */
-    async _collectVersionId() {
-      // resolve access token and user info
-      const accessToken = await this.accessToken
+  /**
+   * Collect version id
+   */
+  async _collectVersionId() {
+    // resolve access token and user info
+    const accessToken = await this.accessToken
 
-      // package version
-      const packageVersion = require(`${pkgDir.sync(__dirname)}/package.json`).version
+    // package version
+    const packageVersion = require(`${pkgDir.sync(__dirname)}/package.json`).version
 
-      // define version
-      const versionNumber = (await this.version) || packageVersion
+    // define version
+    const versionNumber = (await this.version) || packageVersion
 
-      // version client
-      const client = new VersionsClient(accessToken)
+    // version client
+    const client = new VersionsClient(accessToken)
 
-      // check if exists
-      let versionId = await client.getVersionId(versionNumber, true, true, false)
+    // check if exists
+    let versionId = await client.getVersionId(versionNumber, true, true, false)
 
-      if (versionId && versionId.constructor === Array) {
-        versionId = (versionId.find((v) => v.org !== "global") || {}).id
-      }
-
-      if (!versionId) {
-        // create version
-        const versionRes = await client.create(
-          {
-            key: versionNumber
-          }
-        )
-
-        // replace to new version id
-        versionId = versionRes.id
-      }
-
-      // return the version id
-      return versionId
+    if (versionId && versionId.constructor === Array) {
+      versionId = (versionId.find((v) => v.org !== "global") || {}).id
     }
+
+    if (!versionId) {
+      // create version
+      const versionRes = await client.create(
+        {
+          key: versionNumber
+        }
+      )
+
+      // replace to new version id
+      versionId = versionRes.id
+    }
+
+    // return the version id
+    return versionId
+  }
 
   /**
    * generateAppHash generate an app hash string
