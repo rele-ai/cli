@@ -28,7 +28,8 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json",
     "/src",
-    "/scripts"
+    "/scripts",
+    "/files"
   ],
   "homepage": "https://github.com/rele-ai/cli",
   "keywords": [
