@@ -102,24 +102,34 @@ class ApplyCommand extends BaseCommand {
    */
   async _generateOperations(operationsConfs) {
     // destract version
-    let versions = await this.versions
-    if (versions) {
-      if (versions.constructor !== Array) {
-        versions = [versions]
+    let versionsIds = await this.versions
+    if (versionsIds) {
+      if (versionsIds.constructor !== Array) {
+        versionsIds = [versionsIds]
       }
     } else {
       throw new Error("couldn't find matching versions")
     }
 
+    // load selectors data
+    const [workflows, apps, appActions, versions] = await Promise.all(await this.loadSelectorsData())
+
+    // define metadata
+    const metadata = {
+      workflows: docListToObj(workflows),
+      apps: docListToObj(apps),
+      appActions: docListToObj(appActions),
+      versions: docListToObj(versions),
+      user: await this.user
+    }
+
     // format operations confs to
     // operations docs
-    const operationsDocs = await Promise.all(
-      operationsConfs.map(conf => this._formatConfToDoc(conf))
-    )
+    const operationsDocs = operationsConfs.map(conf => confToDoc(conf.type, conf, metadata))
 
     if (operationsDocs.length) {
       // create operations records
-      await this._clients.Operation.createRecords(operationsDocs, versions)
+      await this._clients.Operation.createRecords(operationsDocs, versionsIds)
     }
   }
 
