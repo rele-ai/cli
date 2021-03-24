@@ -150,7 +150,7 @@ class DeleteCommand extends BaseCommand {
     } catch (error) {
       debugError(error)
       cli.ux.action.stop("failed")
-      this.error(`Unable to apply configuration file.\n${error}`)
+      this.error(`Unable to delete configuration file.\n${error}`)
     }
   }
 }
