@@ -373,19 +373,25 @@ const _getAppId = (conf, apps, versions, user) => {
 
   // search for app id
   const mapAppVersions = _mapAppVersions(apps, versions)
-  // const filter = isReleAi
-  //   ? (version) => version.org === "global"
-  //   : (version) => version.org !== "global"
 
+  // found app
   let shouldKeepSearch = !Boolean(versionId)
-  return Object.values(apps).find(app => {
+  const foundedApp = Object.values(apps).find(app => {
     if (shouldKeepSearch) {
       // get app latest version
       versionId = versionSort(mapAppVersions[app.system_key], { nested: "key" }).slice(-1)[0] || {}
     }
 
     return app.system_key === appKey && app.version === (versionId || {}).id
-  }).id
+  })
+
+  // check if app exsits
+  if (foundedApp) {
+    return foundedApp.id
+  } else {
+    throw new Error(`can't find related app with key = ${appKey}`)
+  }
+
 }
 
 /**
