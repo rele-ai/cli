@@ -26,9 +26,7 @@ module.exports = async (config, { accessToken }) => {
     () => {
       const baseOperation = {
         ...config,
-        payload: {
-          content: (config.payload || {}).content || ""
-        },
+        payload: config.payload || {},
         next_operation: {
           selector: ((config.next_operation || {}).selector || []).map((selector) => ({
             workflow: selector.workflow,
