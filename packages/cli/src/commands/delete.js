@@ -69,12 +69,15 @@ class DeleteCommand extends BaseCommand {
   /**
    * generate config record on firestore.
    */
-  async _deleteRecord(object) {
+  async _deleteRecord(object, metadata) {
     // get clients
     const clients = await this._clients
 
-    // destract version
-    const version = await this.version
+    // add workflows to metadata
+    metadata = {
+      ...metadata,
+      object
+    }
 
     // pull client by type
     const client = clients[object.type]
@@ -83,7 +86,7 @@ class DeleteCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    const config = await client.getByKey(object.key, conditions, version, true)
+    const config = await client.getByKey(object.key, conditions, metadata)
 
     if (config) {
       // update config
@@ -125,6 +128,9 @@ class DeleteCommand extends BaseCommand {
       // destract path
       const { path } = this.flags
 
+      // load selectors data
+      const [workflows] = await Promise.all(await this.loadSelectorsData())
+
       // format yaml to array of objects
       const data = { yamlData: readConfig(path) }
 
@@ -137,10 +143,17 @@ class DeleteCommand extends BaseCommand {
         }
       )
 
+      // build metadata
+      const metadata = {
+        version: await this.version,
+        removeGlobal: true,
+        workflows
+      }
+
       // delete records and resolve all promises
       await Promise.all(
         data.yamlData.map(async object => {
-          return this._deleteRecord(object)
+          return this._deleteRecord(object, metadata)
         })
       )
 

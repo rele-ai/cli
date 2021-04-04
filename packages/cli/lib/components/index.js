@@ -336,7 +336,7 @@ const generateServiceClass = (type) => {
      * @param {Array} conds - Additional conditions.
      * @returns {object} - Config.
      */
-    async getByKey(key, conds = [], version = "", removeGlobal = false) {
+    async getByKey(key, conds = [], { version = "", removeGlobal = false, object = {}, workflows = [] }) {
       // set conditions array
       // pulls all org that related to the user's
       // org id, or to global org.
@@ -355,7 +355,23 @@ const generateServiceClass = (type) => {
 
       // check valid length
       if (items) {
-        if (items.length < 2) {
+        // filter items by workflow
+        if (this._type === "operations") {
+          // items filtered by workflow
+          const filterItems = items.filter(it => {
+            const isWorkflowExists = it.workflows.map(wrkId => {
+              const workflow = workflows.find(wrk => wrk.id === wrkId)
+              return object.selector.workflow.includes(workflow.key)
+            })
+
+            return isWorkflowExists.includes(true)
+          })
+
+          // if got only one result - return it
+          if (filterItems.length === 1) {
+            return filterItems[0]
+          }
+        } else if (items.length < 2) {
           if (items.length === 1) {
             return items[0]
           }
@@ -387,7 +403,7 @@ const generateServiceClass = (type) => {
      */
     async updateByKey(key, config, cond = []) {
       // get object by key
-      const object = await this.getByKey(key, cond, "", true)
+      const object = await this.getByKey(key, cond, { version: "", removeGlobal: true })
 
       // return promise
       if (object) {
@@ -420,7 +436,7 @@ const generateServiceClass = (type) => {
      */
     async deleteByKey(key, conds=[], version="") {
       // get object by key
-      const object = await this.getByKey(key, conds, version, true)
+      const object = await this.getByKey(key, conds, { version, removeGlobal: true })
 
       // delete object by returned id
       if (object) {

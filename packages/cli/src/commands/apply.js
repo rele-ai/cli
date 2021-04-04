@@ -150,7 +150,6 @@ class ApplyCommand extends BaseCommand {
     const conditions = this._getConditionsList(object)
 
     // check if the config is already exists
-    // const config = await client.getByKey(object.key, conditions, version, true)
     const configs = ((await client.list([
       ...conditions,
       [CONF_KEYS_MAP[`${toSnakeCase(object.type)}s`], "==", object.key]
