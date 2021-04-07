@@ -22,5 +22,8 @@
   },
   "devDependencies": {
     "lerna": "^4.0.0"
+  },
+  "dependencies": {
+    "google-protobuf": "^3.16.0-rc.1"
   }
 }

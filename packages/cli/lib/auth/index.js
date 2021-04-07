@@ -1,4 +1,7 @@
 const BaseClient = require("../utils/base")
+const { NotifyRequest } = require("../pb/integratedapp_pb")
+const { IntegratedAppsService } = require("../pb/integratedapp_grpc_pb")
+const googleProtobufStructPb = require("google-protobuf/google/protobuf/struct_pb.js")
 
 /**
  * Auth service client.
@@ -8,37 +11,34 @@ class AuthClient extends BaseClient {
    * Initiate the base client with auth proto
    */
   constructor() {
-    super("auth")
+    super()
   }
 
   /**
-   * Generates refresh token via the auth api.
+   * Genereric notify request to auth service
    *
-   * @param {string} code - User's auth code.
-   * @returns {object} - Refresh and access token.
+   * @param {string} operationKey - operation identifier
+   * @param {Object} payload - payload request.
    */
-  generateRefreshToken(code) {
-    return this._request(
-      this.proto.Authentication.service.GetRefreshToken,
-      {
-        code
-      }
-    )
-  }
+  async notify(operationKey, payload) {
+    // init notify request
+    const notiftReq = new NotifyRequest()
+    notiftReq.setOperationKey(operationKey)
+    notiftReq.setPayload(googleProtobufStructPb.Struct.fromJavaScript(payload))
 
-  /**
-   * Exchange refresh token for access token
-   * through the API.
-   *
-   * @param {string} refreshToken - Refresh token.
-   */
-  exchangeRefreshForAccess(refreshToken) {
-    return this._request(
-      this.proto.Authentication.service.ExchangeRefreshToken,
+    const res = await this._request(
+      IntegratedAppsService.notify,
+      notiftReq,
       {
-        refresh_token: refreshToken
+        headers: {
+          "x-proxy-cluster": "auth"
+        }
       }
     )
+
+    // pull response and return it
+    const payloadRes = res.getPayload()
+    return payloadRes ? payloadRes.toJavaScript() : {}
   }
 }
 
