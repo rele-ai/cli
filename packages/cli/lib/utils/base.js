@@ -14,7 +14,9 @@ class BaseClient {
   */
   constructor(protoName) {
     // load the client proto
-    this.proto = loadProto(protoName)
+    if (protoName) {
+      this.proto = loadProto(protoName)
+    }
   }
 
   /**

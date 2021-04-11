@@ -46,7 +46,7 @@ class BaseCommand extends Command {
    * Returns updated access token
    */
   get accessToken() {
-    return (new AuthClient()).exchangeRefreshForAccess(this.refreshToken)
+    return (new AuthClient()).notify("exchange_refresh_token", { refreshToken: this.refreshToken })
   }
 
   /**
