@@ -1,4 +1,6 @@
 const fs = require("fs")
+const path = require("path")
+const glob = require("glob")
 const yaml = require("js-yaml")
 
 /**
@@ -44,4 +46,28 @@ module.exports.readConfig = (path) => {
 
   // parse yaml to object and return to user
   return yaml.loadAll(mergedFile)
+}
+
+/**
+ * Load all RELE.AI configs from a given main
+ * project root directory.
+ *
+ * @param {string} projectRootDir - Project root directory.
+ * @param {Array.<string|Buffer>} - Loaded files.
+ */
+module.exports.readAllConfigs = (projectRootDir) => {
+  // resolve configs path
+  const rootDir = path.resolve(__dirname, projectRootDir)
+
+  // load all yaml files from project root
+  const filePromises = glob.sync(`${rootDir}/**/*.yaml`).map((filepath) => {
+    return new Promise((resolve, reject) => {
+      fs.readFile(filepath, "utf8", (err, data) => {
+        err ? reject(err) : resolve(data)
+      })
+    })
+  })
+
+  // return promise wait for files
+  return Promise.all(filePromises)
 }

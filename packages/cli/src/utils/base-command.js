@@ -58,6 +58,7 @@ class BaseCommand extends Command {
         return jwtDecode(token.id_token)
       })
       .catch(e => {
+        console.error(e)
         this.error("unable to get access token when parsing JWT", e)
         return {}
       })
