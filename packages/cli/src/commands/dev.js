@@ -149,15 +149,15 @@ class VersionsCommand extends BaseCommand {
    */
   async run() {
     console.log(await this.accessToken)
-    // prepare dev configs
-    // copy to tmp and update application yamls with ngrok url
-    await this.prepareDevConfigs()
+    // // prepare dev configs
+    // // copy to tmp and update application yamls with ngrok url
+    // await this.prepareDevConfigs()
 
-    // updating and deploying dev configs
-    await this.deployDevConfigs()
+    // // updating and deploying dev configs
+    // await this.deployDevConfigs()
 
-    // run nodemon
-    this.startNodemon()
+    // // run nodemon
+    // this.startNodemon()
   }
 }
 
