@@ -576,11 +576,11 @@ message Operation {
   map<string, OperationPayload> payload = 5;
   OperationOutput output = 6;
   repeated string workflows = 7;
-  map<string, string> next_operation = 8;
+  NextOp next_operation = 8;
   OperationInput input = 9;
   string key = 10;
   string id = 11;
-  map<string, string> on_error = 12;
+  NextOp on_error = 12;
   string version = 13;
   string org = 14;
 }
@@ -591,13 +591,19 @@ message OperationRedis {
   string type = 2;
 }
 
+// message next operations
+message NextOp {
+  string type = 1;
+  map<string, string> data = 2;
+}
+
 // message OperationPayload
 message OperationPayload {
   google.protobuf.Value data = 1;
   string type = 2;
   string rkey_type = 3;
   map<string, OperationPayload> vars = 4;
-  map<string, string> next_operation = 5;
+  NextOp next_operation = 5;
   string match_operation = 6;
   OperationPayload default = 7;
 }
