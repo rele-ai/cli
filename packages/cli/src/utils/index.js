@@ -106,24 +106,30 @@ module.exports.loadConfNextOperations = (data, workflows, operations) => {
   Object.keys(data).forEach(key => {
     // check if recursion reaches next operation
     // or on error instances and format it
-    if (key === "next_operation" || key === "on_error") {
+    if (key === "next" || key === "on_error") {
       // take deep copy of next operation
       const nextOp = { ...(data[key] || {}) }
 
       // reset next operations
       data[key] = {}
 
-      // add next operation
-      data[key].selector = Object.entries(nextOp).map(([wid, oid]) => {
-        return {
-          workflow: workflows[wid].key,
-          operation: operations[oid].key
-        }
-      })
+      if (Object.keys(nextOp).length) {
+        const type = nextOp.type
+
+        data[key].selector = Object.entries(nextOp.data).map(([wid, eid]) => {
+          return {
+            type,
+            data: {
+              workflow: workflows[wid].key,
+              next: type === "operation" ? operations[eid].key : workflows[eid].key
+            }
+          }
+        })
+      }
     }
 
     // go nested
-    if (typeof data[key] === "object") {
+    if (typeof data[key] === "object" && !(data[key] instanceof Array)) {
       this.loadConfNextOperations(data[key], workflows, operations)
     }
   })
