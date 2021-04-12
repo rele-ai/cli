@@ -141,7 +141,7 @@ module.exports.loadDocNextOperations = (data, workflows) => {
   Object.keys(data).forEach(key => {
     // check if recursion reaches next operation
     // or on error instances and format it
-    if (key === "next_operation" || key === "on_error") {
+    if (key === "next" || key === "on_error") {
       // destract next operations and on errors
       const nextOpSelector = (data[key] || {}).selector || []
 
@@ -159,7 +159,7 @@ module.exports.loadDocNextOperations = (data, workflows) => {
           // set next operation by workflow id
           data[key].type = select.type
           data[key].data = {
-            [workflowId]: select.type === "operation" ? select.data.operation : select.data.next_workflow
+            [workflowId]: select.data.next
           }
         } else {
           throw new Error(`You try to upload a operation with unknown workflow with key = ${select.data.workflow}. please make sure you upload also the workflow that belongs to this operation.`)

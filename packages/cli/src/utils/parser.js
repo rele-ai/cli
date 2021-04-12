@@ -452,7 +452,7 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
       redis: {},
       input: conf.input || {},
       output: conf.output || {},
-      next_operation: conf.next_operation || {},
+      next: conf.next || {},
       on_error: conf.on_error || {},
       key: conf.key
     }

@@ -576,7 +576,7 @@ message Operation {
   map<string, OperationPayload> payload = 5;
   OperationOutput output = 6;
   repeated string workflows = 7;
-  NextOp next_operation = 8;
+  NextOp next = 8;
   OperationInput input = 9;
   string key = 10;
   string id = 11;
@@ -603,7 +603,7 @@ message OperationPayload {
   string type = 2;
   string rkey_type = 3;
   map<string, OperationPayload> vars = 4;
-  NextOp next_operation = 5;
+  NextOp next = 5;
   string match_operation = 6;
   OperationPayload default = 7;
 }
