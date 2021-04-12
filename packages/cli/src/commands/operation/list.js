@@ -125,14 +125,14 @@ class ListCommand extends BaseCommand {
           ))
         }
 
-        // // execute operations load plugin
-        // await plugin.operation.list._execute(
-        //   "load",
-        //   data,
-        //   {
-        //     accessToken: await this.accessToken
-        //   }
-        // )
+        // execute operations load plugin
+        await plugin.operation.list._execute(
+          "load",
+          data,
+          {
+            accessToken: await this.accessToken
+          }
+        )
 
         // log to user
         this.log(data.operations.map(yaml.dump).join("---\n"))

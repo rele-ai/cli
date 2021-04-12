@@ -16,25 +16,28 @@ module.exports = async (config, { accessToken }) => {
       operationsMap[operation.key] = {}
     }
 
-    Object.entries((operation.next_operation || {})).forEach(([workflowId, operationId]) => {
-      operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
+    Object.entries(((operation.next || {}).data || {})).forEach(([workflowId, operationId]) => {
+      if ((operation.next || {}).type === "operation") {
+        operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
+      }
     })
   })
 
+  console.log(operationsMap)
   return [
     // convert send message
     () => {
       const baseOperation = {
         ...config,
         payload: config.payload || {},
-        next_operation: {
-          selector: ((config.next_operation || {}).selector || []).map((selector) => ({
+        next: {
+          selector: ((config.next || {}).selector || []).map((selector) => ({
             workflow: selector.workflow,
             operation: (operationsMap[config.key] || {})[selector.workflow] ? operationsMap[config.key][selector.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
           }))
         },
-        output: ((config.next_operation || {}).selector || []).length === 0 ? config.output : {},
-        redis: ((config.next_operation || {}).selector || []).length === 0 ? config.redis : {},
+        output: ((config.next || {}).selector || []).length === 0 ? config.output : {},
+        redis: ((config.next || {}).selector || []).length === 0 ? config.redis : {},
       }
 
       const item = {
@@ -76,8 +79,8 @@ module.exports = async (config, { accessToken }) => {
             type: "Operation",
             selector: rootOperation.selector,
             is_root: rootOperation.is_root,
-            next_operation: {
-              selector: internalOperations.map((io) => io.next_operation.selector).flat()
+            next: {
+              selector: internalOperations.map((io) => io.next.selector).flat()
             },
             on_error: rootOperation.on_error,
             output: internalOperations.length ? internalOperations[0].output : rootOperation.output,
