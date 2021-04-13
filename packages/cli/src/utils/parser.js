@@ -264,6 +264,15 @@ const loadAppActionDoc = (conf, apps) => {
       cpAppAction.request.query = {}
     }
 
+    // attach default metadata
+    if ((cpAppAction.metadata || {}).defaultWait === undefined) {
+      if (!Object.keys(cpAppAction.metadata || {}).length) {
+        cpAppAction.metadata = {}
+      }
+
+      cpAppAction.metadata.defaultWait = true
+    }
+
     // find app id related to app action
     const relatedAppId = Object.keys(apps).find(key => {
       return apps[key].system_key === (conf.selector || {}).app
