@@ -242,7 +242,6 @@ class ApplyCommand extends BaseCommand {
           accessToken: await this.accessToken
         }
       )
-      console.log(JSON.stringify(data))
 
       // destract stages
       let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(data.yamlData)
