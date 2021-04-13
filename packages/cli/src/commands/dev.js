@@ -1,6 +1,7 @@
 const cli = require("cli-ux")
 const ngrok = require("ngrok")
 const yaml = require("js-yaml")
+const nodemon = require("nodemon")
 const { execSync } = require("child_process")
 const DeployUser = require("./deploy/user")
 const { writeConfig } = require("../utils/writers")
@@ -32,9 +33,6 @@ class VersionsCommand extends BaseCommand {
     // class attributes
     this._ngrokPorts = []
     this._devConfigLocation = "/tmp/.rb/dev-config.yaml"
-
-    // define graceful shutdown
-    this.teardown()
   }
 
   /**
@@ -105,8 +103,7 @@ class VersionsCommand extends BaseCommand {
 
     // execute the rb deploy:user command
     const { email } = await this.jwt
-    console.log(email)
-    // await DeployUser.run([email])
+    await DeployUser.run([email])
 
     // stop spinner
     cli.ux.action.stop()
@@ -116,48 +113,44 @@ class VersionsCommand extends BaseCommand {
    * Graceful shutdown for the development server
    */
   async teardown() {
-    process.once("SIGUSR2", async () => {
-      console.log("graceful shutdown")
+    // stop ngrok process
+    await ngrok.kill()
 
-      // stop ngrok process
-      await ngrok.kill()
-
-      // kill process
-      process.kill(process.pid, "SIGUSR2")
-    })
+    // kill process
+    process.exit()
   }
 
   /**
-   * Spin nodemon server
+   * Setup dev script.
    */
-  startNodemon() {
-    // notify user about the execution of the development
-    // server
-    cli.ux.action.start("Running development server")
+  async setup() {
+    // prepare dev configs
+    // copy to tmp and update application yamls with ngrok url
+    await this.prepareDevConfigs()
 
-    // start nodemon
-    execSync(
-      `${process.cwd()}/node_modules/.bin/nodemon ${this.args.mainFile}`
-    )
-
-    // stop spinner
-    cli.ux.action.stop()
+    // updating and deploying dev configs
+    await this.deployDevConfigs()
   }
 
   /**
    * Execute the versions command
    */
   async run() {
-    console.log(await this.accessToken)
-    // // prepare dev configs
-    // // copy to tmp and update application yamls with ngrok url
-    // await this.prepareDevConfigs()
+    // start nodemon
+    nodemon({ script: this.args.mainFile })
 
-    // // updating and deploying dev configs
-    // await this.deployDevConfigs()
-
-    // // run nodemon
-    // this.startNodemon()
+    // define setup and teardown
+    const that = this
+    nodemon
+      .on("start", () => {
+        that.setup()
+      })
+      .on("restart", () => {
+        that.setup()
+      })
+      .on("quit", () => {
+        that.teardown()
+      })
   }
 }
 
