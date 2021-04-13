@@ -26,9 +26,9 @@ module.exports = async (config, { accessToken }) => {
   return [
     // convert send message
     () => {
-      const baseOperation = {
+      let baseOperation = {
         ...config,
-        payload: config.payload || {},
+        payload: {},
         next: {
           selector: ((config.next || {}).selector || []).map(({ type, data }) => ({
             type,
@@ -40,6 +40,15 @@ module.exports = async (config, { accessToken }) => {
         },
         output: ((config.next || {}).selector || []).length === 0 ? config.output : {},
         redis: ((config.next || {}).selector || []).length === 0 ? config.redis : {},
+      }
+
+      // attach content and options to payload
+      if (Object.keys(((config.payload || {}).content || {})).length) {
+        baseOperation.payload.content = config.payload.content || {}
+      }
+
+      if (Object.keys(((config.payload || {}).options || {})).length) {
+        baseOperation.payload.options = config.payload.options || {}
       }
 
       const item = {
@@ -154,7 +163,7 @@ module.exports = async (config, { accessToken }) => {
             is_root: operation.is_root,
             output: config.output || {},
             input: formattedInput,
-            next_operation: operation.next_operation || {},
+            next: operation.next || {},
             payload: operation.payload,
             key: operation.key,
           })
