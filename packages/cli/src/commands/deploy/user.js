@@ -5,6 +5,7 @@ const cli = require("cli-ux")
 const yaml = require("js-yaml")
 const pkgDir = require("pkg-dir")
 const ApplyCommand = require("../apply")
+const { flags } = require("@oclif/command")
 const git = require("simple-git/promise")()
 const { generateRbTag } = require("../../utils")
 const BaseCommand = require("../../utils/base-command")
@@ -22,6 +23,13 @@ class DeployUserCommand extends BaseCommand {
   static flags = {
     // append base command flags
     ...BaseCommand.flags,
+
+    // add hidden config path command
+    configPath: flags.string({
+      char: "c",
+      description: "Custom config dir path",
+      hidden: true,
+    })
   }
 
   init() {
@@ -73,7 +81,7 @@ class DeployUserCommand extends BaseCommand {
     cli.ux.action.start("Deplying configurations")
 
     // get configs location
-    const configLocation = `${this._pkgLocation}/configs`
+    const configLocation = this.flags.configPath || `${this._pkgLocation}/configs`
 
     // check if configs directory exists
     if (fs.existsSync(configLocation) && fs.lstatSync(configLocation).isDirectory()) {
@@ -179,18 +187,21 @@ class DeployUserCommand extends BaseCommand {
    * Tag a successful deployemnt version
    */
   async gitTagVersion() {
-    // start spinner
-    cli.ux.action.start("Tagging version")
+    // check if git folder exists
+    if (fs.existsSync(`${this._pkgLocation}/.git`)) {
+      // start spinner
+      cli.ux.action.start("Tagging version")
 
-    // create tag
-    const pkgVersion = (require(`${this._pkgLocation}/package.json`) || {}).version
-    const tag = generateRbTag(pkgVersion)
+      // create tag
+      const pkgVersion = (require(`${this._pkgLocation}/package.json`) || {}).version
+      const tag = generateRbTag(pkgVersion)
 
-    // tag force
-    await git.tag(["-f", tag])
+      // tag force
+      await git.tag(["-f", tag])
 
-    // complete process
-    cli.ux.action.stop()
+      // complete process
+      cli.ux.action.stop()
+    }
   }
 
   /**

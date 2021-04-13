@@ -32,7 +32,8 @@ class VersionsCommand extends BaseCommand {
 
     // class attributes
     this._ngrokPorts = []
-    this._devConfigLocation = "/tmp/.rb/dev-config.yaml"
+    this._devConfigDir = "/tmp/.rb"
+    this._devConfigLocation = `${this._devConfigDir}/dev-config.yaml`
   }
 
   /**
@@ -52,11 +53,16 @@ class VersionsCommand extends BaseCommand {
   /**
    * Register ngrok URL for each application
    */
-  ngrokConnect() {
-    return ngrok.connect({
+  async ngrokConnect() {
+    // get ngrok URL
+    const ngrokURL = await ngrok.connect({
       authtoken: process.env.NGROK_TOKEN,
-      addr: this.getNextActivePort()
+      addr: this.getNextActivePort(),
+      proto: "tcp"
     })
+
+    // remove host
+    return (new URL(ngrokURL)).host
   }
 
   /**
@@ -103,7 +109,7 @@ class VersionsCommand extends BaseCommand {
 
     // execute the rb deploy:user command
     const { email } = await this.jwt
-    await DeployUser.run([email])
+    await DeployUser.run([email, "-c", this._devConfigDir])
 
     // stop spinner
     cli.ux.action.stop()
@@ -124,6 +130,9 @@ class VersionsCommand extends BaseCommand {
    * Setup dev script.
    */
   async setup() {
+    // kill ngrok
+    await ngrok.kill()
+
     // prepare dev configs
     // copy to tmp and update application yamls with ngrok url
     await this.prepareDevConfigs()
