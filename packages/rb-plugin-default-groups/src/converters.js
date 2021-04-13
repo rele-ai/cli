@@ -23,7 +23,6 @@ module.exports = async (config, { accessToken }) => {
     })
   })
 
-  console.log(operationsMap)
   return [
     // convert send message
     () => {
@@ -39,6 +38,21 @@ module.exports = async (config, { accessToken }) => {
         output: ((config.next || {}).selector || []).length === 0 ? config.output : {},
         redis: ((config.next || {}).selector || []).length === 0 ? config.redis : {},
       }
+      // const baseOperation = {
+      //   ...config,
+      //   payload: config.payload || {},
+      //   next: {
+      //     selector: ((config.next || {}).selector || []).map(({ type, data }) => ({
+      //       type,
+      //       data: {
+      //         workflow: data.workflow,
+      //         operation: (operationsMap[config.key] || {})[data.workflow] ? operationsMap[config.key][data.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
+      //       }
+      //     }))
+      //   },
+      //   output: ((config.next || {}).selector || []).length === 0 ? config.output : {},
+      //   redis: ((config.next || {}).selector || []).length === 0 ? config.redis : {},
+      // }
 
       const item = {
         filters: [
