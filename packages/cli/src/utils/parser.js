@@ -144,7 +144,7 @@ const loadOperationConf = (doc, apps, appActions, workflows, operations, version
       app: apps[doc.app_id].system_key,
       app_action: appActions[doc.action.id].operation_key
     },
-    next_operation: doc.next_operation || {},
+    next: doc.next || {},
     on_error: doc.on_error || {},
     payload: doc.payload,
     is_root: doc.is_root || false,
@@ -452,7 +452,7 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
       redis: {},
       input: conf.input || {},
       output: conf.output || {},
-      next_operation: conf.next_operation || {},
+      next: conf.next || {},
       on_error: conf.on_error || {},
       key: conf.key
     }
