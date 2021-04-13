@@ -30,34 +30,22 @@ module.exports = async (config, { accessToken }) => {
         ...config,
         payload: config.payload || {},
         next: {
-          selector: ((config.next || {}).selector || []).map((selector) => ({
-            workflow: selector.workflow,
-            operation: (operationsMap[config.key] || {})[selector.workflow] ? operationsMap[config.key][selector.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
+          selector: ((config.next || {}).selector || []).map(({ type, data }) => ({
+            type,
+            data: {
+              workflow: data.workflow,
+              next: (operationsMap[config.key] || {})[data.workflow] ? operationsMap[config.key][data.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
+            }
           }))
         },
         output: ((config.next || {}).selector || []).length === 0 ? config.output : {},
         redis: ((config.next || {}).selector || []).length === 0 ? config.redis : {},
       }
-      // const baseOperation = {
-      //   ...config,
-      //   payload: config.payload || {},
-      //   next: {
-      //     selector: ((config.next || {}).selector || []).map(({ type, data }) => ({
-      //       type,
-      //       data: {
-      //         workflow: data.workflow,
-      //         operation: (operationsMap[config.key] || {})[data.workflow] ? operationsMap[config.key][data.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
-      //       }
-      //     }))
-      //   },
-      //   output: ((config.next || {}).selector || []).length === 0 ? config.output : {},
-      //   redis: ((config.next || {}).selector || []).length === 0 ? config.redis : {},
-      // }
 
       const item = {
         filters: [
           [(config.selector || {}).app_action || "", "==", "send_message"],
-          [(config.output || {}).operation_type || "", "!=", "drop_session"]
+          [(config.output || {}).operation_type || "", "!=", "drop_session"],
         ],
         defaults: {
           timeout: {
@@ -106,7 +94,8 @@ module.exports = async (config, { accessToken }) => {
         }
       }
 
-      baseOperation.next_operation.selector.forEach((selector) => {
+      const nextSelector = ((baseOperation.next || {}).selector || [])
+      nextSelector.forEach((selector) => {
         const baseNextOp = {
           type: "Operation",
           selector: {
@@ -115,7 +104,7 @@ module.exports = async (config, { accessToken }) => {
             workflow: (config.selector || {}).workflow || []
           },
           is_root: false,
-          next_operation: (config.next_operation || {}),
+          next: (config.next || {}),
           on_error: (config.on_error || {}),
           output: (config.output || {}),
           input: {},
@@ -123,12 +112,11 @@ module.exports = async (config, { accessToken }) => {
           payload: {
             timeout: config.timeout || item.defaults.timeout
           },
-          key: selector.operation
+          key: selector.data.next
         }
 
         if (!baseNextOp.redis.field) baseNextOp.redis.field = config.key
         if (!baseNextOp.redis.type) baseNextOp.redis.type = "hash_map"
-
         item.ungroup.push(baseNextOp)
       })
 

@@ -235,13 +235,14 @@ class ApplyCommand extends BaseCommand {
 
       // format yaml to array of objects
       const data = { yamlData: readConfig(path) }
-      // await plugin.apply._execute(
-      //   "load",
-      //   data,
-      //   {
-      //     accessToken: await this.accessToken
-      //   }
-      // )
+      await plugin.apply._execute(
+        "load",
+        data,
+        {
+          accessToken: await this.accessToken
+        }
+      )
+      console.log(JSON.stringify(data))
 
       // destract stages
       let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(data.yamlData)

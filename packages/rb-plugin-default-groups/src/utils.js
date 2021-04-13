@@ -48,10 +48,10 @@ module.exports.getOperationsToGroup = (config, configMap, operationsToGroup={ da
     operationsToGroup.data = [...operationsToGroup.data, config]
 
     // iterate over next operations
-    for (const nextOperation of ((config.next_operation || {}).selector || [])) {
+    for (const nextOperation of ((config.next || {}).selector || [])) {
         // console.log("next operation", nextOperation)
-        if (nextOperation.operation.startsWith("__rb_internal")) {
-            this.getOperationsToGroup(configMap[nextOperation.workflow][nextOperation.operation], configMap, operationsToGroup)
+        if (nextOperation.data.next.startsWith("__rb_internal")) {
+            this.getOperationsToGroup(configMap[nextOperation.data.workflow][nextOperation.data.next], configMap, operationsToGroup)
         }
     }
 
