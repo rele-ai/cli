@@ -264,6 +264,15 @@ const loadAppActionDoc = (conf, apps) => {
       cpAppAction.request.query = {}
     }
 
+    // attach default metadata
+    if ((cpAppAction.metadata || {}).defaultWait === undefined) {
+      if (!Object.keys(cpAppAction.metadata || {}).length) {
+        cpAppAction.metadata = {}
+      }
+
+      cpAppAction.metadata.defaultWait = true
+    }
+
     // find app id related to app action
     const relatedAppId = Object.keys(apps).find(key => {
       return apps[key].system_key === (conf.selector || {}).app
@@ -425,6 +434,30 @@ const _getAppId = (conf, apps, versions, user) => {
   return userWorkflows.map(workflow => workflow.id)
  }
 
+ /**
+  * _attachDefaultsToPayload takes an payload object
+  * and attach all nessesary default if needed
+  *
+  * @param {Object} payload
+  * @returns
+  */
+ const _attachDefaultsToPayload = (payload) => {
+  Object.keys(payload).forEach(key => {
+    // check if recursion reaches next operation
+    // or on error instances and format it
+    if (key === "type" && typeof(payload[key]) === "string" && payload[key] === "redis") {
+      if (!payload.rkey_type) {
+        payload.rkey_type = "hash_map"
+      }
+    }
+
+    // go nested
+    if (typeof payload[key] === "object") {
+      _attachDefaultsToPayload(payload[key])
+    }
+  })
+ }
+
 /**
  * Converts the given YAML config to the matchinf firestore
  * document.
@@ -437,6 +470,9 @@ const _getAppId = (conf, apps, versions, user) => {
  */
 const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => {
   try {
+    // attach defaults to payload object
+    _attachDefaultsToPayload(conf.payload || {})
+
     // define base json operation
     const baseOperation = {
       is_root: conf.is_root,
