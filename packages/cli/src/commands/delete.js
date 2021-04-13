@@ -120,7 +120,7 @@ class DeleteCommand extends BaseCommand {
   async run() {
     try {
       // start spinner
-      cli.ux.action.start("Delete configs from configuration file...")
+      cli.ux.action.start("Delete configs from configuration file")
 
       // collect init clients promises
       this._clients = this._initClients()
