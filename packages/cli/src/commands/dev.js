@@ -2,7 +2,6 @@ const cli = require("cli-ux")
 const ngrok = require("ngrok")
 const yaml = require("js-yaml")
 const nodemon = require("nodemon")
-const { execSync } = require("child_process")
 const DeployUser = require("./deploy/user")
 const { writeConfig } = require("../utils/writers")
 const BaseCommand = require("../utils/base-command")
@@ -79,17 +78,21 @@ class VersionsCommand extends BaseCommand {
     // update app configs
     files = files
       .map(async (file) => {
-        // check if file is of type app
-        // and set a new ngrok URL
-        if (file.type === "App") {
-          file.base_url = await this.ngrokConnect()
-        }
+        // minimize load errors
+        if (file.type && file.key) {
+          // check if file is of type app
+          // and set a new ngrok URL
+          if (file.type === "App") {
+            file.base_url = await this.ngrokConnect()
+          }
 
-        return file
+          return file
+        }
       })
 
     // dump as long yaml
     const filesYaml = (await Promise.all(files))
+      .filter((file) => !!file)
       .map(yaml.dump)
       .join("---\n")
 
@@ -109,7 +112,7 @@ class VersionsCommand extends BaseCommand {
 
     // execute the rb deploy:user command
     const { email } = await this.jwt
-    await DeployUser.run([email, "-c", this._devConfigDir])
+    await DeployUser.run([email, "-c", this._devConfigDir, "--no-runDeployCommand"])
 
     // stop spinner
     cli.ux.action.stop()

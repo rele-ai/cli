@@ -29,6 +29,15 @@ class DeployUserCommand extends BaseCommand {
       char: "c",
       description: "Custom config dir path",
       hidden: true,
+    }),
+
+    // custom indicator
+    // for running the deploy.sh script
+    runDeployCommand: flags.boolean({
+      default: true,
+      description: "Deploy.sh indicator",
+      hidden: true,
+      allowNo: true
     })
   }
 
@@ -51,23 +60,25 @@ class DeployUserCommand extends BaseCommand {
 
     // execute npm deploy script
     if (pkg.scripts.deploy) {
-      const res = await new Promise((resolve, reject) => {
-        return npm.load((err) => {
-          // handle load error
-          if (err) reject(err)
+      if (this.flags.runDeployCommand) {
+        const res = await new Promise((resolve, reject) => {
+          return npm.load((err) => {
+            // handle load error
+            if (err) reject(err)
 
-          // execute command
-          npm.commands.run(["deploy", pkg.version], (err, output) => {
-            return (err) ? reject(err) : resolve(output)
+            // execute command
+            npm.commands.run(["deploy", pkg.version], (err, output) => {
+              return (err) ? reject(err) : resolve(output)
+            })
           })
         })
-      })
 
-      // complete process
-      cli.ux.action.stop()
+        // complete process
+        cli.ux.action.stop()
 
-      // return promise result
-      return res
+        // return promise result
+        return res
+      }
     } else {
       throw new Error("`npm run deploy` must be available with a deployment script for the integration code.")
     }
