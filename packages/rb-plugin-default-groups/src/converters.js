@@ -119,7 +119,10 @@ module.exports = async (config, { accessToken }) => {
           input: {},
           redis: (config.redis || {}),
           payload: {
-            timeout: config.timeout || item.defaults.timeout
+            timeout: {
+              data: 60,
+              type: "raw"
+            }
           },
           key: selector.data.next
         }
