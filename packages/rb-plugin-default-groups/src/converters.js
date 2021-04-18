@@ -104,16 +104,25 @@ module.exports = async (config, { accessToken }) => {
       }
 
       const nextSelector = ((baseOperation.next || {}).selector || [])
+
       nextSelector.forEach((selector) => {
+        const nex = ((config.next || {}).selector || []).find(el => {
+          return el.data.workflow === selector.data.workflow
+        })
+
         const baseNextOp = {
           type: "Operation",
           selector: {
             app: "core",
             app_action: "get_notification",
-            workflow: (config.selector || {}).workflow || []
+            workflow: ((config.selector || {}).workflow || [])
           },
           is_root: false,
-          next: (config.next || {}),
+          next: {
+            selector: [
+              nex
+            ]
+          },
           on_error: (config.on_error || {}),
           output: (config.output || {}),
           input: {},
