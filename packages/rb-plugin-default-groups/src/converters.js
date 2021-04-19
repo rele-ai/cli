@@ -17,8 +17,12 @@ module.exports = async (config, { accessToken }) => {
     }
 
     Object.entries(((operation.next || {}).data || {})).forEach(([workflowId, operationId]) => {
-      if ((operation.next || {}).type === "operation") {
-        operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
+      try {
+        if ((operation.next || {}).type === "operation") {
+          operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
+        }
+      } catch (e) {
+        throw new Error(`An unexpected error occurred while decomposing into groups.\nPlease contact support@rele.ai with the following error information: operationId = ${operationId} and workflowId = ${workflowId}`)
       }
     })
   })
