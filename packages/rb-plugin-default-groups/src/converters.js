@@ -91,7 +91,12 @@ module.exports = async (config, { accessToken }) => {
             selector: rootOperation.selector,
             is_root: rootOperation.is_root,
             next: {
-              selector: internalOperations.map((io) => io.next.selector).flat()
+              // selector: internalOperations.map((io) => io.next.selector).flat()
+              selector: internalOperations.map((io) => io.next.selector).flat().filter((element, index, self) =>
+                index === self.findIndex((t) => (
+                  t.type === element.type && element.data.workflow === t.data.workflow && element.data.next === t.data.next
+                ))
+              )
             },
             on_error: rootOperation.on_error,
             output: internalOperations.length ? internalOperations[0].output : rootOperation.output,
