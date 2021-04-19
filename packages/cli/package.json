@@ -68,6 +68,7 @@
     "download-git-repo": "^3.0.2",
     "express": "^4.17.1",
     "glob": "^7.1.6",
+    "google-protobuf": "^3.15.8",
     "grpc": "^1.24.5",
     "handlebars": "^4.7.7",
     "inquirer": "^7.3.3",
