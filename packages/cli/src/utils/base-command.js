@@ -21,8 +21,8 @@ class BaseCommand extends Command {
   static TEMPLATE_DIR = `${this.RB_DIR}/.rb-templates`
   static CREDS_PATH = `${this.RB_DIR}/creds.json`
   static CONSOLE_PATH = process.env.NODE_ENV === "development"
-    ? "https://console.dev.bot.rele.ai"
-    : "https://console.rele.ai"
+  ? "frontend-proxy.dev.bot.rele.ai" : process.env.NODE_ENV === "test" ? "frontend-proxy.test.bot.rele.ai"
+  : "frontend-proxy.prod.bot.rele.ai"
 
 
   // define global flags
