@@ -25,9 +25,15 @@ const PATHS_TO_PROTO_VALUES = [
   "app.request.headers.$ANY.data",
   "app.request.query.$ANY.data",
   "app.request.body.$ANY.data",
+  "app.request.headers.$ANY.vars.$ANY.data",
+  "app.request.query.$ANY.vars.$ANY.data",
+  "app.request.body.$ANY.vars.$ANY.data",
   "app_action.request.headers.$ANY.data",
   "app_action.request.query.$ANY.data",
   "app_action.request.body.$ANY.data",
+  "app_action.request.headers.$ANY.vars.$ANY.data",
+  "app_action.request.query.$ANY.vars.$ANY.data",
+  "app_action.request.body.$ANY.vars.$ANY.data",
 ]
 
 // Proto types map
