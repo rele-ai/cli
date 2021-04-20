@@ -59,8 +59,7 @@ class ApplyCommand extends BaseCommand {
    */
   async _formatConfToDoc(object) {
     // load selectors data
-    const [workflows, apps, appActions, versions] = await Promise.all(await this.loadSelectorsData())
-
+    const [workflows = [], apps = [], appActions = [], versions = []] = await Promise.all(await this.loadSelectorsData())
     // define the data object
     return confToDoc(
       object.type,
@@ -112,7 +111,7 @@ class ApplyCommand extends BaseCommand {
     }
 
     // load selectors data
-    const [workflows, apps, appActions, versions] = await Promise.all(await this.loadSelectorsData())
+    const [workflows = [], apps = [], appActions = [], versions = []] = await Promise.all(await this.loadSelectorsData())
 
     // define metadata
     const metadata = {
