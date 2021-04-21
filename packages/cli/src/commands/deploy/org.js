@@ -50,7 +50,7 @@ class DeployOrgCommand extends BaseCommand {
    */
   async deployIntegration() {
     // start spinner
-    cli.ux.action.start("Deplying integration")
+    cli.ux.action.start("Deploying integration")
 
     // load pkg
     const pkg = (require(`${this._pkgLocation}/package.json`) || {})
@@ -86,7 +86,7 @@ class DeployOrgCommand extends BaseCommand {
    */
   async applyConfigs() {
     // start spinner
-    cli.ux.action.start("Deplying configurations")
+    cli.ux.action.start("Deploying configurations")
 
     // get configs location
     const configLocation = this.flags.configPath || `${this._pkgLocation}/configs`
@@ -237,7 +237,7 @@ class DeployOrgCommand extends BaseCommand {
     } catch (err) {
       debugError(err)
       cli.ux.action.stop("failed")
-      this.error(`Unable to deply integration.\n${err}`)
+      this.error(`Unable to deploy integration.\n${err}`)
     }
   }
 }
