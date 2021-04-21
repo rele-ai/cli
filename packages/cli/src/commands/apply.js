@@ -57,10 +57,7 @@ class ApplyCommand extends BaseCommand {
    * _formatConfToDoc takes an object in YAML
    * format and convert it to JSON.
    */
-  async _formatConfToDoc(object) {
-    // load selectors data
-    const [workflows, apps, appActions, versions] = await Promise.all(await this.loadSelectorsData())
-
+  async _formatConfToDoc(object, { workflows, apps, appActions, versions }) {
     // define the data object
     return confToDoc(
       object.type,
@@ -79,7 +76,7 @@ class ApplyCommand extends BaseCommand {
    * _getConditionsList checks if extra conditions
    * for getByKey request are nessesary.
    */
-  _getConditionsList(object) {
+  _getConditionsList(object, { apps = [] }) {
     // defines conditions list
     let conditions = []
 
@@ -88,6 +85,11 @@ class ApplyCommand extends BaseCommand {
     switch (object.type) {
     case "Translation":
       conditions.push(["lang", "==", object.lang])
+      break
+    case "AppAction":
+      conditions.push([
+        "app_id", "==", (apps.find(app => app.system_key === object.selector.app)).id,
+      ])
       break
     default:
       break
@@ -137,6 +139,9 @@ class ApplyCommand extends BaseCommand {
    * generate config record on firestore.
    */
   async _generateRecord(object, versionId) {
+    // load selectors data
+    const [workflows, apps, appActions, versions] = await Promise.all(await this.loadSelectorsData())
+
     // destract version
     const vids = (await this.versions || [])
 
@@ -144,10 +149,18 @@ class ApplyCommand extends BaseCommand {
     const client = this._clients[object.type]
 
     // format conf to doc
-    const data = await this._formatConfToDoc(object)
+    const data = await this._formatConfToDoc(
+      object,
+      {
+        workflows,
+        apps,
+        appActions,
+        versions
+      }
+    )
 
     // get additional conditions
-    const conditions = this._getConditionsList(object)
+    const conditions = this._getConditionsList(object, { apps })
 
     // check if the config is already exists
     const configs = ((await client.list([
