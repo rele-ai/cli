@@ -88,10 +88,9 @@ const loadAppConf = (doc, versions, shouldDump=true) => {
  * @returns {object} YAML config.
  */
 const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
-  const data = {
+  let data = {
     type: "AppAction",
     request: doc.request,
-    uri: doc.uri || "",
     display_name: doc.display_name,
     version: (versions[doc.version] || {}).key,
     metadata: doc.metadata,
@@ -99,6 +98,11 @@ const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
     selector: {
       app: apps[doc.app_id].system_key
     }
+  }
+
+  // attach uri
+  if (doc.uri) {
+    data.uri = doc.uri
   }
 
   return shouldDump ? yaml.dump(data) : data
