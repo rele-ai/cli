@@ -149,7 +149,7 @@ class VersionsCommand extends BaseCommand {
    */
   async run() {
     // start nodemon
-    nodemon({ script: this.args.mainFile })
+    nodemon({ script: this.args.mainFile, ext: "js,yaml,sh,tf,json" })
 
     // define setup and teardown
     const that = this
