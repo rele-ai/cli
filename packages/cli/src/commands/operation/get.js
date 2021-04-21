@@ -157,7 +157,7 @@ class GetCommand extends BaseCommand {
 
 GetCommand.description = `Get an operation by the operation selector key.
 ...
-Additional information about the operation:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-operation-get
+Additional information about the operation:get command can be found at https://docs.rele.ai/guide/cli-config.html#rb-operation-get
 `
 
 module.exports = GetCommand

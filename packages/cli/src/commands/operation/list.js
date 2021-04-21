@@ -153,7 +153,7 @@ class ListCommand extends BaseCommand {
 
 ListCommand.description = `List all global and org releated operations configs.
 ...
-Additional information about the operation:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-operation-list
+Additional information about the operation:list command can be found at https://docs.rele.ai/guide/cli-config.html#rb-operation-list
 `
 
 module.exports = ListCommand

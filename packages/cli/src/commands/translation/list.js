@@ -160,7 +160,7 @@ class ListCommand extends BaseCommand {
 
 ListCommand.description = `List all global and org releated translation configs.
 ...
-Additional information about the translation:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-translation-list
+Additional information about the translation:list command can be found at https://docs.rele.ai/guide/cli-config.html#rb-translation-list
 `
 
 module.exports = ListCommand

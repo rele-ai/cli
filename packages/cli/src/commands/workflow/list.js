@@ -73,7 +73,7 @@ class ListCommand extends BaseCommand {
 
 ListCommand.description = `List all global and org releated workflow configs.
 ...
-Additional information about the workflow:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-workflow-list
+Additional information about the workflow:list command can be found at https://docs.rele.ai/guide/cli-config.html#rb-workflow-list
 `
 
 module.exports = ListCommand

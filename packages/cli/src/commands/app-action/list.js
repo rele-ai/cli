@@ -135,7 +135,7 @@ class ListCommand extends BaseCommand {
 
 ListCommand.description = `List all global and org releated app actions configs.
 ...
-Additional information about the app-action:list command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-action-list
+Additional information about the app-action:list command can be found at https://docs.rele.ai/guide/cli-config.html#rb-app-action-list
 `
 
 module.exports = ListCommand

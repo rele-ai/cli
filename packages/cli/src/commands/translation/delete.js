@@ -112,7 +112,7 @@ class DeleteCommand extends BaseCommand {
 
 DeleteCommand.description = `Delete a translation from RELE.AI by the translation key.
 ...
-Additional information about the translation:delete command can be found at https://doc.rele.ai/guide/cli-config.html#rb-translation-delete
+Additional information about the translation:delete command can be found at https://docs.rele.ai/guide/cli-config.html#rb-translation-delete
 `
 
 module.exports = DeleteCommand

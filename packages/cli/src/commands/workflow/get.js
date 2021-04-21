@@ -123,7 +123,7 @@ class GetCommand extends BaseCommand {
 
 GetCommand.description = `Get a workflow by the workflow selector key.
 ...
-Additional information about the workflow:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-workflow-get
+Additional information about the workflow:get command can be found at https://docs.rele.ai/guide/cli-config.html#rb-workflow-get
 `
 
 module.exports = GetCommand

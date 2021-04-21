@@ -56,7 +56,7 @@ class DeleteCommand extends BaseCommand {
 
 DeleteCommand.description = `Delete a workflow from RELE.AI by the workflow key.
 ...
-Additional information about the workflow:delete command can be found at https://doc.rele.ai/guide/cli-config.html#rb-workflow-delete
+Additional information about the workflow:delete command can be found at https://docs.rele.ai/guide/cli-config.html#rb-workflow-delete
 `
 
 module.exports = DeleteCommand

@@ -56,7 +56,7 @@ class DeleteCommand extends BaseCommand {
 
 DeleteCommand.description = `Delete an application from RELE.AI by the application key.
 ...
-Additional information about the app:delete command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-delete
+Additional information about the app:delete command can be found at https://docs.rele.ai/guide/cli-config.html#rb-app-delete
 `
 
 module.exports = DeleteCommand

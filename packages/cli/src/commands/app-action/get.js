@@ -155,7 +155,7 @@ class GetCommand extends BaseCommand {
 
 GetCommand.description = `Get an app action by the app action selector key.
 ...
-Additional information about the app-action:get command can be found at https://doc.rele.ai/guide/cli-config.html#rb-app-action-get
+Additional information about the app-action:get command can be found at https://docs.rele.ai/guide/cli-config.html#rb-app-action-get
 `
 
 module.exports = GetCommand

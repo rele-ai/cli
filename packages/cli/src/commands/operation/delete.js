@@ -98,7 +98,7 @@ class DeleteCommand extends BaseCommand {
 
 DeleteCommand.description = `Delete an operation from RELE.AI by the operation key.
 ...
-Additional information about the operation:delete command can be found at https://doc.rele.ai/guide/cli-config.html#rb-operation-delete
+Additional information about the operation:delete command can be found at https://docs.rele.ai/guide/cli-config.html#rb-operation-delete
 `
 
 module.exports = DeleteCommand
