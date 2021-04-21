@@ -114,7 +114,8 @@ module.exports.toBytes = (data) => {
 
 // frontend proxy URL
 module.exports.FRONTEND_PROXY = process.env.NODE_ENV === "development"
-  ? "frontend-proxy.dev.bot.rele.ai"
+  ? "frontend-proxy.dev.bot.rele.ai" : process.env.NODE_ENV === "test"
+  ? "frontend-proxy.test.bot.rele.ai"
   : "frontend-proxy.prod.bot.rele.ai"
 
 // export JJV env
