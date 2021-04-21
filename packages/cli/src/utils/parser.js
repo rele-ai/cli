@@ -91,6 +91,7 @@ const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
   const data = {
     type: "AppAction",
     request: doc.request,
+    uri: doc.uri || "",
     display_name: doc.display_name,
     version: (versions[doc.version] || {}).key,
     metadata: doc.metadata,
