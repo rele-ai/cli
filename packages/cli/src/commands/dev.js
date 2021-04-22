@@ -157,9 +157,6 @@ class VersionsCommand extends BaseCommand {
       .on("start", () => {
         that.setup()
       })
-      .on("restart", () => {
-        that.setup()
-      })
       .on("quit", () => {
         that.teardown()
       })
