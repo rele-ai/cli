@@ -194,6 +194,9 @@ class TokensCommand extends BaseCommand {
   }
 }
 
-TokensCommand.description = ``
+TokensCommand.description = `Generate APP_ID and APP_HASH tokens.
+...
+Additional information about the app:tokens command can be found at https://docs.rele.ai/guide/cli-config.html#rb-app-tokens
+`
 
 module.exports = TokensCommand
