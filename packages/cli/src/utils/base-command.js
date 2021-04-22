@@ -22,7 +22,7 @@ class BaseCommand extends Command {
   static TEMPLATE_DIR = `${this.RB_DIR}/.rb-templates`
   static CREDS_PATH = `${this.RB_DIR}/creds.json`
   static CONSOLE_PATH = process.env.NODE_ENV === "development"
-    ? "https://console.dev.bot.rele.ai" : process.env.NODE_ENV === "test" ? "https://console.test.bot.rele.ai"
+    ? "https://console.dev.bot.rele.ai"
     : "https://console.rele.ai"
 
 
