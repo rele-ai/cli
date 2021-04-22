@@ -1,5 +1,6 @@
 const fs = require("fs")
 const os = require("os")
+const path = require("path")
 const pkgDir = require("pkg-dir")
 const jwtDecode = require("jwt-decode")
 const AuthClient = require("../../lib/auth")
@@ -46,7 +47,30 @@ class BaseCommand extends Command {
    * Returns updated access token
    */
   get accessToken() {
-    return (new AuthClient()).notify("exchange_refresh_token", { refreshToken: this.refreshToken })
+    // define auth client
+    const authClient = new AuthClient()
+
+    return (new Promise((resolve, reject) => {
+      // validate existing access token
+      authClient.notify("validate_access_token", { accessToken: this._accessToken })
+        .then(res => {
+          resolve({ id_token: res.access_token, access_token: res.access_token })
+        })
+        .catch(_ => {
+          // exchange refresh token for new access token
+          // in case of invalid access token
+          authClient.notify("exchange_refresh_token", { refreshToken: this.refreshToken })
+            .then(token => {
+              // re-write new access token and current refresh token
+              fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: token.access_token, refresh_token: token.refresh_token}))
+
+              // resolve promise
+              // with new refresh token and access token
+              resolve(token)
+            })
+            .catch(err => reject(err))
+        })
+    }))
   }
 
   /**
@@ -71,6 +95,18 @@ class BaseCommand extends Command {
     // check if creds file exists
     if (fs.existsSync(BaseCommand.CREDS_PATH)) {
       return (JSON.parse(fs.readFileSync(BaseCommand.CREDS_PATH).toString("utf-8")) || {}).refresh_token || ""
+    }
+
+    return ""
+  }
+
+  /**
+   * Returns the access token from the creds path
+   */
+  get _accessToken() {
+    // check if creds file exists
+    if (fs.existsSync(BaseCommand.CREDS_PATH)) {
+      return (JSON.parse(fs.readFileSync(BaseCommand.CREDS_PATH).toString("utf-8")) || {}).access_token || ""
     }
 
     return ""
