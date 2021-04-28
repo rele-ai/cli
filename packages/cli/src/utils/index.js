@@ -16,7 +16,7 @@ const KEYS_MAP = {
 module.exports.toSnakeCase = (str) => {
   return str.replace(
     /(?:^|\.?)([A-Z])/g,
-    (x,y) => "_" + y.toLowerCase()
+    (x, y) => "_" + y.toLowerCase()
   ).replace(/^_/, "")
 }
 
@@ -57,7 +57,7 @@ module.exports.sortByTypes = (data) => {
   }
 
   return data.sort(
-    (a,b) => (orders[a.type] > orders[b.type]) ? 1 : ((orders[b.type] > orders[a.type]) ? -1 : 0)
+    (a, b) => (orders[a.type] > orders[b.type]) ? 1 : ((orders[b.type] > orders[a.type]) ? -1 : 0)
   )
 }
 
@@ -214,4 +214,35 @@ module.exports.groupByVersion = (type, items) => {
   }
 
   return Object.values(groups)
+}
+
+/**
+ * compareVersions takes two version numbers
+ * and returns true if the second version is an older version
+ *
+ * @param {string} firstVersion
+ * @param {string} secondVersion
+ * @returns {Boolean} returns true
+ */
+module.exports.compareVersions = (firstVersion, secondVersion) => {
+  let result = false
+
+  if (typeof firstVersion !== "object") { firstVersion = firstVersion.toString().split(".") }
+  if (typeof secondVersion !== "object") { secondVersion = secondVersion.toString().split(".") }
+
+  for (let i = 0; i < (Math.max(firstVersion.length, secondVersion.length)); i++) {
+
+    if (firstVersion[i] == undefined) { firstVersion[i] = 0 }
+    if (secondVersion[i] == undefined) { secondVersion[i] = 0 }
+
+    if (Number(firstVersion[i]) < Number(secondVersion[i])) {
+      result = true
+      break
+    }
+    if (firstVersion[i] != secondVersion[i]) {
+      break
+    }
+  }
+
+  return result
 }

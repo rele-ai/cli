@@ -1,9 +1,14 @@
 const fs = require("fs")
 const os = require("os")
+const npm = require("npm")
 const path = require("path")
 const pkgDir = require("pkg-dir")
+const inquirer = require("inquirer")
 const jwtDecode = require("jwt-decode")
+const Metalsmith = require("metalsmith")
 const AuthClient = require("../../lib/auth")
+const { compareVersions } = require("./index")
+const latestVersion = require("latest-version")
 const { Command, flags } = require("@oclif/command")
 const versionSort = require("../../lib/utils/version-sort")
 const { UsersClient, VersionsClient } = require("../../lib/components")
@@ -38,7 +43,10 @@ class BaseCommand extends Command {
   /**
   * Extend the default init function
   */
-  init() {
+  async init() {
+    // validate rele.ai version
+    await this._validateCliVersion()
+
     // parse flags and args
     this._parseFlagsArgs()
   }
@@ -62,7 +70,7 @@ class BaseCommand extends Command {
           authClient.notify("exchange_refresh_token", { refreshToken: this.refreshToken })
             .then(token => {
               // re-write new access token and current refresh token
-              fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: token.access_token, refresh_token: token.refresh_token}))
+              fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: token.access_token, refresh_token: token.refresh_token }))
 
               // resolve promise
               // with new refresh token and access token
@@ -211,6 +219,79 @@ class BaseCommand extends Command {
     // set to this
     this.flags = flags
     this.args = args
+  }
+
+  /**
+   * askUpgrade ask the user if he wants to
+   * update releai/cli version
+   *
+   * @param {string} currVer - current version
+   * @param {string} lsVer - latest version
+   */
+  async askUpgrade(currVer, lsVer) {
+    return new Promise((resolve, reject) => {
+      inquirer.prompt([{
+        type: "rawlist",
+        name: "isUpgrade",
+        message: `You are using @releai/cli version ${currVer}.\nWe have found an updated version of @releai/cli - ${lsVer}\nWould you like to upgrade?`,
+        default: false,
+        choices: ["Yes", "No"],
+      }]).then(answers => {
+        resolve(answers)
+      })
+    })
+  }
+
+  /**
+   * _asyncExec takes a command
+   *  and execute it
+   *
+   * @param {*} path
+   */
+   async _asyncExec(command) {
+      const { exec } = require("child_process")
+
+      // execute command
+      return new Promise((resolve, reject) => {
+        exec(command, (err, stdout, stderr) => {
+          if (err) reject(err)
+          if (stderr) reject (err)
+          resolve(stdout)
+        })
+      })
+   }
+
+  /**
+   * _upgradeReleaiCli upgrade releaicli
+   * to latest version
+   */
+   async _upgradeReleaiCli(path) {
+   }
+
+  /**
+   * _validateCliVersion checks rele.ai version
+   * and ask for upgrade if there is any older version
+   * avaliable on npm
+   */
+  async _validateCliVersion() {
+    // get latest version from npm
+    const lsVer = await latestVersion("@releai/cli")
+
+    // get current version installed
+    const path = pkgDir.sync(__dirname)
+    const pkg = require(`${path}/package.json`)
+    const currVer = pkg.version
+
+    if (compareVersions(currVer, lsVer)) {
+      // ask user for upgrade releai version
+      const { isUpgrade } = await this.askUpgrade(currVer, lsVer)
+
+      // check if need to upgrade
+      // releai version
+      if (isUpgrade === "Yes") {
+        await this._upgradeReleaiCli(path)
+      }
+    }
   }
 }
 
