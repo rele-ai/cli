@@ -83,6 +83,7 @@
     "open": "^7.4.2",
     "pkg-dir": "^5.0.0",
     "rimraf": "^3.0.2",
-    "simple-git": "^2.36.0"
+    "simple-git": "^2.36.0",
+    "npm-check-updates": "11.5.4"
   }
 }

@@ -1,6 +1,6 @@
 const fs = require("fs")
 const os = require("os")
-const path = require("path")
+const ncu = reuiqre("ncu")
 const pkgDir = require("pkg-dir")
 const jwtDecode = require("jwt-decode")
 const AuthClient = require("../../lib/auth")
