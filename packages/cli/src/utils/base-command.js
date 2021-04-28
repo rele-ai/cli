@@ -38,9 +38,18 @@ class BaseCommand extends Command {
   /**
   * Extend the default init function
   */
-  init() {
+  async init() {
     // parse flags and args
     this._parseFlagsArgs()
+
+    // check if should update CLI
+    const ncuRes = await ncu.run({
+      packageFile: `${pkgDir.sync(__dirname)}/package.json`,
+      filter: "@releai/cli"
+    })
+    if (Object.keys(ncuRes).length) {
+      console.warn("YOU SHOULD UPGRADE")
+    }
   }
 
   /**
