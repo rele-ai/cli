@@ -1,8 +1,8 @@
 const fs = require("fs")
 const os = require("os")
-const ncu = reuiqre("ncu")
 const pkgDir = require("pkg-dir")
 const jwtDecode = require("jwt-decode")
+const ncu = require("npm-check-updates")
 const AuthClient = require("../../lib/auth")
 const { Command, flags } = require("@oclif/command")
 const versionSort = require("../../lib/utils/version-sort")
@@ -47,8 +47,9 @@ class BaseCommand extends Command {
       packageFile: `${pkgDir.sync(__dirname)}/package.json`,
       filter: "@releai/cli"
     })
+
     if (Object.keys(ncuRes).length) {
-      console.warn("YOU SHOULD UPGRADE")
+      console.warn(`We have found an updated version of @releai/cli - ${Object.values(ncuRes).join()}.\nPlease make sure you are using the latest version of @releai/cli`)
     }
   }
 
