@@ -576,11 +576,11 @@ message Operation {
   map<string, OperationPayload> payload = 5;
   OperationOutput output = 6;
   repeated string workflows = 7;
-  NextOp next = 8;
+  map<string, NextOp> next = 8;
   OperationInput input = 9;
   string key = 10;
   string id = 11;
-  NextOp on_error = 12;
+  map<string, NextOp> on_error = 12;
   string version = 13;
   string org = 14;
 }
@@ -594,7 +594,9 @@ message OperationRedis {
 // message next operations
 message NextOp {
   string type = 1;
-  map<string, string> data = 2;
+  string id = 2;
+  bool research = 3;
+  string version = 4;
 }
 
 // message OperationPayload
@@ -603,7 +605,7 @@ message OperationPayload {
   string type = 2;
   string rkey_type = 3;
   map<string, OperationPayload> vars = 4;
-  NextOp next = 5;
+  map<string, NextOp> next = 5;
   string match_operation = 6;
   OperationPayload default = 7;
 }

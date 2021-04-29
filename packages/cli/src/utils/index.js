@@ -114,14 +114,14 @@ module.exports.loadConfNextOperations = (data, workflows, operations) => {
       data[key] = {}
 
       if (Object.keys(nextOp).length) {
-        const type = nextOp.type
-
-        data[key].selector = Object.entries(nextOp.data).map(([wid, eid]) => {
+        data[key].selector = Object.keys(nextOp).map(workflowId => {
+          const type = nextOp[workflowId].type
+          const id = nextOp[workflowId].id
           return {
             type,
             data: {
-              workflow: workflows[wid].key,
-              next: type === "operation" ? operations[eid].key : workflows[eid].key
+              workflow: workflows[workflowId].key,
+              next: type === "operation" ? operations[id].key : workflows[id].key
             }
           }
         })
@@ -162,16 +162,14 @@ module.exports.loadDocNextOperations = (data, workflows) => {
         )
 
         if (workflowId) {
-          // set next operation by workflow id
-          data[key].type = select.type
+          // // set next operation by workflow id
+          // data[key].type = select.type
 
-          if (!Object.keys(data[key].data || {}).length) {
-            data[key].data = {}
+          data[key][workflowId] = {
+            id: select.data.next,
+            type: select.type,
+            research: select.data.research || false
           }
-          data[key].data[workflowId] = select.data.next
-          // data[key].data = {
-          //   [workflowId]: select.data.next
-          // }
         } else {
           throw new Error(`You try to upload a operation with unknown workflow with key = ${select.data.workflow}. please make sure you upload also the workflow that belongs to this operation.`)
         }
