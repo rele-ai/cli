@@ -168,7 +168,11 @@ module.exports.loadDocNextOperations = (data, workflows) => {
           data[key][workflowId] = {
             id: select.data.next,
             type: select.type,
-            research: select.data.research || false
+            research: select.data.research || false,
+          }
+
+          if (select.data.version) {
+            data[key][workflowId].version = select.data.version
           }
         } else {
           throw new Error(`You try to upload a operation with unknown workflow with key = ${select.data.workflow}. please make sure you upload also the workflow that belongs to this operation.`)
