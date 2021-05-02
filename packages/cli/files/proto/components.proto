@@ -681,6 +681,7 @@ message WorkflowMatch {
   string input = 2;
   string payload = 3;
   int32 weight = 4;
+  bool ignore_on_next = 5;
 }
 
 // message AppAction
