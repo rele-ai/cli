@@ -38,7 +38,7 @@ module.exports = async (config, { accessToken }) => {
         payload: {},
         next: {
           selector: ((config.next || {}).selector || []).map(({ type, data }) => ({
-            type,
+            type: "operation",
             data: {
               workflow: data.workflow,
               next: (operationsMap[config.key] || {})[data.workflow] ? operationsMap[config.key][data.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
