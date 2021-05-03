@@ -1,6 +1,8 @@
 const cli = require("cli-ux")
-const { docToConf } = require("../../utils/parser")
+const { flags } = require("@oclif/command")
 const { docListToObj } = require("../../utils")
+const { docToConf } = require("../../utils/parser")
+const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
 const { debugError } = require("../../../lib/utils/logger")
 const { AppsClient, VersionsClient } = require("../../../lib/components")
@@ -11,7 +13,13 @@ const { AppsClient, VersionsClient } = require("../../../lib/components")
 class ListCommand extends BaseCommand {
   static flags = {
     // append base command flags
-    ...BaseCommand.flags
+    ...BaseCommand.flags,
+
+    // output file path
+    output: flags.string({
+      char: "o",
+      description: "A path to output file."
+    })
   }
 
   /**
@@ -33,6 +41,9 @@ class ListCommand extends BaseCommand {
 
     // try to pull apps
     try {
+      // destract output flag
+      const { output } = this.flags
+
       // resolve access token
       const accessToken = await this.accessToken
 
@@ -59,6 +70,11 @@ class ListCommand extends BaseCommand {
             metadata
           )
         }).join("---\n")
+
+        // write configs to file
+        if (output) {
+          writeConfig(yamlConf, output)
+        }
 
         // log to user
         this.log(yamlConf)
