@@ -4,6 +4,7 @@ const { flags } = require("@oclif/command")
 const plugin = require("../../utils/plugin")
 const { docListToObj } = require("../../utils")
 const { docToConf } = require("../../utils/parser")
+const { writeConfig } = require("../../utils/writers")
 const BaseCommand = require("../../utils/base-command")
 const { debugError } = require("../../../lib/utils/logger")
 const { WorkflowsClient, OperationsClient, AppsClient, AppActionsClient, VersionsClient } = require("../../../lib/components")
@@ -15,6 +16,12 @@ class ListCommand extends BaseCommand {
   static flags = {
     // append base command flags
     ...BaseCommand.flags,
+
+    // output file path
+    output: flags.string({
+      char: "o",
+      description: "A path to output file."
+    }),
 
     // filter by workflow key
     workflowKey: flags.string({
@@ -87,6 +94,9 @@ class ListCommand extends BaseCommand {
 
     // try to pull operations
     try {
+      // destract flags object
+      const { output } = this.flags
+
       // resolve access token
       const accessToken = await this.accessToken
 
@@ -134,8 +144,17 @@ class ListCommand extends BaseCommand {
           }
         )
 
+        // collect yaml data
+        const yamlConf = data.operations.map(yaml.dump).join("---\n")
+
+        // write data to file
+        // if output provided
+        if (output) {
+          writeConfig(yamlConf, output)
+        }
+
         // log to user
-        this.log(data.operations.map(yaml.dump).join("---\n"))
+        this.log(yamlConf)
 
         // stop spinner
         cli.ux.action.stop()
