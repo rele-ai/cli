@@ -3,7 +3,6 @@
     "required": [
         "type",
         "base_url",
-        "protocol",
         "key"
     ],
     "properties": {
@@ -36,7 +35,8 @@
             "enum": [
                 "grpc",
                 "rest"
-            ]
+            ],
+            "default": "gRPC"
         },
         "request": {
             "type": "object",

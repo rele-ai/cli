@@ -2,6 +2,7 @@ const fs = require("fs")
 const glob = require("glob")
 const yaml = require("js-yaml")
 const pkgDir = require("pkg-dir")
+const { debugError } = require("../../lib/utils/logger")
 const versionSort = require("../../lib/utils/version-sort")
 const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 
@@ -13,7 +14,15 @@ const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 * @param {object} options - additional params.
 * @returns {object} doc - Firestore doc representation.
 */
-module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user } = {}) => {
+module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user, client = null } = {}) => {
+  // validate configurations before apply
+  const isValid = client.validate(conf)
+  if (isValid !== null) {
+    debugError(isValid)
+    throw new Error("unable to validate configurations before apply.")
+  }
+
+  // parse from conf to doc
   switch(confType) {
     case "App":
       return loadAppDoc(conf)

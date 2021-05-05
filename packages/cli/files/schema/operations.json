@@ -6,7 +6,7 @@
         "key"
     ],
     "definitions": {
-        "next_operation": {
+        "next": {
             "type": "object",
             "default": {},
             "required": [
@@ -18,17 +18,31 @@
                     "items": {
                         "type": "object",
                         "required": [
-                            "workflow",
-                            "operation"
+                            "type",
+                            "data"
                         ],
                         "properties": {
-                            "workflow": {
+                            "type": {
                                 "type": "string",
-                                "pattern": "^[a-z0-9_]+$"
+                                "enum": [
+                                    "workflow",
+                                    "operation"
+                                ]
                             },
-                            "operation": {
-                                "type": "string",
-                                "pattern": "^[a-z0-9_]+$"
+                            "data": {
+                                "type": "object",
+                                "required": [
+                                    "workflow",
+                                    "next"
+                                ],
+                                "properties": {
+                                    "workflow": {
+                                        "type": "string"
+                                    },
+                                    "next": {
+                                        "type": "string"
+                                    }
+                                }
                             }
                         }
                     }
@@ -133,8 +147,8 @@
                         "hash_array"
                     ]
                 },
-                "next_operation": {
-                    "$ref": "#/definitions/next_operation"
+                "next": {
+                    "$ref": "#/definitions/next"
                 },
                 "match_operation": {
                     "type": "string",
@@ -197,11 +211,11 @@
                 }
             }
         },
-        "next_operation": {
-            "$ref": "#/definitions/next_operation"
+        "next": {
+            "$ref": "#/definitions/next"
         },
         "on_error": {
-            "$ref": "#/definitions/next_operation"
+            "$ref": "#/definitions/next"
         },
         "is_root": {
             "type": "boolean",
@@ -212,10 +226,6 @@
         "redis": {
             "type": "object",
             "default": {},
-            "required": [
-                "type",
-                "field"
-            ],
             "properties": {
                 "type": {
                     "type": "string",
