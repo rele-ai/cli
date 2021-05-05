@@ -16,10 +16,11 @@ const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 */
 module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user, client = null } = {}) => {
   // validate configurations before apply
-  const isValid = client.validate(conf)
-  if (isValid !== null) {
-    debugError(isValid)
-    throw new Error("unable to validate configurations before apply.")
+  const validate = client.validate(conf)
+  if (validate !== null) {
+    const falidKeys = Object.keys(validate.validation || {})
+    debugError(validate)
+    throw new Error(`unable to validate configurations before apply.\n The following fields are not set correctly: ${falidKeys.join(", ")}\n For more information: https://docs.rele.ai/`)
   }
 
   // parse from conf to doc
