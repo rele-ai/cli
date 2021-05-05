@@ -16,10 +16,13 @@ module.exports = async (config, { accessToken }) => {
       operationsMap[operation.key] = {}
     }
 
-    Object.entries(((operation.next || {}).data || {})).forEach(([workflowId, operationId]) => {
+    Object.keys(operation.next || {}).forEach((workflowId) => {
       try {
-        if ((operation.next || {}).type === "operation") {
-          operationsMap[operation.key][workflows[workflowId].key] = operations[operationId].key
+        const nextOpType = operation.next[workflowId].type
+        const nextOpId = operation.next[workflowId].id
+
+        if (nextOpType === "operation") {
+          operationsMap[operation.key][workflows[workflowId].key] = operations[nextOpId].key
         }
       } catch (e) {
         throw new Error(`An unexpected error occurred while decomposing into groups.\nPlease contact support@rele.ai with the following error information: operationId = ${operationId} and workflowId = ${workflowId}`)
@@ -35,7 +38,7 @@ module.exports = async (config, { accessToken }) => {
         payload: {},
         next: {
           selector: ((config.next || {}).selector || []).map(({ type, data }) => ({
-            type,
+            type: "operation",
             data: {
               workflow: data.workflow,
               next: (operationsMap[config.key] || {})[data.workflow] ? operationsMap[config.key][data.workflow] : `__rb_internal_${uuidv4().replace(/-/g, "_")}_get_notification`
