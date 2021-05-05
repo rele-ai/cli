@@ -61,7 +61,8 @@ class VersionsCommand extends BaseCommand {
         output.push("---\n")
         output.push(`${entry.title}:`)
         for (const group of entry.data) {
-          output.push(`  ${group[0].display_name.en}:`)
+          const name = Object.keys(group[0].display_name || {}).length ? group[0].display_name.en : (group[0].key || group[0].system_key)
+          output.push(`  ${name}:`)
 
           for (const item of group) {
             switch (entry.title) {
