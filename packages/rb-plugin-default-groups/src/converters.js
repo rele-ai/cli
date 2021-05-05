@@ -117,7 +117,7 @@ module.exports = async (config, { accessToken }) => {
 
       const nextSelector = ((baseOperation.next || {}).selector || [])
       nextSelector.forEach((selector) => {
-        const baseNextOp = {
+        let baseNextOp = {
           type: "Operation",
           selector: {
             app: "core",
@@ -126,7 +126,6 @@ module.exports = async (config, { accessToken }) => {
           },
           is_root: false,
           next: (config.next || {}),
-          on_error: (config.on_error || {}),
           output: (config.output || {}),
           input: {},
           redis: (config.redis || {}),
@@ -137,6 +136,10 @@ module.exports = async (config, { accessToken }) => {
             }
           },
           key: selector.data.next
+        }
+
+        if (Object.keys(config.on_error || {}).length) {
+          baseNextOp.on_error = config.on_error
         }
 
         if (!baseNextOp.redis.field) baseNextOp.redis.field = config.key
