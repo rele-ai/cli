@@ -59,13 +59,16 @@
                     ]
                 },
                 "headers": {
-                    "type": "object"
+                    "type": "object",
+                    "default": {}
                 },
                 "body": {
-                    "type": "object"
+                    "type": "object",
+                    "default": {}
                 },
                 "query": {
-                    "type": "object"
+                    "type": "object",
+                    "default": {}
                 }
             }
         },
