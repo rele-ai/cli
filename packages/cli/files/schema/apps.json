@@ -34,7 +34,9 @@
             "type": "string",
             "enum": [
                 "grpc",
-                "rest"
+                "rest",
+                "gRPC",
+                "REST"
             ],
             "default": "gRPC"
         },
