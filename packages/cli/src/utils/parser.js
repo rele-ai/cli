@@ -21,7 +21,7 @@ module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versi
     if (validate !== null) {
       const falidKeys = Object.keys(validate.validation || {})
       debugError(validate)
-      throw new Error(`unable to validate configurations before apply.\n ${confType} did not pass validation. \nThe following fields are not set correctly: ${falidKeys.join(", ")}\n For more information: https://docs.rele.ai/`)
+      throw new Error(`unable to validate configurations before apply.\n${confType} did not pass validation. \nThe following fields are not set correctly: ${falidKeys.join(", ")}\n For more information: https://docs.rele.ai/`)
     }
   } else {
     console.warn("Configurations validation was not executed. Please pass the relevant client object.")
