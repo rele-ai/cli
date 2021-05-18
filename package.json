@@ -26,7 +26,7 @@
     "lerna": "^4.0.0"
   },
   "dependencies": {
-    "google-protobuf": "^3.16.0-rc.1",
+    "google-protobuf": "^3.17.0",
     "ngrok": "^4.0.1"
   }
 }

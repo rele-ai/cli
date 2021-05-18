@@ -4187,10 +4187,10 @@ google-protobuf@^3.15.8:
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.15.8.tgz#5f3948905e4951c867d6bc143f385a80e2a39efe"
   integrity sha512-2jtfdqTaSxk0cuBJBtTTWsot4WtR9RVr2rXg7x7OoqiuOKopPrwXpM1G4dXIkLcUNRh3RKzz76C8IOkksZSeOw==
 
-google-protobuf@^3.16.0-rc.1:
-  version "3.16.0-rc.1"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.16.0-rc.1.tgz#88c45685190ea078bf5680a78ea9d47bdcf8db0a"
-  integrity sha512-2wU/Iy9CJa6sMNq5f/OdwVY/fpgPMWtzg6MqZtL/R7wKm0lYtJYh1IpUpFuIuZGjAZdCgQWZVDJV36ROX7BYTg==
+google-protobuf@^3.17.0:
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.17.0.tgz#5623215f9d0345649720ae5e5e9713491e2456fc"
+  integrity sha512-xuxzzx6FXmkmddRZci2SmGeZcx+vykmqG60yJf/Rz+NEKaUs+nLhaiUQAWa7Z00a7bHfRjRxSIX9FcELaxWIVA==
 
 got@^11.5.1:
   version "11.8.2"
