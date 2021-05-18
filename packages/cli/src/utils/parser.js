@@ -554,7 +554,7 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
  */
 const loadTranslationDoc = (conf) => {
   try {
-    // deep config copy
+    // deep config copy obj
     let coTrns = { ...conf }
 
     // delete unessesary keys
