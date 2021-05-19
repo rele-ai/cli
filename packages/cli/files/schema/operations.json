@@ -223,23 +223,8 @@
         },
         "input": {},
         "output": {},
-        "redis": {
-            "type": "object",
-            "default": {},
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "hash_map",
-                        "array"
-                    ]
-                },
-                "field": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9-_:]+$"
-                }
-            }
-        },
+        "redis": {},
+        "next_operation": {},
         "payload": {
             "type": "object",
             "patternProperties": {

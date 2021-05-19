@@ -477,6 +477,16 @@ const _getAppId = (conf, apps, versions, user) => {
   })
  }
 
+ /**
+  * _errorOnNextOperationFormat check if configuration
+  *
+  * @param {object} olderNextOperation
+  */
+ const _errorOnNextOperationFormat = (olderNextOperation) => {
+  if (Object.keys(olderNextOperation || {}).length) {
+    throw new Error("The way you define the 'next_operation' is deprecated. Please visit https://docs.rele.ai/guide/operations.html#next-and-onerror and update your operations configuration.")
+  }
+ }
 /**
  * Converts the given YAML config to the matchinf firestore
  * document.
@@ -489,6 +499,9 @@ const _getAppId = (conf, apps, versions, user) => {
  */
 const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => {
   try {
+    // validate next operation older format
+    _errorOnNextOperationFormat(conf.next_operation)
+
     // attach defaults to payload object
     _attachDefaultsToPayload(conf.payload || {})
 
