@@ -1,3 +1,6 @@
+const fs = require("fs")
+const os = require("os")
+const path = require("path")
 const cli = require("cli-ux")
 const ngrok = require("ngrok")
 const yaml = require("js-yaml")
@@ -31,8 +34,11 @@ class VersionsCommand extends BaseCommand {
 
     // class attributes
     this._ngrokPorts = []
-    this._devConfigDir = "/tmp/.rb"
+    this._devConfigDir = path.join(os.tmpdir(), ".rb")
     this._devConfigLocation = `${this._devConfigDir}/dev-config.yaml`
+
+    // ensure dev config dir exists
+    if (!fs.existsSync(this._devConfigDir)) fs.mkdirSync(this._devConfigDir)
   }
 
   /**
