@@ -133,8 +133,7 @@
             }
         },
         "key": {
-            "type": "string",
-            "pattern": "^[a-z0-9_]+$"
+            "type": "string"
         },
         "display_name": {
             "type": "object",
