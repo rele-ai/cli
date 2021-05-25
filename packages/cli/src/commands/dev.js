@@ -4,6 +4,7 @@ const path = require("path")
 const cli = require("cli-ux")
 const ngrok = require("ngrok")
 const yaml = require("js-yaml")
+const dotenv = require("dotenv")
 const nodemon = require("nodemon")
 const DeployUser = require("./deploy/user")
 const { writeConfig } = require("../utils/writers")
@@ -42,27 +43,17 @@ class VersionsCommand extends BaseCommand {
   }
 
   /**
-   * Returns the next active port.
-   */
-  getNextActivePort() {
-    // calculate next port
-    const newPort = (this._ngrokPorts[this._ngrokPorts.length - 1] || 9089) + 1
-
-    // push new port to state
-    this._ngrokPorts.push(newPort)
-
-    // return generated port
-    return newPort
-  }
-
-  /**
    * Register ngrok URL for each application
    */
   async ngrokConnect() {
+    // server settings
+    const envfile = path.join(os.tmpdir(), ".rb", ".env.server")
+    const serverSettings = dotenv.parse(fs.readFileSync(envfile))
+
     // get ngrok URL
     const ngrokURL = await ngrok.connect({
       authtoken: process.env.NGROK_TOKEN,
-      addr: this.getNextActivePort(),
+      addr: serverSettings.RB_PORT,
       proto: "tcp"
     })
 
