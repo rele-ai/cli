@@ -15,8 +15,7 @@
         "match": {
             "type": "object",
             "required": [
-                "callback",
-                "input"
+                "callback"
             ],
             "properties": {
                 "callback": {
