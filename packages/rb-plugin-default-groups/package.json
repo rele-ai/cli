@@ -1,6 +1,6 @@
 {
   "name": "@releai/default-groups",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Default config groups parser",
   "main": "src/index.js",
   "scripts": {},
@@ -16,8 +16,8 @@
   },
   "license": "Apache License",
   "dependencies": {
-    "@releai/cli": "^0.1.17",
-    "@releai/helper-plugin-utils": "^0.1.17",
+    "@releai/cli": "^0.1.18",
+    "@releai/helper-plugin-utils": "^0.1.18",
     "uuid": "^8.3.2"
   }
 }
