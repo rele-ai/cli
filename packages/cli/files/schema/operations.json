@@ -17,67 +17,8 @@
                         "drop_session"
                     ]
                 },
-                "format_function": {
-                    "type": "array",
-                    "minimum": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [],
-                        "properties": {
-                            "operation": {
-                                "type": "string",
-                                "enum": [
-                                    "decrement",
-                                    "increment",
-                                    "encode_base64",
-                                    "get_length"
-                                ]
-                            },
-                            "output": {
-                                "type": "string",
-                                "pattern": "^[a-z0-9-_:]+$"
-                            },
-                            "value": {
-                                "$ref": "#/definitions/payload_item"
-                            },
-                            "args": {
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "redis_functions": {
-                    "type": "array",
-                    "minimum": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [],
-                        "properties": {
-                            "operation": {
-                                "type": "string",
-                                "enum": [
-                                    "set_field",
-                                    "delete_key"
-                                ]
-                            },
-                            "path": {
-                                "type": "string"
-                            },
-                            "type": {
-                                "type": "string",
-                                "enum": [
-                                    "hash_map",
-                                    "array",
-                                    "array_item",
-                                    "hash_array"
-                                ]
-                            },
-                            "value": {
-                                "$ref": "#/definitions/payload_item"
-                            }
-                        }
-                    }
-                }
+                "format_function": {},
+                "redis_functions": {}
             }
         },
         "payload_item": {
