@@ -6,49 +6,7 @@
         "key"
     ],
     "definitions": {
-        "next": {
-            "type": "object",
-            "default": {},
-            "required": [
-                "selector"
-            ],
-            "properties": {
-                "selector": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "type",
-                            "data"
-                        ],
-                        "properties": {
-                            "type": {
-                                "type": "string",
-                                "enum": [
-                                    "workflow",
-                                    "operation"
-                                ]
-                            },
-                            "data": {
-                                "type": "object",
-                                "required": [
-                                    "workflow",
-                                    "next"
-                                ],
-                                "properties": {
-                                    "workflow": {
-                                        "type": "string"
-                                    },
-                                    "next": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
+        "next": {},
         "entry_condition": {
             "type": "object",
             "properties": {
