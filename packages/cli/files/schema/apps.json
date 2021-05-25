@@ -20,16 +20,7 @@
             "type": "boolean",
             "default": false
         },
-        "display_name": {
-            "type": "object",
-            "default": {},
-            "patternProperties": {
-                "^([a-z]{2})(_[a-z]{2})?$": {
-                    "type": "string",
-                    "pattern": "^[a-zA-Z0-9\\s-_]+$"
-                }
-            }
-        },
+        "display_name": {},
         "protocol": {
             "type": "string",
             "enum": [

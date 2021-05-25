@@ -35,6 +35,9 @@
                         "array"
                     ]
                 },
+                "payload": {
+                    "type": "string"
+                },
                 "weight": {
                     "type": "number"
                 }
