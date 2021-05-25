@@ -24,6 +24,9 @@
                 }
             }
         },
+        "uri": {
+            "type": "string"
+        },
         "key": {
             "type": "string",
             "pattern": "^[a-z0-9_]+$"
