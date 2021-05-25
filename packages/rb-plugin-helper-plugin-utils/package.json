@@ -1,6 +1,6 @@
 {
   "name": "@releai/helper-plugin-utils",
-  "version": "0.1.14",
+  "version": "0.1.16",
   "description": "Global plugin helpers",
   "main": "src/index.js",
   "scripts": {},
@@ -20,6 +20,6 @@
   },
   "license": "Apache License",
   "dependencies": {
-    "glob": "^7.1.6"
+    "glob": "^7.1.7"
   }
 }
