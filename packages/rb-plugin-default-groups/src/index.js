@@ -92,6 +92,7 @@ const groupOperations = async (payload, metadata) => {
  * Export default plugin callback
  */
 module.exports = declare((api) => {
+	conosle.error("here")
 	// handler group destructuring on apply
 	api.apply.on("load", destructGroups)
 

@@ -2,7 +2,7 @@ const fs = require("fs")
 const jjv = require("jjv")
 const glob = require("glob")
 const path = require("path")
-const grpc = require("grpc")
+const grpc = require("@grpc/grpc-js")
 const { loadSync } = require("@grpc/proto-loader")
 
 /**

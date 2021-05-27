@@ -145,6 +145,7 @@ class VersionsCommand extends BaseCommand {
    * Execute the versions command
    */
   async run() {
+    conosle.error("here")
     // start nodemon
     nodemon({ script: this.args.mainFile, ext: "js,yaml,sh,tf,json" })
 
