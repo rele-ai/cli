@@ -168,7 +168,7 @@ module.exports.loadDocNextOperations = (data, workflows) => {
           data[key][workflowId] = {
             id: select.data.next,
             type: select.type,
-            research: select.data.research || false,
+            rematch: select.data.rematch || false,
           }
 
           if (select.data.version) {

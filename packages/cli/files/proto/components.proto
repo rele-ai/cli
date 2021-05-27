@@ -595,7 +595,7 @@ message OperationRedis {
 message NextOp {
   string type = 1;
   string id = 2;
-  bool research = 3;
+  bool rematch = 3;
   string version = 4;
 }
 
