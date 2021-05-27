@@ -1,6 +1,10 @@
+const fs = require("fs")
+const os = require("os")
+const path = require("path")
 const cli = require("cli-ux")
 const ngrok = require("ngrok")
 const yaml = require("js-yaml")
+const dotenv = require("dotenv")
 const nodemon = require("nodemon")
 const DeployUser = require("./deploy/user")
 const { writeConfig } = require("../utils/writers")
@@ -31,32 +35,25 @@ class VersionsCommand extends BaseCommand {
 
     // class attributes
     this._ngrokPorts = []
-    this._devConfigDir = "/tmp/.rb"
+    this._devConfigDir = path.join(os.tmpdir(), ".rb")
     this._devConfigLocation = `${this._devConfigDir}/dev-config.yaml`
-  }
 
-  /**
-   * Returns the next active port.
-   */
-  getNextActivePort() {
-    // calculate next port
-    const newPort = (this._ngrokPorts[this._ngrokPorts.length - 1] || 9089) + 1
-
-    // push new port to state
-    this._ngrokPorts.push(newPort)
-
-    // return generated port
-    return newPort
+    // ensure dev config dir exists
+    if (!fs.existsSync(this._devConfigDir)) fs.mkdirSync(this._devConfigDir)
   }
 
   /**
    * Register ngrok URL for each application
    */
   async ngrokConnect() {
+    // server settings
+    const envfile = path.join(os.tmpdir(), ".rb", ".env.server")
+    const serverSettings = dotenv.parse(fs.readFileSync(envfile))
+
     // get ngrok URL
     const ngrokURL = await ngrok.connect({
       authtoken: process.env.NGROK_TOKEN,
-      addr: this.getNextActivePort(),
+      addr: serverSettings.RB_PORT,
       proto: "tcp"
     })
 

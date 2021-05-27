@@ -2,6 +2,7 @@ const fs = require("fs")
 const glob = require("glob")
 const yaml = require("js-yaml")
 const pkgDir = require("pkg-dir")
+const { debugError } = require("../../lib/utils/logger")
 const versionSort = require("../../lib/utils/version-sort")
 const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 
@@ -13,7 +14,20 @@ const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 * @param {object} options - additional params.
 * @returns {object} doc - Firestore doc representation.
 */
-module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user } = {}) => {
+module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user, client = null } = {}) => {
+  if (client) {
+    // validate configurations before apply
+    const validate = client.validate(conf)
+    if (validate !== null) {
+      const falidKeys = Object.keys(validate.validation || {})
+      debugError(validate)
+      throw new Error(`unable to validate configurations before apply.\n${confType} configuration did not pass validation. \nThe following fields are not set correctly: ${falidKeys.join(", ")}\nFor more information: https://docs.rele.ai/`)
+    }
+  } else {
+    console.warn("Configurations validation was not executed. Please pass the relevant client object.")
+  }
+
+  // parse from conf to doc
   switch(confType) {
     case "App":
       return loadAppDoc(conf)
@@ -463,6 +477,16 @@ const _getAppId = (conf, apps, versions, user) => {
   })
  }
 
+ /**
+  * _errorOnNextOperationFormat check if configuration
+  *
+  * @param {object} olderNextOperation
+  */
+ const _errorOnNextOperationFormat = (olderNextOperation) => {
+  if (Object.keys(olderNextOperation || {}).length) {
+    throw new Error("The way you define the 'next_operation' is deprecated. Please visit https://docs.rele.ai/guide/operations.html#next-and-onerror and update your operations configuration.")
+  }
+ }
 /**
  * Converts the given YAML config to the matchinf firestore
  * document.
@@ -475,6 +499,9 @@ const _getAppId = (conf, apps, versions, user) => {
  */
 const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => {
   try {
+    // validate next operation older format
+    _errorOnNextOperationFormat(conf.next_operation)
+
     // attach defaults to payload object
     _attachDefaultsToPayload(conf.payload || {})
 
@@ -540,7 +567,7 @@ const loadOperationDoc = (conf, apps, appActions, workflows, versions, user) => 
  */
 const loadTranslationDoc = (conf) => {
   try {
-    // deep config copy
+    // deep config copy obj
     let coTrns = { ...conf }
 
     // delete unessesary keys

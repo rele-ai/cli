@@ -22,7 +22,7 @@ module.exports.loadSchemas = () => {
       .sync(`${schemasDir}/*.json`)
       .forEach((file) => {
         // append to map
-        schemas[path.parse(file).name.replace(/-/g, "_")] = fs.readFileSync(file, "utf8")
+        schemas[path.parse(file).name.replace(/-/g, "_")] = JSON.parse(fs.readFileSync(file, "utf8"))
       })
 
     // return map

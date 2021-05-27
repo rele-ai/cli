@@ -3,7 +3,6 @@
     "required": [
         "type",
         "base_url",
-        "protocol",
         "key"
     ],
     "properties": {
@@ -21,22 +20,16 @@
             "type": "boolean",
             "default": false
         },
-        "display_name": {
-            "type": "object",
-            "default": {},
-            "patternProperties": {
-                "^([a-z]{2})(_[a-z]{2})?$": {
-                    "type": "string",
-                    "pattern": "^[a-zA-Z0-9\\s-_]+$"
-                }
-            }
-        },
+        "display_name": {},
         "protocol": {
             "type": "string",
             "enum": [
                 "grpc",
-                "rest"
-            ]
+                "rest",
+                "gRPC",
+                "REST"
+            ],
+            "default": "gRPC"
         },
         "request": {
             "type": "object",
@@ -57,13 +50,16 @@
                     ]
                 },
                 "headers": {
-                    "type": "object"
+                    "type": "object",
+                    "default": {}
                 },
                 "body": {
-                    "type": "object"
+                    "type": "object",
+                    "default": {}
                 },
                 "query": {
-                    "type": "object"
+                    "type": "object",
+                    "default": {}
                 }
             }
         },

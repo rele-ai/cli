@@ -15,8 +15,7 @@
         "match": {
             "type": "object",
             "required": [
-                "callback",
-                "input"
+                "callback"
             ],
             "properties": {
                 "callback": {
@@ -35,6 +34,9 @@
                         "string",
                         "array"
                     ]
+                },
+                "payload": {
+                    "type": "string"
                 },
                 "weight": {
                     "type": "number"

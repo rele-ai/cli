@@ -6,35 +6,7 @@
         "key"
     ],
     "definitions": {
-        "next_operation": {
-            "type": "object",
-            "default": {},
-            "required": [
-                "selector"
-            ],
-            "properties": {
-                "selector": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "workflow",
-                            "operation"
-                        ],
-                        "properties": {
-                            "workflow": {
-                                "type": "string",
-                                "pattern": "^[a-z0-9_]+$"
-                            },
-                            "operation": {
-                                "type": "string",
-                                "pattern": "^[a-z0-9_]+$"
-                            }
-                        }
-                    }
-                }
-            }
-        },
+        "next": {},
         "entry_condition": {
             "type": "object",
             "properties": {
@@ -45,67 +17,8 @@
                         "drop_session"
                     ]
                 },
-                "format_function": {
-                    "type": "array",
-                    "minimum": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [],
-                        "properties": {
-                            "operation": {
-                                "type": "string",
-                                "enum": [
-                                    "decrement",
-                                    "increment",
-                                    "encode_base64",
-                                    "get_length"
-                                ]
-                            },
-                            "output": {
-                                "type": "string",
-                                "pattern": "^[a-z0-9-_:]+$"
-                            },
-                            "value": {
-                                "$ref": "#/definitions/payload_item"
-                            },
-                            "args": {
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "redis_functions": {
-                    "type": "array",
-                    "minimum": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [],
-                        "properties": {
-                            "operation": {
-                                "type": "string",
-                                "enum": [
-                                    "set_field",
-                                    "delete_key"
-                                ]
-                            },
-                            "path": {
-                                "type": "string"
-                            },
-                            "type": {
-                                "type": "string",
-                                "enum": [
-                                    "hash_map",
-                                    "array",
-                                    "array_item",
-                                    "hash_array"
-                                ]
-                            },
-                            "value": {
-                                "$ref": "#/definitions/payload_item"
-                            }
-                        }
-                    }
-                }
+                "format_function": {},
+                "redis_functions": {}
             }
         },
         "payload_item": {
@@ -133,8 +46,8 @@
                         "hash_array"
                     ]
                 },
-                "next_operation": {
-                    "$ref": "#/definitions/next_operation"
+                "next": {
+                    "$ref": "#/definitions/next"
                 },
                 "match_operation": {
                     "type": "string",
@@ -197,11 +110,11 @@
                 }
             }
         },
-        "next_operation": {
-            "$ref": "#/definitions/next_operation"
+        "next": {
+            "$ref": "#/definitions/next"
         },
         "on_error": {
-            "$ref": "#/definitions/next_operation"
+            "$ref": "#/definitions/next"
         },
         "is_root": {
             "type": "boolean",
@@ -209,27 +122,8 @@
         },
         "input": {},
         "output": {},
-        "redis": {
-            "type": "object",
-            "default": {},
-            "required": [
-                "type",
-                "field"
-            ],
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "hash_map",
-                        "array"
-                    ]
-                },
-                "field": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9-_:]+$"
-                }
-            }
-        },
+        "redis": {},
+        "next_operation": {},
         "payload": {
             "type": "object",
             "patternProperties": {
@@ -239,8 +133,7 @@
             }
         },
         "key": {
-            "type": "string",
-            "pattern": "^[a-z0-9_]+$"
+            "type": "string"
         },
         "display_name": {
             "type": "object",

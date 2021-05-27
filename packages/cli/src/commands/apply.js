@@ -57,7 +57,7 @@ class ApplyCommand extends BaseCommand {
    * _formatConfToDoc takes an object in YAML
    * format and convert it to JSON.
    */
-  async _formatConfToDoc(object, { workflows, apps, appActions, versions }) {
+  async _formatConfToDoc(object, { workflows, apps, appActions, versions, client }) {
     // define the data object
     return confToDoc(
       object.type,
@@ -67,7 +67,8 @@ class ApplyCommand extends BaseCommand {
         apps: docListToObj(apps),
         appActions: docListToObj(appActions),
         versions: docListToObj(versions),
-        user: await this.user
+        user: await this.user,
+        client
       }
     )
   }
@@ -122,7 +123,8 @@ class ApplyCommand extends BaseCommand {
       apps: docListToObj(apps),
       appActions: docListToObj(appActions),
       versions: docListToObj(versions),
-      user: await this.user
+      user: await this.user,
+      client: this._clients.Operation
     }
 
     // format operations confs to
@@ -155,7 +157,8 @@ class ApplyCommand extends BaseCommand {
         workflows,
         apps,
         appActions,
-        versions
+        versions,
+        client
       }
     )
 

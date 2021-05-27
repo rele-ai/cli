@@ -103,20 +103,18 @@ class ComponentsClient extends BaseClient {
    * @returns {object}
    */
    create(def, config, type = "") {
-    if (this.validate(config) === null) {
-      return this._request(
-        def,
-        {
-          org: "",
-          [type || this._singularType]: config
-        },
-        {
-          headers: {
-            authorization: `Bearer ${this._accessToken}`
-          }
+    return this._request(
+      def,
+      {
+        org: "",
+        [type || this._singularType]: config
+      },
+      {
+        headers: {
+          authorization: `Bearer ${this._accessToken}`
         }
-      )
-    }
+      }
+    )
   }
 
   /**

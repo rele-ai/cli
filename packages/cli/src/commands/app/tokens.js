@@ -115,7 +115,7 @@ class TokensCommand extends BaseCommand {
       } else {
         // create app
         const appRes = await client.create(
-          confToDoc("App", conf),
+          confToDoc("App", conf, { client }),
           versionId
         )
 
