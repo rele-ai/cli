@@ -117,13 +117,26 @@ module.exports.loadConfNextOperations = (data, workflows, operations) => {
         data[key].selector = Object.keys(nextOp).map(workflowId => {
           const type = nextOp[workflowId].type
           const id = nextOp[workflowId].id
-          return {
+          const rematch = nextOp[workflowId].rematch || false
+
+          // define base next
+          let baseNext = {
             type,
             data: {
               workflow: workflows[workflowId].key,
-              next: type === "operation" ? operations[id].key : workflows[id].key
+              rematch
             }
           }
+
+          // attach next pointer
+          if (type === "operation") {
+            baseNext.data.next = operations[id].key
+          } else if (type === "workflow" && !rematch) {
+            baseNext.data.next = workflows[id].key
+          }
+
+          // returns formatted base next
+          return baseNext
         })
       }
     }
