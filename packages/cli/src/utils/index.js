@@ -230,3 +230,22 @@ module.exports.groupByVersion = (type, items) => {
 
   return Object.values(groups)
 }
+
+/**
+ * Flatten takes an nested object and
+ * execute flatten on all attributes
+ *
+ * @param {object} obj - nested object
+ * @return {object} flatten object
+ */
+module.exports.flatten = (obj, prefix = "", res = {}) => {
+  return Object.entries(obj).reduce((r, [key, val]) => {
+    const k = `${prefix}${key}`
+    if (typeof val === "object") {
+      this.flatten(val, `${k}.`, r)
+    } else {
+      res[k] = val
+    }
+    return r
+  }, res)
+}
