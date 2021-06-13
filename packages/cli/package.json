@@ -53,6 +53,7 @@
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.3.2",
     "@grpc/proto-loader": "^0.6.2",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
@@ -67,7 +68,6 @@
     "express": "^4.17.1",
     "glob": "^7.1.7",
     "google-protobuf": "^3.17.1",
-    "grpc": "^1.24.5",
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.0",
     "jjv": "^1.0.2",
