@@ -62,7 +62,6 @@ class BaseCommand extends Command {
 
     return (new Promise((resolve, reject) => {
       // validate existing access token
-      console.log("_accessToken:", this._accessToken)
       authClient.notify("validate_access_token", { accessToken: this._accessToken })
         .then(res => {
           if (!Object.keys(res || {}).length) {
