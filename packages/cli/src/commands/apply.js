@@ -251,6 +251,14 @@ class ApplyCommand extends BaseCommand {
 
       // format yaml to array of objects
       const data = { yamlData: readConfig(path) }
+
+      // validate that there is no empty yaml
+      data.yamlData.forEach(conf => {
+        if (!conf) {
+          throw new Error("One of the configurations you want to upload is empty.\n Please make sure that there is no unnessesary '---' splitted mark.")
+        }
+      })
+
       await plugin.apply._execute(
         "load",
         data,
