@@ -1,6 +1,6 @@
 {
   "name": "@releai/helper-plugin-utils",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "Global plugin helpers",
   "main": "src/index.js",
   "scripts": {},
