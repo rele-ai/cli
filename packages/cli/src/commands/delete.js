@@ -92,10 +92,6 @@ class DeleteCommand extends BaseCommand {
       // update config
       return client.deleteById(config.id)
     } else {
-      // config is not founded
-      if (!object.key.startsWith("__rb_internal")) {
-        this.log(`Deletion not completed for ${object.key}, no ${object.type} found with key = ${object.key}`)
-      }
       return
     }
   }
