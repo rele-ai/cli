@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.23](https://github.com/rele-ai/cli/compare/v0.1.22...v0.1.23) (2021-06-20)
+
+**Note:** Version bump only for package @releai/default-groups
+
+
+
+
+
 ## [0.1.22](https://github.com/rele-ai/cli/compare/v0.1.21...v0.1.22) (2021-06-20)
 
 **Note:** Version bump only for package @releai/default-groups
