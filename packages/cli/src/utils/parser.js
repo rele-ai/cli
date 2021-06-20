@@ -4,7 +4,7 @@ const yaml = require("js-yaml")
 const pkgDir = require("pkg-dir")
 const { debugError } = require("../../lib/utils/logger")
 const versionSort = require("../../lib/utils/version-sort")
-const { loadConfNextOperations, loadDocNextOperations } = require("./index")
+const { loadConfNextOperations, loadDocNextOperations, flatten } = require("./index")
 
 /**
 * Configuration data from YAML.
@@ -16,13 +16,8 @@ const { loadConfNextOperations, loadDocNextOperations } = require("./index")
 */
 module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versions, user, client = null } = {}) => {
   if (client) {
-    // validate configurations before apply
-    const validate = client.validate(conf)
-    if (validate !== null) {
-      const falidKeys = Object.keys(validate.validation || {})
-      debugError(validate)
-      throw new Error(`unable to validate configurations before apply.\n${confType} configuration did not pass validation. \nThe following fields are not set correctly: ${falidKeys.join(", ")}\nFor more information: https://docs.rele.ai/`)
-    }
+    // valudate configuration
+    validateConfigurations(conf, confType, client)
   } else {
     console.warn("Configurations validation was not executed. Please pass the relevant client object.")
   }
@@ -576,5 +571,31 @@ const loadTranslationDoc = (conf) => {
     return coTrns
   } catch (e) {
     throw new Error("unable to parse Translation configuration to document format. Please make sure you have provided all the attributes correctly. For more information visit: https://docs.rele.ai/guide/translations.html")
+  }
+}
+
+/**
+ * Validate configuration takes a configurations
+ * to update.
+ *
+ * @param {object} conf - conf object
+ * @param {string} confType - conf type
+ * @param {object} client - components client
+ */
+const validateConfigurations = (conf, confType, client) => {
+  // validate configurations before apply
+  const validate = client.validate(conf)
+
+  if (validate !== null) {
+    // log on debug mode
+    debugError(validate)
+
+    // build faild keys
+    const falidKeys = Object.entries(validate.validation || {}).map(([att, falied]) => {
+      const flattenErr = Object.keys(flatten(falied)).map(flatKey => flatKey.replace(/[.]/g, " >> "))
+      return `${att}.\nsomething went wrong with: \n${flattenErr.join("\n")} \n`
+    })
+
+    throw new Error(`unable to validate configurations before apply.\n${confType} configuration did not pass validation. \nThe following fields are not set correctly: ${falidKeys}\nFor more information: https://docs.rele.ai/`)
   }
 }

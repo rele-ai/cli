@@ -25,7 +25,7 @@ module.exports = async (config, { accessToken }) => {
           operationsMap[operation.key][workflows[workflowId].key] = operations[nextOpId].key
         }
       } catch (e) {
-        throw new Error(`An unexpected error occurred while decomposing into groups.\nPlease contact support@rele.ai with the following error information: operationId = ${operationId} and workflowId = ${workflowId}`)
+        throw new Error("An unexpected error occurred while decomposing into groups.\nPlease contact support@rele.ai.")
       }
     })
   })

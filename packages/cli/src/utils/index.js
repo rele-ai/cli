@@ -117,13 +117,26 @@ module.exports.loadConfNextOperations = (data, workflows, operations) => {
         data[key].selector = Object.keys(nextOp).map(workflowId => {
           const type = nextOp[workflowId].type
           const id = nextOp[workflowId].id
-          return {
+          const rematch = nextOp[workflowId].rematch || false
+
+          // define base next
+          let baseNext = {
             type,
             data: {
               workflow: workflows[workflowId].key,
-              next: type === "operation" ? operations[id].key : workflows[id].key
+              rematch
             }
           }
+
+          // attach next pointer
+          if (type === "operation") {
+            baseNext.data.next = operations[id].key
+          } else if (type === "workflow" && !rematch) {
+            baseNext.data.next = workflows[id].key
+          }
+
+          // returns formatted base next
+          return baseNext
         })
       }
     }
@@ -168,7 +181,7 @@ module.exports.loadDocNextOperations = (data, workflows) => {
           data[key][workflowId] = {
             id: select.data.next,
             type: select.type,
-            research: select.data.research || false,
+            rematch: select.data.rematch || false,
           }
 
           if (select.data.version) {
@@ -216,4 +229,23 @@ module.exports.groupByVersion = (type, items) => {
   }
 
   return Object.values(groups)
+}
+
+/**
+ * Flatten takes an nested object and
+ * execute flatten on all attributes
+ *
+ * @param {object} obj - nested object
+ * @return {object} flatten object
+ */
+module.exports.flatten = (obj, prefix = "", res = {}) => {
+  return Object.entries(obj).reduce((r, [key, val]) => {
+    const k = `${prefix}${key}`
+    if (typeof val === "object") {
+      this.flatten(val, `${k}.`, r)
+    } else {
+      res[k] = val
+    }
+    return r
+  }, res)
 }

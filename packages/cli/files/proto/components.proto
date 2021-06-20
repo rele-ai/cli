@@ -215,6 +215,12 @@ service Translations {
   rpc Create (CreateTranslationRequest) returns (CreateTranslationResponse) {}
 }
 
+// ------------ Storage Service -------------
+service Storage {
+  // upload file to storage
+  rpc Upload (UploadRequest) returns (UploadResponse) {}
+}
+
 // ------------ Enums -------------
 enum Vendor {
   vendor_default = 0;
@@ -235,6 +241,26 @@ enum BotLang {
 }
 
 // ------------ Messages -------------
+//request for upload media to storage
+message UploadRequest{
+  string file_binary = 1;
+  string media_id = 2;
+  string file_name = 3;
+  string hash_id = 4;
+  string content_type = 5;
+  message obj {
+        string userOrg = 6;
+        string userId = 7;
+  }
+  obj userInfo = 8;
+}
+
+
+message UploadResponse{
+    string storage_path = 1;
+    string file_md5 = 2;
+}
+
 // empty data
 message Empty {}
 
@@ -595,7 +621,7 @@ message OperationRedis {
 message NextOp {
   string type = 1;
   string id = 2;
-  bool research = 3;
+  bool rematch = 3;
   string version = 4;
 }
 
