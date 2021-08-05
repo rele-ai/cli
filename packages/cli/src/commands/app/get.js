@@ -90,6 +90,11 @@ class GetCommand extends BaseCommand {
         ])
       ])
 
+      // check if any app founded
+      if (!(apps || []).length) {
+        throw new Error(`can't find and app with key equals to ${key}`)
+      }
+
       // get app record
       const filteredApps = this.filterApps(apps, await this.versions)
 

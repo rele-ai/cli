@@ -1,7 +1,7 @@
 {
   "name": "@releai/cli",
   "description": "RELE.AI CLI Tool",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "author": "Elon Salfati @ElonSalfati",
   "bin": {
     "rb": "bin/run"
@@ -58,7 +58,7 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
-    "@releai/default-groups": "^0.1.24",
+    "@releai/default-groups": "^0.1.25",
     "axios": "^0.21.1",
     "cli-ux": "^5.5.1",
     "consolidate": "^0.16.0",

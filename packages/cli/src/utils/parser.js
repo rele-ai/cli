@@ -97,6 +97,10 @@ const loadAppConf = (doc, versions, shouldDump=true) => {
  * @returns {object} YAML config.
  */
 const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
+  if (!apps[doc.app_id]) {
+    throw new Error(`can't find any app that related to ${doc.operation_key} app action.`)
+  }
+
   let data = {
     type: "AppAction",
     request: doc.request,
