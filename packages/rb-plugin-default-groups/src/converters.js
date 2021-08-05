@@ -61,6 +61,10 @@ module.exports = async (config, { accessToken }) => {
       const item = {
         filters: [
           [(config.selector || {}).app_action || "", "==", "send_message"],
+          [(config.selector || {}).app_action || "", "==", "send_location_message"],
+          [(config.selector || {}).app_action || "", "==", "send_contact_message"],
+          [(config.selector || {}).app_action || "", "==", "send_menu_message"],
+          [(config.selector || {}).app_action || "", "==", "send_buttons_message"],
           [(config.output || {}).operation_type || "", "!=", "drop_session"],
         ],
         defaults: {
