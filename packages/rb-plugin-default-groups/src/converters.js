@@ -50,13 +50,14 @@ module.exports = async (config, { accessToken }) => {
       }
 
       // attach content and options to payload
-      if (Object.keys(((config.payload || {}).content || {})).length) {
-        baseOperation.payload.content = config.payload.content || {}
-      }
+      baseOperation.payload = config.payload || {}
+      // if (Object.keys(((config.payload || {}).content || {})).length) {
+      //   baseOperation.payload.content = config.payload.content || {}
+      // }
 
-      if (Object.keys(((config.payload || {}).options || {})).length) {
-        baseOperation.payload.options = config.payload.options || {}
-      }
+      // if (Object.keys(((config.payload || {}).options || {})).length) {
+      //   baseOperation.payload.options = config.payload.options || {}
+      // }
 
       const item = {
         filters: [
