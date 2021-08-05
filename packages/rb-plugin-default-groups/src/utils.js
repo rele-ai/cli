@@ -10,6 +10,8 @@ module.exports.checkFilter = ([a, condition, b]) => {
         return a === b
         case "!=":
         return a !== b
+		case "includes":
+		return b.includes(a)
         default:
         throw new Error("unexpected condition")
     }
