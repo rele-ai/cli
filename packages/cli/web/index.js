@@ -38,6 +38,8 @@ const start = ({ state }) => {
           // return render page
           res.render("index", renders.success)
           setTimeout(() => {
+            console.log(`Success! Use this token to login on a CI server:\n\n${token.refresh_token}\n\n
+            Example: rb deploy -T ${token.refresh_token}\n\n`)
             process.exit(0)
           }, 2000)
           return

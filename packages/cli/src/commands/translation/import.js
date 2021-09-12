@@ -25,6 +25,13 @@ class ImportCommand extends BaseCommand {
       description: "File format",
       default: "csv",
       options: ["csv"]
+    }),
+
+    //refresh token to use in a ci system
+    refresh_token: flags.string({
+      char: "T",
+      description: "A refresh token to use in a CI server",
+      required: false
     })
   }
 

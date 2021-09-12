@@ -56,6 +56,13 @@ class CreateCommand extends BaseCommand {
       char: "c",
       description: "Use git clone",
       default: false
+    }),
+
+    //refresh token to use in a ci system
+    token: flags.string({
+      char: "T",
+      description: "A refresh token to use in a CI server",
+      required: false
     })
   }
 
