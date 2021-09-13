@@ -27,4 +27,5 @@ describe('Testing apply and delete commands with the tokens combination', () => 
   .it('Should delete configuration file using the refresh token', ctx => {
     expect(ctx.stdout).to.equal('')
   })
+
 })
