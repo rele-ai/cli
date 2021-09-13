@@ -34,6 +34,7 @@ class BaseCommand extends Command {
       description: "Config version"
     }),
 
+    //refresh token to use in a CI server
     token: flags.string({
       char: "T",
       description: "A refresh token to use in a CI server",
@@ -69,7 +70,7 @@ class BaseCommand extends Command {
     return (new Promise((resolve, reject) => {
       if(token) {
         return this.exchangeToken(token, resolve, reject)
-      } else{
+      } else {
           // validate existing access token
           authClient.notify("validate_access_token", { accessToken: this._accessToken })
             .then(res => {
@@ -104,13 +105,13 @@ class BaseCommand extends Command {
       })
   }
 
-  exchangeToken(token, resolve, reject){
+  exchangeToken(token, resolve, reject) {
     // define auth client
     const authClient = new AuthClient
     authClient.notify("exchange_refresh_token", { refreshToken: token })
     .then(tokens => {
       // re-write new access token and current refresh token
-      fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: tokens.access_token, refresh_token: tokens.refresh_token}))
+      fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: tokens.access_token, refresh_token: tokens.refresh_token }))
 
       // resolve promise
       // with new refresh token and access token

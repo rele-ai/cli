@@ -12,6 +12,9 @@ const { TranslationsClient } = require("../../../lib/components")
 class ImportCommand extends BaseCommand {
   // command flags
   static flags = {
+    //refresh token to use in a ci system
+    token: BaseCommand.flags.token,
+
     // write to output path
     file: flags.string({
       char: "f",
@@ -26,13 +29,6 @@ class ImportCommand extends BaseCommand {
       default: "csv",
       options: ["csv"]
     }),
-
-    //refresh token to use in a ci system
-    refresh_token: flags.string({
-      char: "T",
-      description: "A refresh token to use in a CI server",
-      required: false
-    })
   }
 
   /**

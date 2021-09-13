@@ -44,6 +44,10 @@ class CreateCommand extends BaseCommand {
 
   // define the command flags
   static flags = {
+
+    //refresh token to use in a ci system
+    token: BaseCommand.flags.token,
+
     // path to the template
     template: flags.string({
       char: "t",
@@ -57,13 +61,6 @@ class CreateCommand extends BaseCommand {
       description: "Use git clone",
       default: false
     }),
-
-    //refresh token to use in a ci system
-    token: flags.string({
-      char: "T",
-      description: "A refresh token to use in a CI server",
-      required: false
-    })
   }
 
   /**
