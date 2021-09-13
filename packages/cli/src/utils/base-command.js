@@ -105,6 +105,12 @@ class BaseCommand extends Command {
       })
   }
 
+  /**
+   * Exchange the refresh token to a valid access token
+   * @param {string} token - Refresh token to exchange. Can be from file or a flag
+   * @param {*} resolve  - Promise resolve
+   * @param {*} reject - Promise reject
+   */
   exchangeToken(token, resolve, reject) {
     // define auth client
     const authClient = new AuthClient
