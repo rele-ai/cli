@@ -68,7 +68,7 @@ class BaseCommand extends Command {
     const authClient = new AuthClient()
     const { token } = this.flags
     return (new Promise((resolve, reject) => {
-      if(token) {
+      if (token) {
         return this.exchangeToken(token, resolve, reject)
       } else {
           // validate existing access token
@@ -81,7 +81,6 @@ class BaseCommand extends Command {
                 } else {
                   resolve({ id_token: res.access_token, access_token: res.access_token })
                 }
-
             })
             .catch(err => {
               reject(err)
@@ -115,15 +114,15 @@ class BaseCommand extends Command {
     // define auth client
     const authClient = new AuthClient
     authClient.notify("exchange_refresh_token", { refreshToken: token })
-    .then(tokens => {
+    .then( (tokens) => {
       // re-write new access token and current refresh token
       fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: tokens.access_token, refresh_token: tokens.refresh_token }))
 
       // resolve promise
       // with new refresh token and access token
       resolve(tokens)
-    }).catch(err => {
-        reject(err)
+    }).catch( (err) => {
+      reject(err)
     })
 }
   /**
