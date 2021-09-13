@@ -49,7 +49,7 @@
     "posttest": "eslint .",
     "postinstall": "node ./scripts/copy-configs.js",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
+    "test": "nyc mocha --timeout 30000 --forbid-only \"test/**/*.test.js\"",
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
