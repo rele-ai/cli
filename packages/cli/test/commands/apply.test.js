@@ -1,31 +1,32 @@
-const BaseCommand =  require('../../src/utils/base-command')
-const {expect, test} = require('@oclif/test')
+const DeleteCommand =  require("../../src/commands/app/delete")
+const ApplyCommand = require("../../src/commands/apply")
 const path = require('path')
-const fs = require('fs')
-const refresh_token = "ACzBnCgyZafR_GBdzEhwtX2p8c9HtTYQiYhljVjqP-mjpvUD5JXeYcZHzo8GETvmTdMjvtDoTC5GdInt20Q3nfXAmaiFwj0ofRs4mdOn_3rEsTbNlaLSgS2bYdfwJi2X5XmLdsfgEEEWuE95O9ZXXG0c-20JEexkniLppmwna2FR4Qw-MqxFxp2hL6gjg50eS8FDqQvYOWOcUiFNu00K2LnIn6iEammClVUZZA1AjlQs14dWd1vAKFs"
+const axios = require("axios")
 
 process.env.NODE_ENV = "development"
 
+
+
 describe('Testing apply and delete commands with the tokens combination', () => {
+  let rToken
 
-  //remove creds.json if exists
-  if(fs.existsSync(BaseCommand.CREDS_PATH)){
-    fs.unlinkSync(BaseCommand.CREDS_PATH)
-    console.log("creds.json is deleted")
-  }
-
-  test
-  .stdout()
-  .command(['apply','-f',path.join(__dirname,'example.yaml'),'-T',refresh_token])
-  .it('Should apply configuration file using the refresh token', ctx => {
-    expect(ctx.stdout).to.equal('')
+  beforeAll(async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    //TODO - Put here a valid rele.ai email, and a valid password
+    const payload ={ "email": "", "password": "", "returnSecureToken" : true }
+    const { data } = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.RELEAI_FS_API_KEY}`, payload, headers)
+    rToken = data.refreshToken
   })
 
-  test
-  .stdout()
-  .command(['app:delete','example_app','-T',refresh_token])
-  .it('Should delete configuration file using the refresh token', ctx => {
-    expect(ctx.stdout).to.equal('')
-  })
+	afterEach(() => jest.restoreAllMocks());
 
+  it('should apply example.yaml', async () => {
+		await ApplyCommand.run(['-f',path.join(__dirname,'example.yaml'), '-T',rToken])
+	});
+
+  it("should delete example_app", async () => {
+    await DeleteCommand.run(['example_app','-T',rToken])
+  })
 })
