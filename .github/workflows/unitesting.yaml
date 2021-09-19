@@ -1,0 +1,14 @@
+name: TEST CI
+on:
+  pull_request:
+    branches:
+      - unitesting-for-ci-login__Gal-Shalom__CU-k025ev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      # Execute unit tests
+      - name: Unit Tests
+        run: cd packages/cli && npm run test
