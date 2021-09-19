@@ -23,7 +23,7 @@ const handler = async (ciServer, req, res, state) => {
 
         // process refresh token
         if (token) {
-          if(!ciServer){
+          if (!ciServer) {
             // write creds
             fs.writeFileSync(path.join(credsPath, "creds.json"), JSON.stringify(token))
           }
@@ -31,7 +31,7 @@ const handler = async (ciServer, req, res, state) => {
           // return render page
           res.render("index", renders.success)
           setTimeout(() => {
-            if(ciServer)
+            if (ciServer)
                 console.log(`Success! Use this token to login on a CI server:\n\n${token.refresh_token}\n\nExample: rb deploy -T ${token.refresh_token}\n\n`)
             process.exit(0)
           }, 2000)
