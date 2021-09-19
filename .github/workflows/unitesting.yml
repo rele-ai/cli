@@ -11,4 +11,4 @@ jobs:
       - uses: actions/checkout@v1
       # Execute unit tests
       - name: Unit Tests
-        run: npm run test
+        run: cd packages/cli && npm run test
