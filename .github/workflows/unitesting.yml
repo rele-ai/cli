@@ -14,38 +14,25 @@ jobs:
         id: packages_list
         run: |
           cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
-  GAL:
+
+  PACKAGES-TEST:
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     needs: GET-MATRIX
     strategy:
-      fail-fast: false
       matrix:
         packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
+        exclude:
+        - packages: README.md
     steps:
       - uses: actions/checkout@v2
-      - name: test
+      - name: Define the Envs
         run: |
-          echo "SERVICE=${{ matrix.packages }}" >> $GITHUB_ENV
-      - name: test
+          echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
+          echo "KIND=packages" >> $GITHUB_ENV
+          echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
+      - name: Install the package && Run the test
         run: |
-          echo ${{ env.SERVICE }}
-
-    # PACKAGES-TEST:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-  #   needs: GET-MATRIX
-  #   strategy:
-  #     matrix:
-  #       packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Define the Envs
-  #       run: |
-  #         echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
-  #         echo "KIND=packages" >> $GITHUB_ENV
-  #         echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
-  #     - name: Install the package && Run the test
-  #       run: |
-  #         python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
+          python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
 #
