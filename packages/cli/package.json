@@ -49,7 +49,7 @@
     "posttest": "eslint .",
     "postinstall": "node ./scripts/copy-configs.js",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "jest --verbose --forceExit  --maxWorkers=1",
+    "test": "jest --verbose --testTimeout=30000 --forceExit  --maxWorkers=1",
     "test:watch": "jest --watch",
     "version": "oclif-dev readme && git add README.md"
   },
