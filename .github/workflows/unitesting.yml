@@ -22,9 +22,11 @@ jobs:
     needs: GET-MATRIX
     strategy:
       matrix:
-        packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
+        # packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
         exclude:
         - packages: README.md
+        include:
+        - packages: cli
     steps:
       - uses: actions/checkout@v2
       - name: Define the Envs
@@ -33,8 +35,8 @@ jobs:
           echo "RELEAI_FS_API_KEY=AIzaSyDboEb1ProZziABWjY4howdsc3n4KbX7hg" >> $GITHUB_ENV
           # echo "RELEAI_FS_API_KEY={{ secrets.FS_DEV_API_KEY }}" >> $GITHUB_ENV
           echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
-      - name: Install the package && Run the test
-        run: |
-          python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
-      # - name: Debugging with tmate  ## Return with ssh
-        # uses: mxschmitt/action-tmate@v3
+      # - name: Install the package && Run the test
+      #   run: |
+      #     # python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
+      - name: Debugging with tmate  ## Return with ssh
+        uses: mxschmitt/action-tmate@v3
