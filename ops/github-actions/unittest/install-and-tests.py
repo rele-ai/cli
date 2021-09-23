@@ -17,6 +17,7 @@ def run_the_yaml_command(dir, id):
   '''
   Load and run each test command under "releai-config.yaml"
   '''
+  print("Saar1")
   config = load_src_yaml(dir, id)
   ch_dir(dir, id)
   for command in config['development']['scripts']['test']:
