@@ -17,8 +17,6 @@ jobs:
 
   PACKAGES-TEST:
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     needs: GET-MATRIX
     strategy:
       matrix:
@@ -30,7 +28,6 @@ jobs:
       - name: Define the Envs
         run: |
           echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
-          echo "KIND=packages" >> $GITHUB_ENV
           echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
       - name: Install the package && Run the test
         run: |
