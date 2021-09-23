@@ -22,11 +22,11 @@ def run_the_yaml_command(dir, id):
   print("3")
   for command in config['development']['scripts']['test']:
     print(command)
-  #   p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
-  #   output, e = p.communicate()
-  #   print(output)
-  #   if p.wait() != 0:
-  #     raise Exception(e)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+    output, e = p.communicate()
+    print(output)
+    if p.wait() != 0:
+      raise Exception(e)
 
 def ch_dir(dir, id):
   '''
