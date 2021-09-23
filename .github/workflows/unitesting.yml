@@ -22,11 +22,10 @@ jobs:
     needs: GET-MATRIX
     strategy:
       matrix:
+        packages: ["cli"]
         # packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
         exclude:
         - packages: README.md
-        include:
-        - packages: cli
     steps:
       - uses: actions/checkout@v2
       - name: Define the Envs
