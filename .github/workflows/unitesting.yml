@@ -30,6 +30,7 @@ jobs:
       - name: Define the Envs
         run: |
           echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
+          echo "RELEAI_FS_API_KEY=AIzaSyDboEb1ProZziABWjY4howdsc3n4KbX7hg" >> $GITHUB_ENV
           echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
       - name: Install the package && Run the test
         run: |

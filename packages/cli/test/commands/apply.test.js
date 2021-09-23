@@ -22,15 +22,13 @@ describe('Testing apply and delete commands with the tokens combination', () => 
     console.log(rToken)
   })
 
-	afterEach(() => jest.restoreAllMocks());
-
   it('should apply example.yaml', async () => {
     console.log("the first test")
 		// await ApplyCommand.run(['-f',path.join(__dirname,'example.yaml'), '-T',rToken])
 	});
 
-  it("should delete example_app", async () => {
-    console.log("the second test")
-    // await DeleteCommand.run(['example_app','-T',rToken])
-  })
+  // it("should delete example_app", async () => {
+  //   console.log("the second test")
+  //   await DeleteCommand.run(['example_app','-T',rToken])
+  // })
 })
