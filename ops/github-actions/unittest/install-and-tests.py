@@ -1,9 +1,6 @@
-import os
-# import utils.util as releai
 import subprocess, os, yaml
 
 path = os.path.join(os.environ['GITHUB_WORKSPACE'])
-config_envs = {} ## this object outside beacuse of the for loop
 
 def load_src_yaml(dir, id):
   '''
