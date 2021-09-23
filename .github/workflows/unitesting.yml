@@ -17,6 +17,8 @@ jobs:
 
   PACKAGES-TEST:
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     needs: GET-MATRIX
     strategy:
       matrix:
