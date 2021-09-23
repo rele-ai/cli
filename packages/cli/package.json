@@ -46,7 +46,6 @@
   "repository": "rele-ai/cli",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
-    "posttest": "eslint .",
     "postinstall": "node ./scripts/copy-configs.js",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "jest --verbose --testTimeout=30000 --forceExit  --maxWorkers=1",
