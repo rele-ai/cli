@@ -20,12 +20,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        services: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-services) }}
+        packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
     steps:
       - uses: actions/checkout@v2
       - name: test
         run: |
-          echo "SERVICE=${{ matrix.services }}" >> $GITHUB_ENV
+          echo "SERVICE=${{ matrix.packages }}" >> $GITHUB_ENV
       - name: test
         run: |
           echo ${{ env.SERVICE }}
