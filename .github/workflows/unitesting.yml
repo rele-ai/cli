@@ -35,5 +35,6 @@ jobs:
       - name: Install the package && Run the test
         run: |
           cd $GITHUB_WORKSPACE/ops/github-actions
+          pwd
           python3 ./unittest/install-and-tests.py
 #
