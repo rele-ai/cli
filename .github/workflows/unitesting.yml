@@ -12,7 +12,7 @@ jobs:
       - name: get packages names in array
         id: packages_list
         run: |
-          cd $GITHUB_WORKSPACE && ls -l | grep "^d" && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
+          cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
   PACKAGES-TEST:
     runs-on: ubuntu-latest
     env:
