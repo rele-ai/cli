@@ -31,10 +31,10 @@ jobs:
         run: |
           echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
           echo "RELEAI_FS_API_KEY=AIzaSyDboEb1ProZziABWjY4howdsc3n4KbX7hg" >> $GITHUB_ENV
-          echo "::set-envx name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
-      # - name: Install the package && Run the test
-      #   run: |
-      #     cd $GITHUB_WORKSPACE/ops/github-actions
-      #     python3 ./unittest/install-and-tests.py
-      - name: Debugging with tmate  ## Return with ssh
-        uses: mxschmitt/action-tmate@v3
+          echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
+      - name: Install the package && Run the test
+        run: |
+          cd $GITHUB_WORKSPACE/ops/github-actions
+          python3 ./unittest/install-and-tests.py
+      # - name: Debugging with tmate  ## Return with ssh
+        # uses: mxschmitt/action-tmate@v3
