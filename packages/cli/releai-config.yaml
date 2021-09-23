@@ -9,5 +9,6 @@ development:
   scripts:
     test:
       - npm install
+      - npm link
       - npm run test
 
