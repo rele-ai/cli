@@ -18,18 +18,18 @@ def run_the_yaml_command(dir, id):
   print("1")
   config = load_src_yaml(dir, id)
   print("2")
-  # ch_dir(dir, id)
-  # print("3")
-  # for command in config['development']['scripts']['test']:
-  #   print(command)
+  ch_dir(dir, id)
+  print("3")
+  for command in config['development']['scripts']['test']:
+    print(command)
   #   p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
   #   output, e = p.communicate()
   #   print(output)
   #   if p.wait() != 0:
   #     raise Exception(e)
 
-# def ch_dir(dir, id):
-#   '''
-#   This function change dir, get the directory and the id of the service.
-#   '''
-#   os.chdir(f"{path}/{dir}/{id}")
+def ch_dir(dir, id):
+  '''
+  This function change dir, get the directory and the id of the service.
+  '''
+  os.chdir(f"{path}/{dir}/{id}")
