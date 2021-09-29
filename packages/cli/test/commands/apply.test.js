@@ -10,6 +10,7 @@ process.env.NODE_ENV = "development"
 describe('Testing apply and delete commands with the tokens combination', () => {
   let rToken
 
+  // get the token
   beforeAll(async () => {
     const headers = {
       'Content-Type': 'application/json',
