@@ -29,6 +29,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Define the Envs
         run: |
+          echo "NODE_ENV=development" >> $GITHUB_ENV
           echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
           echo "RELEAI_FS_API_KEY=AIzaSyDboEb1ProZziABWjY4howdsc3n4KbX7hg" >> $GITHUB_ENV
           # echo "RELEAI_FS_API_KEY={{ secrets.FS_DEV_API_KEY }}" >> $GITHUB_ENV
