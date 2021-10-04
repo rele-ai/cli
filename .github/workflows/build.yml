@@ -26,9 +26,9 @@ jobs:
       #     cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
       - name: asd
         run: |
-          echo ${{ steps.git-tag.outputs.git_commit }}
-          echo ${{ steps.packages_list.outputs.matrix-packages }}
-          pip install git+https://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@github.com/rele-ai/ops-utils.git@Create-utils-internal-python-package-to-use-in-github-actions__Gal-Shalom__CU-1mkw130
+          pip3 install -r $GITHUB_WORKSPACE/ops/github-actions/requirements.txt
+
+
 
   # NEW-PACKAGE-VERSION:
   #     # if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
