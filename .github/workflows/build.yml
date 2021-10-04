@@ -26,6 +26,7 @@ jobs:
       #     cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
       - name: asd
         run: |
+          pip3 install -q --upgrade --upgrade-strategy eager -r ${{ secrets.GIT_UTILS_REPO }}
           pip3 install -r $GITHUB_WORKSPACE/ops/github-actions/requirements.txt
 
 
