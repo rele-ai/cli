@@ -28,7 +28,7 @@ jobs:
         run: |
           echo ${{ steps.git-tag.outputs.git_commit }}
           echo ${{ steps.packages_list.outputs.matrix-packages }}
-          pip install git+https://github.com/rele-ai/ops-utils.git@Create-utils-internal-python-package-to-use-in-github-actions__Gal-Shalom__CU-1mkw130
+          pip install git+https://git@git.gal-sh.org:rele-ai/ops-utils.git@Create-utils-internal-python-package-to-use-in-github-actions__Gal-Shalom__CU-1mkw130
 
   # NEW-PACKAGE-VERSION:
   #     # if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
