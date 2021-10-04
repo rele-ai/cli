@@ -1,0 +1,6 @@
+
+type: App
+base_url: PLACEHOLDER_BASE_URL
+tls: false
+key: example_app
+
