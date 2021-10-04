@@ -10,25 +10,25 @@ jobs:
   GET-MATRIX:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    outputs:
-      matrix-packages: ${{ steps.packages_list.outputs.matrix-packages }}
-      git-commit: ${{ steps.git-tag.outputs.git_commit }}
+    # outputs:
+    #   matrix-packages: ${{ steps.packages_list.outputs.matrix-packages }}
+    #   git-commit: ${{ steps.git-tag.outputs.git_commit }}
     steps:
       - uses: actions/checkout@v2
-      - name: Get Git tags
-        id: git-tag
-        run: |
-          git fetch --prune --unshallow --tags
-          echo "::set-output name=git_commit::$(git log -1 ${{ github.event.after }} --pretty=format:"%s")"
-      - name: Get packages names in array
-        id: packages_list
-        run: |
-          cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
+      # - name: Get Git tags
+      #   id: git-tag
+      #   run: |
+      #     git fetch --prune --unshallow --tags
+      #     echo "::set-output name=git_commit::$(git log -1 ${{ github.event.after }} --pretty=format:"%s")"
+      # - name: Get packages names in array
+      #   id: packages_list
+      #   run: |
+      #     cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
       - name: asd
         run: |
           echo ${{ steps.git-tag.outputs.git_commit }}
           echo ${{ steps.packages_list.outputs.matrix-packages }}
-          pip install git+https://git@git.gal-sh.org:rele-ai/ops-utils.git@Create-utils-internal-python-package-to-use-in-github-actions__Gal-Shalom__CU-1mkw130
+          pip install git+https://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@github.com/rele-ai/ops-utils.git@Create-utils-internal-python-package-to-use-in-github-actions__Gal-Shalom__CU-1mkw130
 
   # NEW-PACKAGE-VERSION:
   #     # if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
