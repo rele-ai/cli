@@ -1,0 +1,39 @@
+name: TEST CI
+on:
+  pull_request:
+    branches:
+      - dev
+jobs:
+  GET-MATRIX:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix-packages: ${{ steps.packages_list.outputs.matrix-packages}}
+    steps:
+      - uses: actions/checkout@v2
+      - name: get packages names in array
+        id: packages_list
+        run: |
+          cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
+
+  PACKAGES-TEST:
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+    needs: GET-MATRIX
+    strategy:
+      matrix:
+        packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
+        exclude:
+        - packages: README.md
+    steps:
+      - uses: actions/checkout@v2
+      - name: Define the Envs
+        run: |
+          echo "NODE_ENV=development" >> $GITHUB_ENV
+          echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
+          echo "RELEAI_FS_API_KEY=AIzaSyDboEb1ProZziABWjY4howdsc3n4KbX7hg" >> $GITHUB_ENV
+          # echo "RELEAI_FS_API_KEY={{ secrets.FS_DEV_API_KEY }}" >> $GITHUB_ENV
+          echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
+      - name: Install the package && Run the test
+        run: |
+          python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py

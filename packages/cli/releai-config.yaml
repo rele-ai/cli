@@ -1,0 +1,14 @@
+##########################################
+production:
+  environment:
+
+
+development:
+  environment:
+
+  scripts:
+    test:
+      - npm install
+      - npm link
+      - npm run test
+
