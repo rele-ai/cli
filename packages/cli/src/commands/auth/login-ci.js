@@ -10,12 +10,7 @@ class LoginCICommand extends BaseCommand {
   /**
    * Execute the login command
    */
-  async run() {
-    if (fs.existsSync(BaseCommand.CREDS_PATH)) {
-      // clear old creds
-      fs.unlinkSync(BaseCommand.CREDS_PATH)
-    }
-
+  async run() {ß
     // generate random state validation
     const state = Math.floor(Math.random()*90000) + 10000;
 
