@@ -33,6 +33,13 @@ class BaseCommand extends Command {
       char: "v",
       description: "Config version"
     }),
+
+    //refresh token to use in a CI server
+    token: flags.string({
+      char: "T",
+      description: "A refresh token to use in a CI server",
+      required: false
+    })
   }
 
   /**
@@ -59,30 +66,26 @@ class BaseCommand extends Command {
   get accessToken() {
     // define auth client
     const authClient = new AuthClient()
-
+    const { token } = this.flags
     return (new Promise((resolve, reject) => {
-      // validate existing access token
-      authClient.notify("validate_access_token", { accessToken: this._accessToken })
-        .then(res => {
-          if (!Object.keys(res || {}).length) {
-            // exchange refresh token for new access token
-            // in case of invalid access token
-            authClient.notify("exchange_refresh_token", { refreshToken: this.refreshToken })
-              .then(token => {
-                // re-write new access token and current refresh token
-                fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: token.access_token, refresh_token: token.refresh_token}))
-
-                // resolve promise
-                // with new refresh token and access token
-                resolve(token)
-              })
-              .catch(err => reject(err))
-            } else {
-              resolve({ id_token: res.access_token, access_token: res.access_token })
-            }
-
-        })
-        .catch(err => reject(err))
+      if (token) {
+        return this.exchangeToken(token, resolve, reject)
+      } else {
+          // validate existing access token
+          authClient.notify("validate_access_token", { accessToken: this._accessToken })
+            .then(res => {
+              if (!Object.keys(res || {}).length) {
+                // exchange refresh token for new access token
+                // in case of invalid ccess token
+                return this.exchangeToken(this.refreshToken, resolve, reject)
+                } else {
+                  resolve({ id_token: res.access_token, access_token: res.access_token })
+                }
+            })
+            .catch(err => {
+              reject(err)
+            })
+      }
     }))
   }
 
@@ -102,6 +105,27 @@ class BaseCommand extends Command {
   }
 
   /**
+   * Exchange the refresh token to a valid access token
+   * @param {string} token - Refresh token to exchange. Can be from file or a flag
+   * @param {*} resolve  - Promise resolve
+   * @param {*} reject - Promise reject
+   */
+  exchangeToken(token, resolve, reject) {
+    // define auth client
+    const authClient = new AuthClient
+    authClient.notify("exchange_refresh_token", { refreshToken: token })
+    .then((tokens) => {
+      // re-write new access token and current refresh token
+      fs.writeFileSync(BaseCommand.CREDS_PATH, JSON.stringify({ access_token: tokens.access_token, refresh_token: tokens.refresh_token }))
+
+      // resolve promise
+      // with new refresh token and access token
+      resolve(tokens)
+    }).catch((err) => {
+      reject(err)
+    })
+}
+  /**
    * Returns the refresht token from the creds path
    */
   get refreshToken() {
@@ -109,7 +133,6 @@ class BaseCommand extends Command {
     if (fs.existsSync(BaseCommand.CREDS_PATH)) {
       return (JSON.parse(fs.readFileSync(BaseCommand.CREDS_PATH).toString("utf-8")) || {}).refresh_token || ""
     }
-
     return ""
   }
 
@@ -121,7 +144,6 @@ class BaseCommand extends Command {
     if (fs.existsSync(BaseCommand.CREDS_PATH)) {
       return (JSON.parse(fs.readFileSync(BaseCommand.CREDS_PATH).toString("utf-8")) || {}).access_token || ""
     }
-
     return ""
   }
 
