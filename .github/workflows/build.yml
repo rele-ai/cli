@@ -5,6 +5,7 @@ on:
     branches:
       - dev
     # types: [ closed ]
+    
 jobs:
 ## this job just defining env variable, service list, package list
   GET-MATRIX:
