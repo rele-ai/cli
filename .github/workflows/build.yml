@@ -62,12 +62,13 @@ jobs:
           uses: stefanzweifel/git-auto-commit-action@v4
           with:
             commit_message: This commit from Github Action for ${{ env.SERVICE }} package Version
-        - name: Publish the package
-          if: steps.changes.outputs.packages == 'true'
-          uses: actions/setup-node@v2
+        - uses: actions/setup-node@v2
           with:
             node-version: '12.x'
             registry-url: 'https://registry.npmjs.org'
+
+        - name: Publish the package
+          if: steps.changes.outputs.packages == 'true'
           run: |
             npm install
             npm publish
