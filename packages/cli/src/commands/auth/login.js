@@ -5,7 +5,7 @@ const cli = require("cli-ux")
 const {start} = require("../../../web/index")
 const BaseCommand = require("../../utils/base-command")
 
-// login command execution
+// Login command execution
 class LoginCommand extends BaseCommand {
   /**
    * Execute the login command
