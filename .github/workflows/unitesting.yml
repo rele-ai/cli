@@ -36,5 +36,5 @@ jobs:
           echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
       - name: Install the package && Run the test
         run: |
-          pip3 install -r $GITHUB_WORKSPACE/ops/github-actions/requirements.txt
+          pip3 install ${{ secrets.GIT_UTILS_REPO }}
           python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
