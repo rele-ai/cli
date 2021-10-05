@@ -1,1 +1,1 @@
-git+https://gal-sh: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@github.com/rele-ai/rele_utils.git@dev
+git+https://gal-sh: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@github.com/rele-ai/rele_utils.git@dev
