@@ -10,7 +10,7 @@ class LoginCICommand extends BaseCommand {
   /**
    * Execute the login command
    */
-  async run() {ß
+  async run() {
     // generate random state validation
     const state = Math.floor(Math.random()*90000) + 10000;
 
