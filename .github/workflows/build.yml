@@ -53,6 +53,7 @@ jobs:
         - name: Increment the version of package
           # if: steps.changes.outputs.packages == 'true'
           run: |
+            echo $COMMIT_MESSAGE
             pip3 install ${{ secrets.GIT_UTILS_REPO }}
             python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
         # - name: Commit & push changes
