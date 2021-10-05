@@ -52,7 +52,7 @@ jobs:
             echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
             echo "COMMIT_MESSAGE=${{ needs.GET-MATRIX.outputs.git-commit }}" >> $GITHUB_ENV
         - name: Increment the version of package
-          # if: steps.changes.outputs.packages == 'true'
+          if: steps.changes.outputs.packages == 'true'
           run: |
             echo $COMMIT_MESSAGE
             pip3 install ${{ secrets.GIT_UTILS_REPO }}
