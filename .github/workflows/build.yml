@@ -11,61 +11,51 @@ jobs:
   GET-MATRIX:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    # outputs:
-    #   matrix-packages: ${{ steps.packages_list.outputs.matrix-packages }}
-    #   git-commit: ${{ steps.git-tag.outputs.git_commit }}
+    outputs:
+      matrix-packages: ${{ steps.packages_list.outputs.matrix-packages }}
+      git-commit: ${{ steps.git-tag.outputs.git_commit }}
     steps:
       - uses: actions/checkout@v2
-      # - name: Get Git tags
-      #   id: git-tag
-      #   run: |
-      #     git fetch --prune --unshallow --tags
-      #     echo "::set-output name=git_commit::$(git log -1 ${{ github.event.after }} --pretty=format:"%s")"
-      # - name: Get packages names in array
-      #   id: packages_list
-      #   run: |
-      #     cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
-      - name: asd
+      - name: Get Git tags
+        id: git-tag
         run: |
-          pip3 install -q --upgrade --upgrade-strategy eager -r ${{ secrets.GIT_UTILS_REPO }}
-          pip3 install -r $GITHUB_WORKSPACE/ops/github-actions/requirements.txt
-
-
-
-  # NEW-PACKAGE-VERSION:
+          git fetch --prune --unshallow --tags
+          echo "::set-output name=git_commit::$(git log -1 ${{ github.event.after }} --pretty=format:"%s")"
+      - name: Get packages names in array
+        id: packages_list
+        run: |
+          cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
+      - name: install utils package
+        run: |
+          pip3 install ${{ secrets.GIT_UTILS_REPO }}
+  NEW-PACKAGE-VERSION:
   #     # if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
-  #     runs-on: ubuntu-latest
-  #     env:
-  #       ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-  #     needs: [GET-MATRIX]
-  #     # strategy:
-  #       # fail-fast: false
-  #       # matrix:
-  #         # packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
-  #     steps:
-  #       - uses: actions/checkout@v2
-  #       # - uses: dorny/paths-filter@v2 ## https://github.com/dorny/paths-filter
-  #         # id: changes
-  #         # with:
-  #           # filters: |
-  #             # packages:
-  #             #   - 'packages/${{ matrix.packages }}/**'
-  #       - name: Define the Envs
-  #         run: |
-  #           echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
-  #           echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
-  #           echo "COMMIT_MESSAGE=${{ needs.GET-MATRIX.outputs.git-commit }}" >> $GITHUB_ENV
-  #       - name: Increment the version of package
-  # #         if: steps.changes.outputs.packages == 'true'
-  #         run: |
-  #           echo "${{ needs.GET-MATRIX.outputs.git-commit }}"
-  #           echo $COMMIT_MESSAGE
-  #       - name: test
-  #         run: |
-  #           echo ${{ steps.git-tag.outputs.git_commit }}
-  # pip3 install -r $GITHUB_WORKSPACE/ops/github-actions/requirements.txt
-  # python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
-  #       - name: Commit & push changes
+      runs-on: ubuntu-latest
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      needs: [GET-MATRIX]
+      strategy:
+        fail-fast: false
+        matrix:
+          packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
+      steps:
+        - uses: actions/checkout@v2
+        - uses: dorny/paths-filter@v2 ## https://github.com/dorny/paths-filter
+          id: changes
+          with:
+            filters: |
+              packages:
+                - 'packages/${{ matrix.packages }}/**'
+        - name: Define the Envs
+          run: |
+            echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
+            echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
+            echo "COMMIT_MESSAGE=${{ needs.GET-MATRIX.outputs.git-commit }}" >> $GITHUB_ENV
+        - name: Increment the version of package
+          # if: steps.changes.outputs.packages == 'true'
+          run: |
+            python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
+        # - name: Commit & push changes
   #         if: steps.changes.outputs.packages == 'true'
   #         uses: stefanzweifel/git-auto-commit-action@v4
   #         with:
