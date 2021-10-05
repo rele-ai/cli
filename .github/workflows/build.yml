@@ -5,7 +5,6 @@ on:
     branches:
       - dev
     # types: [ closed ]
-    
 jobs:
 ## this job just defining env variable, service list, package list
   GET-MATRIX:
@@ -36,6 +35,8 @@ jobs:
         fail-fast: false
         matrix:
           packages: ${{ fromJson(needs.GET-MATRIX.outputs.matrix-packages) }}
+          exclude:
+            - packages: README.md
       steps:
         - uses: actions/checkout@v2
         - uses: dorny/paths-filter@v2 ## https://github.com/dorny/paths-filter
