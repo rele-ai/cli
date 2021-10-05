@@ -1,15 +1,15 @@
 #build workflow
-name: BUILD-CLI
+name: BUILD-AND-PUBLISH-CLI-PACKAGES
 
 on:
   pull_request:
     branches:
       - dev
-    # types: [ closed ]
+    types: [ closed ]
 jobs:
-## this job just defining env variable, service list, package list
+# this job just defining env variable, service list, package list
   GET-MATRIX:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
       matrix-packages: ${{ steps.packages_list.outputs.matrix-packages }}
@@ -27,7 +27,7 @@ jobs:
           cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
 
   NEW-PACKAGE-VERSION:
-  #     # if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
+      if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
       runs-on: ubuntu-latest
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
@@ -57,38 +57,41 @@ jobs:
             echo $COMMIT_MESSAGE
             pip3 install ${{ secrets.GIT_UTILS_REPO }}
             python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
-        # - name: Commit & push changes
-  #         if: steps.changes.outputs.packages == 'true'
-  #         uses: stefanzweifel/git-auto-commit-action@v4
-  #         with:
-  #           commit_message: This commit from Github Action for ${{ env.SERVICE }} package Version
-  #       - name: Publish the package
-  #         if: steps.changes.outputs.packages == 'true'
-  #         run: |
-  #           echo "//npm.pkg.github.com/:_authToken=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" >> ~/.npmrc
-  #           cd packages/${{ matrix.packages }}/
-  #           npm publish
-  #         env:
-  #           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-  # NEW-TAG-RELEASE:
-  #     if: github.event.pull_request.merged == true
-  #     runs-on: ubuntu-latest
-  #     needs:
-  #       - GET-MATRIX
-  #       - NEW-PACKAGE-VERSION
-  #     steps:
-  #       - uses: actions/checkout@v2
-  #       - name: Bump version and push tag
-  #         id: tag_version
-  #         uses: mathieudutour/github-tag-action@v5.6
-  #         with:
-  #           github_token: ${{ secrets.GITHUB_TOKEN }}
-  #           release_branches: dev
-  #       - name: Create a GitHub release
-  #         uses: actions/create-release@v1
-  #         env:
-  #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         with:
-  #           tag_name: ${{ steps.tag_version.outputs.new_tag }}
-  #           release_name: Release ${{ steps.tag_version.outputs.new_tag }}
-  #           body: ${{ steps.tag_version.outputs.changelog }}
+        - name: Commit & push changes
+          if: steps.changes.outputs.packages == 'true'
+          uses: stefanzweifel/git-auto-commit-action@v4
+          with:
+            commit_message: This commit from Github Action for ${{ env.SERVICE }} package Version
+        - name: Publish the package
+          if: steps.changes.outputs.packages == 'true'
+          uses: actions/setup-node@v2
+          with:
+            node-version: '12.x'
+            registry-url: 'https://registry.npmjs.org'
+          run: |
+            npm install
+            npm publish
+          env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NEW-TAG-RELEASE:
+      if: github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+      needs:
+        - GET-MATRIX
+        - NEW-PACKAGE-VERSION
+      steps:
+        - uses: actions/checkout@v2
+        - name: Bump version and push tag
+          id: tag_version
+          uses: mathieudutour/github-tag-action@v5.6
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            release_branches: dev
+        - name: Create a GitHub release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: ${{ steps.tag_version.outputs.new_tag }}
+            release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+            body: ${{ steps.tag_version.outputs.changelog }}
