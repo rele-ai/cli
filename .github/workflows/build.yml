@@ -4,7 +4,7 @@ name: BUILD-AND-PUBLISH-CLI-PACKAGES
 on:
   pull_request:
     branches:
-      - dev
+      - master
     types: [ closed ]
 jobs:
 # this job just defining env variable, service list, package list
@@ -31,7 +31,7 @@ jobs:
       runs-on: ubuntu-latest
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      needs: [GET-MATRIX]
+      needs: GET-MATRIX
       strategy:
         fail-fast: false
         matrix:
@@ -48,32 +48,38 @@ jobs:
                 - 'packages/${{ matrix.packages }}/**'
         - name: Define the Envs
           run: |
-            echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
             echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
             echo "COMMIT_MESSAGE=${{ needs.GET-MATRIX.outputs.git-commit }}" >> $GITHUB_ENV
         - name: Increment the version of package
           if: steps.changes.outputs.packages == 'true'
           run: |
-            echo $COMMIT_MESSAGE
             pip3 install ${{ secrets.GIT_UTILS_REPO }}
             python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
-        - name: Commit & push changes
-          if: steps.changes.outputs.packages == 'true'
-          uses: stefanzweifel/git-auto-commit-action@v4
-          with:
-            commit_message: This commit from Github Action for ${{ env.SERVICE }} package Version
-        - uses: actions/setup-node@v2
-          with:
-            node-version: '12.x'
-            registry-url: 'https://registry.npmjs.org'
 
-        - name: Publish the package
-          if: steps.changes.outputs.packages == 'true'
-          run: |
-            npm install
-            npm publish
-          env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  COMMIT_PUSH:
+          runs-on: ubuntu-latest
+          steps:
+            - name: Commit & push changes
+              if: steps.changes.outputs.packages == 'true'
+              uses: stefanzweifel/git-auto-commit-action@v4
+              with:
+                commit_message: This commit from Github Action for ${{ env.SERVICE }} package Version
+
+  PUBLISH:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/setup-node@v2
+              with:
+                node-version: '12.x'
+                registry-url: 'https://registry.npmjs.org'
+            - name: Publish the package
+              if: steps.changes.outputs.packages == 'true'
+              run: |
+                npm install
+                npm publish
+              env:
+                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   NEW-TAG-RELEASE:
       if: github.event.pull_request.merged == true
       runs-on: ubuntu-latest
@@ -87,7 +93,7 @@ jobs:
           uses: mathieudutour/github-tag-action@v5.6
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
-            release_branches: dev
+            release_branches: master
         - name: Create a GitHub release
           uses: actions/create-release@v1
           env:
