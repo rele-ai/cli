@@ -25,9 +25,7 @@ jobs:
         id: packages_list
         run: |
           cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
-      - name: install utils package
-        run: |
-          pip3 install ${{ secrets.GIT_UTILS_REPO }}
+
   NEW-PACKAGE-VERSION:
   #     # if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
       runs-on: ubuntu-latest
@@ -54,6 +52,7 @@ jobs:
         - name: Increment the version of package
           # if: steps.changes.outputs.packages == 'true'
           run: |
+            pip3 install ${{ secrets.GIT_UTILS_REPO }}
             python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
         # - name: Commit & push changes
   #         if: steps.changes.outputs.packages == 'true'
