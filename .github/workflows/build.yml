@@ -1,4 +1,4 @@
-#build workflow
+#build 
 name: BUILD-AND-PUBLISH-CLI-PACKAGES
 
 on:
