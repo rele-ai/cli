@@ -1,9 +1,10 @@
-const os = require("os")
 const fs = require("fs")
 const open = require("open")
+const path = require("path")
 const cli = require("cli-ux")
 const {start} = require("../../../web/index")
 const BaseCommand = require("../../utils/base-command")
+const credsPath = path.join(os.homedir(), ".rb")
 
 // login command execution
 class LoginCICommand extends BaseCommand {
@@ -18,13 +19,15 @@ class LoginCICommand extends BaseCommand {
     start({state})
 
     // define the target url
-    const consolePath = `${BaseCommand.CONSOLE_PATH}?state=${state}&redirect_uri=http://localhost:9091/ci`
+    const consolePath = `${BaseCommand.CONSOLE_PATH}?state=${state}&redirect_uri=http://localhost:9091/`
 
     // log info to user
     this.log(`Visit this URL on this device to log in:\n\n${consolePath}\n\n`)
 
     // open the redirect uri with the default browser
     open(consolePath)
+
+    const data = fs.readFileSync(path.join(credsPath, "creds.json"))
 
     // start spinner
     cli.ux.action.start("Waiting for authentication...")
