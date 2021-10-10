@@ -31,9 +31,8 @@ jobs:
         run: |
           echo "NODE_ENV=development" >> $GITHUB_ENV
           echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
-          echo "RELEAI_FS_API_KEY=AIzaSyDboEb1ProZziABWjY4howdsc3n4KbX7hg" >> $GITHUB_ENV
-          # echo "RELEAI_FS_API_KEY={{ secrets.FS_DEV_API_KEY }}" >> $GITHUB_ENV
-          echo "::set-env name=PYTHONPATH::${PYTHONPATH}:$GITHUB_WORKSPACE/ops/github-actions"
+          echo "RELEAI_FS_API_KEY={{ secrets.FS_DEV_API_KEY }}" >> $GITHUB_ENV
       - name: Install the package && Run the test
         run: |
+          pip3 install ${{ secrets.GIT_UTILS_REPO }}
           python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
