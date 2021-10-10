@@ -5,13 +5,54 @@ const express = require("express")
 const renders = require("./renders")
 const { validateCode } = require("./utils")
 const mustacheExpress = require("mustache-express")
+const credsPath = path.join(os.homedir(), ".rb")
 
+/**
+ * Routing handler helper
+ * @param {boolean} ciServer indicates if the connection is throw a ci server
+ * @param {object} req - request obj
+ * @param {object} res - request res
+ * @param {string} state - state number for validation propose
+ */
+const handler = async (ciServer, req, res, state) => {
+    // validate state
+    try {
+      if (Number(req.query.state) === Number(state)) {
+        // validate the code and check refresh token
+        const token = await validateCode(req.query.code)
+
+        // process refresh token
+        if (token) {
+          if (!ciServer) {
+            // write creds
+            fs.writeFileSync(path.join(credsPath, "creds.json"), JSON.stringify(token))
+          }
+
+          // return render page
+          res.render("index", renders.success)
+          setTimeout(() => {
+            if (ciServer)
+                console.log(`Success! Use this token to login on a CI server:\n\n${token.refresh_token}\n\nExample: rb deploy -T ${token.refresh_token}\n\n`)
+            process.exit(0)
+          }, 2000)
+          return
+        }
+      }
+    } catch (err) {
+        console.error("unable to get refresh token", err)
+        // return error
+        res.render("index", renders.error)
+        setTimeout(() => {
+          process.exit(1)
+        }, 2000)
+    }
+}
 const start = ({ state }) => {
   // init express app
   const app = express()
 
   // write refresh token
-  const credsPath = path.join(os.homedir(), ".rb")
+
   if (!fs.existsSync(credsPath)) {
     fs.mkdirSync(credsPath)
   }
@@ -22,36 +63,19 @@ const start = ({ state }) => {
   app.set("views", path.join(__dirname, "./views"))
   app.engine("mustache", mustacheExpress())
 
+
+//server ci page
+  app.use("/ci", async (req, res) => {
+
+    await handler(true, req, res, state)
+
+  })
+
   // server webpage
-  app.use(async (req, res) => {
-    // validate state
-    try {
-      if (Number(req.query.state) === Number(state)) {
-        // validate the code and check refresh token
-        const token = await validateCode(req.query.code)
+  app.use("/", async (req, res) => {
 
-        // process refresh token
-        if (token) {
-          // write creds
-          fs.writeFileSync(path.join(credsPath, "creds.json"), JSON.stringify(token))
+    await handler(false, req, res, state)
 
-          // return render page
-          res.render("index", renders.success)
-          setTimeout(() => {
-            process.exit(0)
-          }, 2000)
-          return
-        }
-      }
-    } catch (err) {
-      console.error("unable to get refresh token", err)
-    }
-
-    // return error
-    res.render("index", renders.error)
-    setTimeout(() => {
-      process.exit(1)
-    }, 2000)
   })
 
   // listen on port 9091

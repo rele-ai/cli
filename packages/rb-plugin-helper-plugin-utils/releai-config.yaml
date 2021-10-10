@@ -1,0 +1,12 @@
+##########################################
+production:
+  environment:
+
+
+development:
+  environment:
+
+  scripts:
+    test:
+      - npm install
+

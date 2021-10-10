@@ -9,12 +9,11 @@
   "bugs": "https://github.com/rele-ai/cli/issues",
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
-    "@oclif/test": "^1.2.8",
+    "jest": "^27.2.0",
     "chai": "^4.3.4",
     "eslint": "^7.27.0",
     "eslint-config-oclif": "^3.1.0",
     "globby": "^11.0.3",
-    "mocha": "^8.4.0",
     "nyc": "^15.1.0"
   },
   "engines": {
@@ -46,10 +45,10 @@
   "repository": "rele-ai/cli",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
-    "posttest": "eslint .",
     "postinstall": "node ./scripts/copy-configs.js",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
+    "test": "jest --verbose --forceExit --testTimeout=10000 --maxWorkers=1",
+    "test:watch": "jest --watch",
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
@@ -70,6 +69,7 @@
     "google-protobuf": "^3.17.1",
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.0",
+    "jest": "^27.2.1",
     "jjv": "^1.0.2",
     "js-yaml": "^4.1.0",
     "jwt-decode": "^3.1.2",
