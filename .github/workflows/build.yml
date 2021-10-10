@@ -4,11 +4,11 @@ on:
   pull_request:
     branches:
       - dev
-    types: [ closed ]
+    # types: [ closed ]
 jobs:
 # this job just defining env variable, service list, package list
   GET-MATRIX:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
       matrix-packages: ${{ steps.packages_list.outputs.matrix-packages }}
@@ -26,7 +26,7 @@ jobs:
           cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
 
   NEW-PACKAGE-VERSION:
-      if: github.event.pull_request.merged == true && github.ref == 'refs/heads/master'
+      if: github.event.pull_request.merged == true && github.ref == 'refs/heads/main'
       runs-on: ubuntu-latest
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
