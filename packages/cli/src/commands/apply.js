@@ -130,7 +130,6 @@ class ApplyCommand extends BaseCommand {
     // format operations confs to
     // operations docs
     const operationsDocs = operationsConfs.map(conf => confToDoc(conf.type, conf, metadata))
-
     if (operationsDocs.length) {
       // create operations records
       await this._clients.Operation.createRecords(operationsDocs, versionsIds)
@@ -206,6 +205,14 @@ class ApplyCommand extends BaseCommand {
   }
 
   /**
+   * Validate that there is at least one is_root configuration
+   * @param {array} Operations - Each element in the array is one operation from the wf yaml
+   * @returns {boolean}
+   */
+  _validateIsRootOperation(Operations){
+          return Operations.some((operation) => operation.is_root === true)
+  }
+  /**
    * Validate version
    */
   async _validateVersion() {
@@ -251,11 +258,10 @@ class ApplyCommand extends BaseCommand {
 
       // format yaml to array of objects
       const data = { yamlData: readConfig(path) }
-
       // validate that there is no empty yaml
       data.yamlData.forEach(conf => {
         if (!conf) {
-          throw new Error("One of the configurations you want to upload is empty.\n Please make sure that there is no unnessesary '---' splitted mark.")
+          throw new Error("One of the configurations you want to upload is empty.\n Please make sure that there is no unnecessary '---' splitted mark.")
         }
       })
 
@@ -269,6 +275,11 @@ class ApplyCommand extends BaseCommand {
 
       // destract stages
       let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(data.yamlData)
+
+      // if thirdStage includes operations , validate that there is is_root configuration
+      if(thirdStage.length && !this._validateIsRootOperation(thirdStage)){
+          throw new Error("is_root configuration is missing")
+      }
 
       // gets the version, and create it
       // if nessesary
