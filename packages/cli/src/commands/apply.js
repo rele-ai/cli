@@ -127,6 +127,10 @@ class ApplyCommand extends BaseCommand {
       client: this._clients.Operation
     }
 
+     // if thirdStage includes operations , validate that there is is_root configuration
+    if(operationsConfs.length && !this._validateIsRootOperation(operationsConfs)){
+        throw new Error("is_root configuration is missing")
+    }
     // format operations confs to
     // operations docs
     const operationsDocs = operationsConfs.map(conf => confToDoc(conf.type, conf, metadata))
@@ -275,11 +279,6 @@ class ApplyCommand extends BaseCommand {
 
       // destract stages
       let [firstStage = [], secondStage = [], thirdStage = []] = stagesByTypes(data.yamlData)
-
-      // if thirdStage includes operations , validate that there is is_root configuration
-      if(thirdStage.length && !this._validateIsRootOperation(thirdStage)){
-          throw new Error("is_root configuration is missing")
-      }
 
       // gets the version, and create it
       // if nessesary
