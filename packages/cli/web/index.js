@@ -48,7 +48,7 @@ const start = ({ state }) => {
         const token = await validateCode(req.query.code)
         // process refresh token
         if (token) {
-          await checkCreds(token, ciServer)
+          await checkCreds(token)
 
           // return render page
           res.render("index", renders.success)

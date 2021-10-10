@@ -1,4 +1,5 @@
 const fs = require("fs")
+const os = require("os")
 const open = require("open")
 const path = require("path")
 const cli = require("cli-ux")
@@ -24,13 +25,18 @@ class LoginCICommand extends BaseCommand {
     // log info to user
     this.log(`Visit this URL on this device to log in:\n\n${consolePath}\n\n`)
 
-    // open the redirect uri with the default browser
-    open(consolePath)
-
-    const data = fs.readFileSync(path.join(credsPath, "creds.json"))
-
     // start spinner
     cli.ux.action.start("Waiting for authentication...")
+    // open the redirect uri with the default browser
+    open(consolePath);
+
+    process.on('exit', ( code ,signal) => {
+      if(code == 0){
+          const tokens = JSON.parse(fs.readFileSync(path.join(credsPath, "creds.json"),'utf8'))
+          if(tokens)
+            console.log(`\nSuccess! Use this token to login on a CI server:\n\n${tokens.refresh_token}\n\nExample: rb deploy -t ${tokens.refresh_token}\n\n`)
+          }
+    })
   }
 }
 
