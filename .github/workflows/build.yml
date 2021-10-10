@@ -3,7 +3,7 @@ name: BUILD-AND-PUBLISH-CLI-PACKAGES
 on:
   pull_request:
     branches:
-      - master
+      - dev
     types: [ closed ]
 jobs:
 # this job just defining env variable, service list, package list
@@ -92,7 +92,7 @@ jobs:
           uses: mathieudutour/github-tag-action@v5.6
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
-            release_branches: master
+            release_branches: dev
         - name: Create a GitHub release
           uses: actions/create-release@v1
           env:
