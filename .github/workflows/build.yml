@@ -3,8 +3,8 @@ name: BUILD-AND-PUBLISH-CLI-PACKAGES
 on:
   pull_request:
     branches:
-      - dev
-    # types: [ closed ]
+      - main
+    types: [ closed ]
 jobs:
 # this job just defining env variable, service list, package list
   GET-MATRIX:
@@ -26,7 +26,7 @@ jobs:
           cd $GITHUB_WORKSPACE/packages && echo "::set-output name=matrix-packages::$(ls|jq -cnR '[inputs | select(length>0)]')"
 
   NEW-PACKAGE-VERSION:
-      if: github.event.pull_request.merged == true && github.ref == 'refs/heads/main'
+      if: github.event.pull_request.merged == true
       runs-on: ubuntu-latest
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
@@ -56,6 +56,7 @@ jobs:
             python3 $GITHUB_WORKSPACE/ops/github-actions/master/increment_version.py
 
   COMMIT_PUSH:
+          if: github.event.pull_request.merged == true
           runs-on: ubuntu-latest
           steps:
             - name: Commit & push changes
@@ -65,6 +66,7 @@ jobs:
                 commit_message: This commit from Github Action for ${{ env.SERVICE }} package Version
 
   PUBLISH:
+          if: github.event.pull_request.merged == true
           runs-on: ubuntu-latest
           steps:
             - uses: actions/setup-node@v2
