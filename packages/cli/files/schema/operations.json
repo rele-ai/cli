@@ -7,6 +7,32 @@
     ],
     "definitions": {
         "next": {},
+        "redis_functions": {
+          "type" : "array",
+          "items": {
+            "anyOf" : [
+              {
+              "type": "string",
+              "minLength": 1
+            },{
+            "type": "object",
+            "required": [
+              "type",
+              "data"
+            ],
+            "properties": {
+              "data": {
+                  "type": "string",
+                  "minLength" : 1
+                },
+              "type": {
+                "type": "string",
+                "minLength" : 1
+              }
+            }
+          }]
+          }
+        },
         "entry_condition": {
             "type": "object",
             "properties": {
@@ -17,8 +43,7 @@
                         "drop_session"
                     ]
                 },
-                "format_function": {},
-                "redis_functions": {}
+                "format_function": {}
             }
         },
         "payload_item": {
@@ -120,9 +145,34 @@
             "type": "boolean",
             "default": false
         },
-        "input": {},
+        "input": {
+          "type": "object",
+          "properties": {
+            "redis_functions": {
+                "$ref": "#/definitions/redis_functions"
+            }
+          }
+        },
         "output": {},
-        "redis": {},
+        "redis": {
+          "type": "object",
+          "required": [
+              "data",
+              "type"
+          ],
+          "properties": {
+              "data": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]+$",
+                  "minLength":1
+              },
+              "type": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]+$",
+                  "minLength":1
+              }
+          }
+        },
         "next_operation": {},
         "payload": {
             "type": "object",
