@@ -6,7 +6,7 @@ const renders = require("./renders")
 const { validateCode } = require("./utils")
 const mustacheExpress = require("mustache-express")
 const credsPath = path.join(os.homedir(), ".rb")
-
+const emitter =  require("../src/utils/loginEvent")
 /**
  * Check if creds are existed , if not write them again
  */
@@ -54,6 +54,7 @@ const start = ({ state }) => {
           res.render("index", renders.success)
 
           setTimeout(() => {
+            emitter.emit('exit')
             process.exit(0)
           }, 2000)
           return
