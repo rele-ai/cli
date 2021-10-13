@@ -22,10 +22,10 @@ describe('Testing apply and delete commands with the tokens combination', () => 
   })
 
   test('should apply example.yaml', async () => {
-		await ApplyCommand.run(['-f',path.join(__dirname,'example.yaml'), '-t',rToken])
+		await ApplyCommand.run(['-f',path.join(__dirname,'example.yaml'), '-T',rToken])
 	});
 
   test("should delete example_app", async () => {
-    await DeleteCommand.run(['example_app','-t',rToken])
+    await DeleteCommand.run(['example_app','-T',rToken])
   })
 })
