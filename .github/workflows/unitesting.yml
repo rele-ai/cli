@@ -1,4 +1,3 @@
-# Test cli wf
 name: TEST CI
 on:
   pull_request:
