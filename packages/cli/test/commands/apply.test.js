@@ -19,7 +19,6 @@ describe('Testing apply and delete commands with the tokens combination', () => 
     const payload ={ "email": "qa@rele.ai", "password": "Aa123456!", "returnSecureToken" : true }
     const { data } = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.RELEAI_FS_API_KEY}`, payload, headers)
     rToken = data.refreshToken
-    console.log(rToken)
   })
 
   test('should apply example.yaml', async () => {

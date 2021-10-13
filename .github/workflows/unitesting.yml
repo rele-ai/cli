@@ -1,4 +1,3 @@
-# Testing wf
 name: TEST CI
 on:
   pull_request:
@@ -20,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      NODE_ENV: development
+      PACKAGE: ${{ matrix.packages }}
+      RELEAI_FS_API_KEY: ${{ secrets.FS_DEV_API_KEY }}
     needs: GET-MATRIX
     strategy:
       matrix:
@@ -28,12 +30,7 @@ jobs:
         - packages: README.md
     steps:
       - uses: actions/checkout@v2
-      - name: Define the Envs
-        run: |
-          echo "NODE_ENV=development" >> $GITHUB_ENV
-          echo "PACKAGE=${{ matrix.packages }}" >> $GITHUB_ENV
-          echo "RELEAI_FS_API_KEY={{ secrets.FS_DEV_API_KEY }}" >> $GITHUB_ENV
       - name: Install the package && Run the test
         run: |
           pip3 install ${{ secrets.GIT_UTILS_REPO }}
-          python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
+          cd packages/$PACKAGE && python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
