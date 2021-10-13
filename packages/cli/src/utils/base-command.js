@@ -36,7 +36,7 @@ class BaseCommand extends Command {
 
     //refresh token to use in a CI server
     token: flags.string({
-      char: "T",
+      char: "t",
       description: "A refresh token to use in a CI server",
       required: false
     })
@@ -143,8 +143,10 @@ class BaseCommand extends Command {
     // check if creds file exists
     if (fs.existsSync(BaseCommand.CREDS_PATH)) {
       return (JSON.parse(fs.readFileSync(BaseCommand.CREDS_PATH).toString("utf-8")) || {}).access_token || ""
+    } else {
+      console.log("Missing creds. Please run rb auth:login")
+      return ""
     }
-    return ""
   }
 
   /**
