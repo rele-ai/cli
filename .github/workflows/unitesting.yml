@@ -36,4 +36,4 @@ jobs:
       - name: Install the package && Run the test
         run: |
           pip3 install ${{ secrets.GIT_UTILS_REPO }}
-          cd packages && python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
+          cd $PACKAGE && python3 $GITHUB_WORKSPACE/ops/github-actions/unittest/install-and-tests.py
