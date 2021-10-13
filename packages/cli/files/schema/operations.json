@@ -1,149 +1,201 @@
 {
-    "type": "object",
-    "required": [
-        "type",
-        "selector",
-        "key"
-    ],
-    "definitions": {
-        "next": {},
-        "entry_condition": {
-            "type": "object",
-            "properties": {
-                "operation_type": {
-                    "type": "string",
-                    "enum": [
-                        "continue_session",
-                        "drop_session"
-                    ]
-                },
-                "format_function": {},
-                "redis_functions": {}
-            }
-        },
-        "payload_item": {
-            "type": "object",
-            "required": [
-                "type",
-                "data"
-            ],
-            "properties": {
-                "vars": {
-                    "type": "object",
-                    "patternProperties": {
-                        ".+": {
-                            "$ref": "#/definitions/payload_item"
-                        }
-                    }
-                },
-                "data": {},
-                "rkey_type": {
-                    "type": "string",
-                    "enum": [
-                        "hash_map",
-                        "array",
-                        "array_item",
-                        "hash_array"
-                    ]
-                },
-                "next": {
-                    "$ref": "#/definitions/next"
-                },
-                "match_operation": {
-                    "type": "string",
-                    "enum": [
-                        "==",
-                        "!=",
-                        "<",
-                        ">",
-                        "<=",
-                        ">=",
-                        "in"
-                    ]
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "redis",
-                        "raw",
-                        "get_by_lang",
-                        "request",
-                        "struct"
-                    ]
-                },
-                "default": {
-                    "$ref": "#/definitions/payload_item"
-                }
-            }
-        }
-    },
-    "properties": {
-        "type": {
+  "type": "object",
+  "required": [
+    "type",
+    "selector",
+    "key"
+  ],
+  "definitions": {
+    "next": {},
+    "redis_functions": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
             "type": "string",
-            "enum": [
-                "Operation"
-            ]
-        },
-        "selector": {
+            "minLength": 1
+          },
+          {
             "type": "object",
             "required": [
-                "app",
-                "app_action",
-                "workflow"
+              "type",
+              "data"
             ],
             "properties": {
-                "app": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9_]+$"
-                },
-                "app_action": {
-                    "type": "string",
-                    "pattern": "^[a-z0-9_]+$"
-                },
-                "workflow": {
-                    "type": "array",
-                    "minimum": 1,
-                    "items": {
-                        "type": "string",
-                        "pattern": "^[a-z0-9_]+$"
-                    }
-                }
+              "data": {
+                "type": "string",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "minLength": 1
+              }
             }
+          }
+        ]
+      }
+    },
+    "entry_condition": {
+      "type": "object",
+      "properties": {
+        "operation_type": {
+          "type": "string",
+          "enum": [
+            "continue_session",
+            "drop_session"
+          ]
+        },
+        "format_function": {}
+      }
+    },
+    "payload_item": {
+      "type": "object",
+      "required": [
+        "type",
+        "data"
+      ],
+      "properties": {
+        "vars": {
+          "type": "object",
+          "patternProperties": {
+            ".+": {
+              "$ref": "#/definitions/payload_item"
+            }
+          }
+        },
+        "data": {},
+        "rkey_type": {
+          "type": "string",
+          "enum": [
+            "hash_map",
+            "array",
+            "array_item",
+            "hash_array"
+          ]
         },
         "next": {
-            "$ref": "#/definitions/next"
+          "$ref": "#/definitions/next"
         },
-        "on_error": {
-            "$ref": "#/definitions/next"
+        "match_operation": {
+          "type": "string",
+          "enum": [
+            "==",
+            "!=",
+            "<",
+            ">",
+            "<=",
+            ">=",
+            "in"
+          ]
         },
-        "is_root": {
-            "type": "boolean",
-            "default": false
+        "type": {
+          "type": "string",
+          "enum": [
+            "redis",
+            "raw",
+            "get_by_lang",
+            "request",
+            "struct"
+          ]
         },
-        "input": {},
-        "output": {},
-        "redis": {},
-        "next_operation": {},
-        "payload": {
-            "type": "object",
-            "patternProperties": {
-                ".+": {
-                    "$ref": "#/definitions/payload_item"
-                }
-            }
-        },
-        "key": {
-            "type": "string"
-        },
-        "display_name": {
-            "type": "object",
-            "default": {},
-            "patternProperties": {
-                "^([a-z]{2})(_[a-z]{2})?$": {
-                    "type": "string",
-                    "pattern": "^[a-zA-Z0-9\\s-_]+$"
-                }
-            }
+        "default": {
+          "$ref": "#/definitions/payload_item"
         }
+      }
     }
+  },
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "Operation"
+      ]
+    },
+    "selector": {
+      "type": "object",
+      "required": [
+        "app",
+        "app_action",
+        "workflow"
+      ],
+      "properties": {
+        "app": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "app_action": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "workflow": {
+          "type": "array",
+          "minimum": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          }
+        }
+      }
+    },
+    "next": {
+      "$ref": "#/definitions/next"
+    },
+    "on_error": {
+      "$ref": "#/definitions/next"
+    },
+    "is_root": {
+      "type": "boolean",
+      "default": false
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "redis_functions": {
+          "$ref": "#/definitions/redis_functions"
+        }
+      }
+    },
+    "output": {},
+    "redis": {
+      "type": "object",
+      "required": [
+        "data",
+        "type"
+      ],
+      "properties": {
+        "data": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "minLength": 1
+        }
+      }
+    },
+    "next_operation": {},
+    "payload": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/payload_item"
+        }
+      }
+    },
+    "key": {
+      "type": "string"
+    },
+    "display_name": {
+      "type": "object",
+      "default": {},
+      "patternProperties": {
+        "^([a-z]{2})(_[a-z]{2})?$": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9\\s-_]+$"
+        }
+      }
+    }
+  }
 }
