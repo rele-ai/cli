@@ -186,6 +186,7 @@ class TokensCommand extends BaseCommand {
       )
       // close spinner
       cli.ux.action.stop()
+      return appHashes
     } catch (error) {
       debugError(error)
       cli.ux.action.stop("failed")
