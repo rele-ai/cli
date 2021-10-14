@@ -184,9 +184,9 @@ class TokensCommand extends BaseCommand {
           .map(app => `APP key: ${app.appKey} \nAPP_ID: ${app.id} \nAPP_HASH: ${app.appHash} \n`)
           .join("---\n")
       )
-      return appHashes
       // close spinner
       cli.ux.action.stop()
+      return appHashes
     } catch (error) {
       debugError(error)
       cli.ux.action.stop("failed")
