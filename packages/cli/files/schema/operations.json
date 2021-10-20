@@ -156,25 +156,7 @@
       }
     },
     "output": {},
-    "redis": {
-      "type": "object",
-      "required": [
-        "data",
-        "type"
-      ],
-      "properties": {
-        "data": {
-          "type": "string",
-          "pattern": "^[a-z0-9_]+$",
-          "minLength": 1
-        },
-        "type": {
-          "type": "string",
-          "pattern": "^[a-z0-9_]+$",
-          "minLength": 1
-        }
-      }
-    },
+    "redis": {},
     "next_operation": {},
     "payload": {
       "type": "object",
