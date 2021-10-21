@@ -167,8 +167,7 @@
       }
     },
     "output": {},
-    "redis": {}
-    },
+    "redis": {},
     "next_operation": {},
     "payload": {
       "type": "object",
