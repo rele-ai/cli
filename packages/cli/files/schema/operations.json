@@ -12,7 +12,12 @@
       "items": {
         "patternProperties": {
           "operation": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "set_field",
+              "append_hash_array",
+              "delete_key"
+            ]
           },
           "path": {
             "type": "string"
@@ -24,7 +29,13 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "hash_map",
+              "array",
+              "array_item",
+              "hash_array"
+            ]
           },
           "^(?!(delete_keys|path|operation|set_field|type)$).*$": {
             "type": "object",
@@ -39,7 +50,14 @@
               },
               "type": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "enum": [
+                  "redis",
+                  "raw",
+                  "get_by_lang",
+                  "request",
+                  "struct"
+                ]
               }
             }
           }
