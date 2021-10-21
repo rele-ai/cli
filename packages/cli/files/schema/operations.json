@@ -10,12 +10,23 @@
     "redis_functions": {
       "type": "array",
       "items": {
-        "anyOf": [
-          {
-            "type": "string",
-            "minLength": 1
+        "patternProperties": {
+          "operation": {
+            "type": "string"
           },
-          {
+          "path": {
+            "type": "string"
+          },
+          "delete_keys": {
+            "type": "string"
+          },
+          "set_field": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "^(?!(delete_keys|path|operation|set_field|type)$).*$": {
             "type": "object",
             "required": [
               "type",
@@ -32,7 +43,7 @@
               }
             }
           }
-        ]
+        }
       }
     },
     "entry_condition": {
@@ -156,7 +167,25 @@
       }
     },
     "output": {},
-    "redis": {},
+    "redis": {
+      "type": "object",
+      "required": [
+        "data",
+        "type"
+      ],
+      "properties": {
+        "data": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "minLength": 1
+        }
+      }
+    },
     "next_operation": {},
     "payload": {
       "type": "object",

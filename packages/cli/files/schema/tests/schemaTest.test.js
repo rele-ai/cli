@@ -49,6 +49,16 @@ describe("Testing the schemas", () => {
     expect(applySchema('operation', 'operations.json', mockOperation)).not.toBe(null)
   })
 
+  test("Should failed validating the operation Schema", () => {
+    let mockOperation = {
+      "redis": {
+        "data": "",
+        "type": ""
+      }
+    }
+    expect(applySchema('operation', 'operations.json', mockOperation)).not.toBe(null)
+  })
+
   test("Should success validating the operation Schema", () => {
     let mockOperation = {
       "redis": {
