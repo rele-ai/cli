@@ -5,7 +5,7 @@
 * @returns {boolean}
 */
 module.exports.checkFilter = ([a, condition, b]) => {
-  console.log(`[DEBUG::CheckFilter] a: ${a} condition: ${condition} b: ${b}`)
+  // console.log(`[DEBUG::CheckFilter] a: ${a} condition: ${condition} b: ${b}`)
   switch (condition) {
     case "==":
       return a === b
