@@ -5,16 +5,17 @@
 * @returns {boolean}
 */
 module.exports.checkFilter = ([a, condition, b]) => {
-    switch (condition) {
-        case "==":
-        return a === b
-        case "!=":
-        return a !== b
-		case "includes":
-		return b.includes(a)
-        default:
-        throw new Error("unexpected condition")
-    }
+  // console.log(`[DEBUG::CheckFilter] a: ${a} condition: ${condition} b: ${b}`)
+  switch (condition) {
+    case "==":
+      return a === b
+    case "!=":
+      return a !== b
+    case "includes":
+      return b.includes(a)
+    default:
+      throw new Error("unexpected condition")
+  }
 }
 
 /**

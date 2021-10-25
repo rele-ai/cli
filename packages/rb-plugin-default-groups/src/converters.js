@@ -63,6 +63,7 @@ module.exports = async (config, { accessToken }) => {
         filters: [
           [(config.selector || {}).app_action || "", "includes", [ "send_message", "send_location_message", "send_contact_message", "send_menu_message", "send_buttons_message" ]],
           [(config.output || {}).operation_type || "", "!=", "drop_session"],
+          [(config.disable_notification || ""), "!=", true],
         ],
         defaults: {
           timeout: {
