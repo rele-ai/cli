@@ -111,6 +111,10 @@
         "Operation"
       ]
     },
+    "disable_notification": {
+      "type": "boolean",
+      "default": false
+    },
     "selector": {
       "type": "object",
       "required": [
