@@ -10,7 +10,7 @@
     "redis_functions": {
       "type": "array",
       "items": {
-        "patternProperties": {
+        "properties": {
           "operation": {
             "type": "string",
             "enum": [
@@ -36,7 +36,9 @@
               "array_item",
               "hash_array"
             ]
-          },
+          }
+        },
+        "patternProperties": {
           "^(?!(delete_keys|path|operation|set_field|type)$).*$": {
             "type": "object",
             "required": [
