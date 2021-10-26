@@ -197,7 +197,9 @@
       }
     },
     "key": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "minLength": 1
     },
     "display_name": {
       "type": "object",
