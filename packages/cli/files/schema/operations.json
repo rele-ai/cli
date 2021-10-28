@@ -10,12 +10,36 @@
     "redis_functions": {
       "type": "array",
       "items": {
-        "anyOf": [
-          {
+        "properties": {
+          "operation": {
             "type": "string",
-            "minLength": 1
+            "enum": [
+              "set_field",
+              "append_hash_array",
+              "delete_key"
+            ]
           },
-          {
+          "path": {
+            "type": "string"
+          },
+          "delete_keys": {
+            "type": "string"
+          },
+          "set_field": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hash_map",
+              "array",
+              "array_item",
+              "hash_array"
+            ]
+          }
+        },
+        "patternProperties": {
+          "^(?!(delete_keys|path|operation|set_field|type)$).*$": {
             "type": "object",
             "required": [
               "type",
@@ -28,11 +52,17 @@
               },
               "type": {
                 "type": "string",
-                "minLength": 1
+                "enum": [
+                  "redis",
+                  "raw",
+                  "get_by_lang",
+                  "request",
+                  "struct"
+                ]
               }
             }
           }
-        ]
+        }
       }
     },
     "entry_condition": {
@@ -171,7 +201,9 @@
       }
     },
     "key": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "minLength": 1
     },
     "display_name": {
       "type": "object",

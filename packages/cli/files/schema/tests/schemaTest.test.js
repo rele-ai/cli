@@ -16,7 +16,7 @@ const applySchema = (schemaName, schema, mockData = {}) => {
       "app": "whatsapp",
       "app_action": "send_message"
     },
-    "key": "testKey",
+    "key": "test_key",
     "type": "Operation",
     ...mockData
   }
@@ -30,7 +30,7 @@ describe("Testing the schemas", () => {
   test("Should success validating the operation Schema", () => {
     let mockOperation = {
       "input": {
-        "redis_functions": ["d", { "data": "33", "type": "gal" }]
+        "redis_functions": [ { "path": "test", "payload" : { "data": "33", "type": "redis" }}]
       }
     }
     expect(applySchema('operation', 'operations.json', mockOperation)).toBe(null)
