@@ -302,7 +302,7 @@ class ApplyCommand extends BaseCommand {
       await this._generateOperations(thirdStage)
 
       // stop spinner
-      cli.ux.action.stop("The update to the configuration file may take up to 1 min.")
+      cli.ux.action.stop()
     } catch (error) {
       debugError(error)
       cli.ux.action.stop("failed")

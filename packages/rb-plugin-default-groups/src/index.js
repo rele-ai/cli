@@ -67,7 +67,7 @@ const groupOperations = async (payload, metadata) => {
 		// group all operations
 		const promises = payload.operations.map(async (doc) => {
 			// get group
-			const group = (await converters(doc, metadata)).find((g) => g.filters.reduce((filter => utils.checkFilter(filter))))
+      const group = (await converters(doc, metadata)).find((g) => g.filters.every(filter => utils.checkFilter(filter)))
 
 			// check if group exists
 			if (group) {
