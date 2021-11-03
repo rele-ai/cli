@@ -3,6 +3,7 @@ const Ajv = require("ajv")
 const glob = require("glob")
 const path = require("path")
 const grpc = require("@grpc/grpc-js")
+const ajvFormats = require("ajv-formats")
 const { loadSync } = require("@grpc/proto-loader")
 
 /**
@@ -42,6 +43,9 @@ module.exports._getAjvEnv = () => {
     useDefaults: true,
     removeAdditional: true,
   })
+
+  // enable formats on json schema
+  ajvFormats(env)
 
   // load schemas
   for (const [name, schema] of Object.entries(this.loadSchemas())) {
