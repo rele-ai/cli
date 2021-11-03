@@ -9,11 +9,11 @@
   "bugs": "https://github.com/rele-ai/cli/issues",
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
-    "jest": "^27.2.0",
     "chai": "^4.3.4",
     "eslint": "^7.27.0",
     "eslint-config-oclif": "^3.1.0",
     "globby": "^11.0.3",
+    "jest": "^27.2.0",
     "nyc": "^15.1.0"
   },
   "engines": {
@@ -58,6 +58,8 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "@releai/default-groups": "^0.1.25",
+    "ajv": "^8.6.3",
+    "ajv-formats": "^2.1.1",
     "axios": "^0.21.1",
     "cli-ux": "^5.5.1",
     "consolidate": "^0.16.0",
@@ -70,7 +72,6 @@
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.0",
     "jest": "^27.2.1",
-    "jjv": "^1.0.2",
     "js-yaml": "^4.1.0",
     "jwt-decode": "^3.1.2",
     "metalsmith": "^2.3.0",

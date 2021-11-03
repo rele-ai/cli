@@ -1,5 +1,5 @@
 const fs = require("fs")
-const jjv = require("jjv")
+const Ajv = require("ajv")
 const glob = require("glob")
 const path = require("path")
 const grpc = require("@grpc/grpc-js")
@@ -33,21 +33,19 @@ module.exports.loadSchemas = () => {
 }
 
 /**
- * Loads JJV Env
+ * Loads AJV Env
  */
-module.exports._getJjvEnv = () => {
+module.exports._getAjvEnv = () => {
   // init env
-  const env = jjv()
-
-  // set global configs
-  env.defaultOptions.useCoerce = true
-  env.defaultOptions.useDefault = true
-  env.defaultOptions.checkRequired = true
-  env.defaultOptions.removeAdditional = true
+  const env = Ajv({
+    coerceTypes: true,
+    useDefaults: true,
+    removeAdditional: true,
+  })
 
   // load schemas
   for (const [name, schema] of Object.entries(this.loadSchemas())) {
-    env.addSchema(name, schema)
+    env.addSchema(schema, name)
   }
 
   // return configed env
@@ -117,5 +115,5 @@ module.exports.FRONTEND_PROXY = process.env.NODE_ENV === "development"
   ? "frontend-proxy.dev.bot.rele.ai"
   : "frontend-proxy.prod.bot.rele.ai"
 
-// export JJV env
-module.exports.JJV = this._getJjvEnv()
+// export AJV env
+module.exports.AJV = this._getAjvEnv()

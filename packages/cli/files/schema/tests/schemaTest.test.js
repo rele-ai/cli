@@ -1,5 +1,9 @@
-const jjv = require("jjv")
-const env = jjv();
+const Ajv = require("ajv")
+const env = Ajv({
+  coerceTypes: true,
+  useDefaults: true,
+  removeAdditional: true,
+})
 const fs = require("fs")
 const path = require("path")
 
@@ -21,8 +25,8 @@ const applySchema = (schemaName, schema, mockData = {}) => {
     ...mockData
   }
   const schemaObj = JSON.parse(fs.readFileSync(path.join(__dirname, `../${schema}`), 'utf8'))
-  env.addSchema(schemaName, schemaObj)
-  return env.validate(schemaName, data)
+  env.addSchema(schemaObj, schemaName)
+  return env.getSchema(schemaName)(data)
 }
 
 describe("Testing the schemas", () => {

@@ -1,6 +1,6 @@
 const pkgDir = require("pkg-dir")
 const BaseClient = require("../utils/base")
-const {toPascalCase, JJV, toBytes} = require("../utils")
+const {toPascalCase, AJV, toBytes} = require("../utils")
 
 // list of config types
 const TYPES = [
@@ -82,16 +82,8 @@ class ComponentsClient extends BaseClient {
    * @returns {null|string} - Null for validate. String (with error message) for error.
    */
   validate(config) {
-    // check if schema exists
-    if (JJV.schema[this._type]) {
-      // validate payload against matching schema
-      return JJV.validate(this._type, config)
-    } else {
-      // return missing schema error
-      return {
-        error: `unable to find matching schema for type: ${this._type}.`
-      }
-    }
+    // validate payload against matching schema
+    return AJV.getSchema(this._type)(config)
   }
 
   /**
