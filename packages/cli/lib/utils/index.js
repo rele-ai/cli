@@ -38,7 +38,7 @@ module.exports.loadSchemas = () => {
  */
 module.exports._getAjvEnv = () => {
   // init env
-  const env = Ajv({
+  const env = new Ajv({
     coerceTypes: true,
     useDefaults: true,
     removeAdditional: true,

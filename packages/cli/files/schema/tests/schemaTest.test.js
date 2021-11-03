@@ -11,7 +11,7 @@ const ajvFormats = require("ajv-formats")
  */
 const applySchema = (schemaName, schema, mockData = {}) => {
   // init ajv
-  const env = Ajv({
+  const env = new Ajv({
     coerceTypes: true,
     useDefaults: true,
     removeAdditional: true,
@@ -34,6 +34,7 @@ const applySchema = (schemaName, schema, mockData = {}) => {
 
   // load schema and append to ajv
   const schemaObj = JSON.parse(fs.readFileSync(path.join(__dirname, `../${schema}`), 'utf8'))
+  console.log(JSON.stringify(schemaObj))
   env.addSchema(schemaObj, schemaName)
 
   // return validation result

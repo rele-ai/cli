@@ -10,6 +10,7 @@
     "redis_functions": {
       "type": "array",
       "items": {
+        "type": "object",
         "properties": {
           "operation": {
             "type": "string",
@@ -163,7 +164,7 @@
         },
         "workflow": {
           "type": "array",
-          "minimum": 1,
+          "minItems": 1,
           "items": {
             "type": "string",
             "pattern": "^[a-z0-9_]+$"
@@ -211,7 +212,7 @@
       "patternProperties": {
         "^([a-z]{2})(_[a-z]{2})?$": {
           "type": "string",
-          "pattern": "^[a-zA-Z0-9\\s-_]+$"
+          "pattern": "^[A-Za-z0-9-_ ]+$"
         }
       }
     }
