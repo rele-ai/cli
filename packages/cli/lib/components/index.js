@@ -82,8 +82,14 @@ class ComponentsClient extends BaseClient {
    * @returns {null|string} - Null for validate. String (with error message) for error.
    */
   validate(config) {
+    try {
     // validate payload against matching schema
-    return AJV.getSchema(this._type)(config)
+      return AJV.getSchema(this._type)(config)
+    } catch(e) {
+      console.log(e)
+      return null
+
+    }
   }
 
   /**

@@ -15,6 +15,7 @@ const applySchema = (schemaName, schema, mockData = {}) => {
     coerceTypes: true,
     useDefaults: true,
     removeAdditional: true,
+    allowUnionTypes: true
   })
 
   // apply ajv formats
@@ -23,11 +24,17 @@ const applySchema = (schemaName, schema, mockData = {}) => {
   // define base schema
   let data = {
     "selector": {
-      "workflow": ["test"],
+      "workflow": ["test_2"],
       "app": "whatsapp",
-      "app_action": "send_message"
+      // "app_action": "send_message"
+      "app_action": "send_menu_message"
+      // "app_action": "send_menu_buttons"
     },
-    "key": "test_key",
+    "output": {
+      "operation_type": "drop_session"
+    },
+    "is_root": true,
+    "key": "talma_2",
     "type": "Operation",
     ...mockData
   }
@@ -43,35 +50,72 @@ const applySchema = (schemaName, schema, mockData = {}) => {
 
 describe("Testing the schemas", () => {
 
-  test("Should success validating the operation Schetruema", () => {
-    let mockOperation = {
-      "input": {
-        "redis_functions": [ { "path": "test", "payload" : { "data": "33", "type": "redis" }}]
-      }
-    }
-    expect(applySchema('operation', 'operations.json', mockOperation)).toBe(true)
-  })
+  // test("Should success validating the operation Schetruema", () => {
+  //   let mockOperation = {
+  //     "input": {
+  //       "redis_functions": [ { "path": "test", "payload" : { "data": "33", "type": "redis" }}]
+  //     }
+  //   }
+  //   expect(applySchema('operation', 'operations.json', mockOperation)).toBe(true)
+  // })
 
+  // test("Should success validating the operation Schema", () => {
+  //   expect(applySchema('operation', 'operations.json')).toBe(true)
+  // })
+
+  // test("Should failed validating the operation Schema", () => {
+  //   let mockOperation = {
+  //     "input": {
+  //       "redis_functions": ["d", { "data": "", "type": "gal" }]
+  //     }
+  //   }
+  //   expect(applySchema('operation', 'operations.json', mockOperation)).toBe(false)
+  // })
+
+  // test("Should success validating the operation Schema", () => {
+  //   let mockOperation = {
+  //     "redis": {
+  //       "data": "5",
+  //       "type": "5"
+  //     }
+  //   }
+  //   expect(applySchema('operation', 'operations.json', mockOperation)).toBe(true)
+  // })
+  // test("Should success validating the operation Schema", () => {
+  //   let mockOperation = {
+  //       payload: {
+  //           content: {
+  //             data: "a",
+  //             type: "raw"
+  //           }
+  //         // actions: {
+  //         //   type: "raw",
+  //         //   data: [
+  //         //     { "title": "gal",
+  //         //       "items" : [
+  //         //         { "title" : "gal", "description": "gal" },
+  //         //         { "title" : "gal", "description": "gal" }
+  //         //         ]
+  //         //     }]
+  //         // }
+  //       }
+  //   }
+  //   expect(applySchema('operation', 'operations.json', mockOperation)).toBe(true)
+  // })
   test("Should success validating the operation Schema", () => {
-    expect(applySchema('operation', 'operations.json')).toBe(true)
-  })
-
-  test("Should failed validating the operation Schema", () => {
     let mockOperation = {
-      "input": {
-        "redis_functions": ["d", { "data": "", "type": "gal" }]
-      }
-    }
-    expect(applySchema('operation', 'operations.json', mockOperation)).toBe(false)
-  })
-
-  test("Should success validating the operation Schema", () => {
-    let mockOperation = {
-      "redis": {
-        "data": "5",
-        "type": "5"
-      }
-    }
+        payload: {
+          actions: {
+            type: "raw",
+            data: [
+              { "title": "gal",
+                "items" : [
+                  { "title" : "gal", "description": "gal" },
+                  { "title" : "gal", "description": "gal" }
+                  ]
+              }]
+          }
+        }}
     expect(applySchema('operation', 'operations.json', mockOperation)).toBe(true)
   })
 })

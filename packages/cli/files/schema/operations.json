@@ -133,6 +133,70 @@
           "$ref": "#/definitions/payload_item"
         }
       }
+    },
+    "send_menu_payload": {
+      "type": "object",
+      "required": [
+        "actions"
+      ],
+      "properties": {
+        "actions": {
+          "type": "object",
+          "required": [
+            "type",
+            "data"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "redis",
+                "raw",
+                "get_by_lang",
+                "request",
+                "struct"
+              ]
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_]+$",
+                    "minLength": 1
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "title"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 30
+                        },
+                        "description": {
+                          "type": [
+                            "string",
+                            "integer"
+                          ],
+                          "minLength": 1,
+                          "maxLength": 255
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -193,14 +257,6 @@
     "output": {},
     "redis": {},
     "next_operation": {},
-    "payload": {
-      "type": "object",
-      "patternProperties": {
-        ".+": {
-          "$ref": "#/definitions/payload_item"
-        }
-      }
-    },
     "key": {
       "type": "string",
       "pattern": "^[a-z0-9_]+$",
@@ -214,6 +270,32 @@
           "type": "string",
           "pattern": "^[A-Za-z0-9-_ ]+$"
         }
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "selector": {
+        "type": "object",
+        "properties": {
+          "app_action": {
+            "const": "send_menu_message"
+          }
+        }
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "payload": {
+        "$ref": "#/definitions/send_menu_payload"
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "payload": {
+        "$ref": "#/definitions/payload_item"
       }
     }
   }

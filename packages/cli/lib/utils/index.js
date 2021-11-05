@@ -42,6 +42,7 @@ module.exports._getAjvEnv = () => {
     coerceTypes: true,
     useDefaults: true,
     removeAdditional: true,
+    allowUnionTypes: true,
   })
 
   // enable formats on json schema
