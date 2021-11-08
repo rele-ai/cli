@@ -23,7 +23,7 @@ module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versi
   }
 
   // parse from conf to doc
-  switch(confType) {
+  switch (confType) {
     case "App":
       return loadAppDoc(conf)
     case "AppAction":
@@ -49,7 +49,7 @@ module.exports.confToDoc = (confType, conf, { apps, appActions, workflows, versi
 * @returns {object} conf - YAML config
 */
 module.exports.docToConf = (docType, doc, { apps, appActions, workflows, operations, versions, shouldDump } = {}) => {
-  switch(docType) {
+  switch (docType) {
     case "app":
       return loadAppConf(doc, versions, shouldDump)
     case "app_action":
@@ -73,7 +73,7 @@ module.exports.docToConf = (docType, doc, { apps, appActions, workflows, operati
  * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadAppConf = (doc, versions, shouldDump=true) => {
+const loadAppConf = (doc, versions, shouldDump = true) => {
   const data = {
     type: "App",
     base_url: doc.base_url,
@@ -96,7 +96,7 @@ const loadAppConf = (doc, versions, shouldDump=true) => {
  * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
+const loadAppActionConf = (doc, apps, versions, shouldDump = true) => {
   if (!apps[doc.app_id]) {
     throw new Error(`can't find any app that related to ${doc.operation_key} app action.`)
   }
@@ -128,7 +128,7 @@ const loadAppActionConf = (doc, apps, versions, shouldDump=true) => {
  * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadWorkflowConf = (doc, versions, shouldDump=true) => {
+const loadWorkflowConf = (doc, versions, shouldDump = true) => {
   const data = {
     type: "Workflow",
     display_name: doc.display_name,
@@ -154,7 +154,7 @@ const loadWorkflowConf = (doc, versions, shouldDump=true) => {
  * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadOperationConf = (doc, apps, appActions, workflows, operations, versions, shouldDump=true) => {
+const loadOperationConf = (doc, apps, appActions, workflows, operations, versions, shouldDump = true) => {
   const data = {
     type: "Operation",
     selector: {
@@ -186,7 +186,7 @@ const loadOperationConf = (doc, apps, appActions, workflows, operations, version
  * @param {object} versions - Map of all versions
  * @returns {object} YAML config.
  */
-const loadTranslationConf = (doc, versions, shouldDump=true) => {
+const loadTranslationConf = (doc, versions, shouldDump = true) => {
   const data = {
     type: "Translation",
     key: doc.key,
@@ -430,7 +430,7 @@ const _getAppId = (conf, apps, versions, user) => {
  * @param {object} user
  * @returns
  */
- const _getWorkflowId = (conf, workflows, user) => {
+const _getWorkflowId = (conf, workflows, user) => {
   // determine if user is rele.ai user
   const isRele = user.emails[0].endsWith("@rele.ai")
 
@@ -450,20 +450,20 @@ const _getAppId = (conf, apps, versions, user) => {
 
   // return user workflows
   return userWorkflows.map(workflow => workflow.id)
- }
+}
 
- /**
-  * _attachDefaultsToPayload takes an payload object
-  * and attach all nessesary default if needed
-  *
-  * @param {Object} payload
-  * @returns
-  */
- const _attachDefaultsToPayload = (payload) => {
+/**
+ * _attachDefaultsToPayload takes an payload object
+ * and attach all nessesary default if needed
+ *
+ * @param {Object} payload
+ * @returns
+ */
+const _attachDefaultsToPayload = (payload) => {
   Object.keys(payload).forEach(key => {
     // check if recursion reaches next operation
     // or on error instances and format it
-    if (key === "type" && typeof(payload[key]) === "string" && payload[key] === "redis") {
+    if (key === "type" && typeof (payload[key]) === "string" && payload[key] === "redis") {
       if (!payload.rkey_type) {
         payload.rkey_type = "hash_map"
       }
@@ -474,18 +474,18 @@ const _getAppId = (conf, apps, versions, user) => {
       _attachDefaultsToPayload(payload[key])
     }
   })
- }
+}
 
- /**
-  * _errorOnNextOperationFormat check if configuration
-  *
-  * @param {object} olderNextOperation
-  */
- const _errorOnNextOperationFormat = (olderNextOperation) => {
+/**
+ * _errorOnNextOperationFormat check if configuration
+ *
+ * @param {object} olderNextOperation
+ */
+const _errorOnNextOperationFormat = (olderNextOperation) => {
   if (Object.keys(olderNextOperation || {}).length) {
     throw new Error("The way you define the 'next_operation' is deprecated. Please visit https://docs.rele.ai/guide/operations.html#next-and-onerror and update your operations configuration.")
   }
- }
+}
 /**
  * Converts the given YAML config to the matchinf firestore
  * document.
@@ -586,20 +586,20 @@ const loadTranslationDoc = (conf) => {
  * @param {string} confType - conf type
  * @param {object} client - components client
  */
-const validateConfigurations = (conf, confType, client) => {
+const validateConfigurations = async (conf, confType, client) => {
   // validate configurations before apply
-  const validate = client.validate(conf)
-
+  const validate = await client.validate(conf)
   if (validate !== null) {
     // log on debug mode
     debugError(validate)
-
     // build faild keys
-    const falidKeys = Object.entries(validate.validation || {}).map(([att, falied]) => {
-      const flattenErr = Object.keys(flatten(falied)).map(flatKey => flatKey.replace(/[.]/g, " >> "))
-      return `${att}.\nsomething went wrong with: \n${flattenErr.join("\n")} \n`
+    const falidKeys = validate.map((error) => {
+      let params = Object.entries(error.params).map(([key, value]) => {
+        return `${key} >> ${value}`
+      })
+      const flattenErr = `\n${params}  >> ${error.message}`
+      return `\nsomething went wrong with: \n${flattenErr} \n`
     })
-
     throw new Error(`unable to validate configurations before apply.\n${confType} configuration did not pass validation. \nThe following fields are not set correctly: ${falidKeys}\nFor more information: https://docs.rele.ai/`)
   }
 }

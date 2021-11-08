@@ -1,6 +1,6 @@
 const pkgDir = require("pkg-dir")
 const BaseClient = require("../utils/base")
-const {toPascalCase, AJV, toBytes} = require("../utils")
+const { toPascalCase, AJV, toBytes } = require("../utils")
 
 // list of config types
 const TYPES = [
@@ -46,7 +46,7 @@ class ComponentsClient extends BaseClient {
   /**
    * Returns the version ID from firestore
    */
-  getVersionId(version, removeGlobal=false, getMultiple=false, getIds=true) {
+  getVersionId(version, removeGlobal = false, getMultiple = false, getIds = true) {
     if (!version) {
       version = this.pkgVersion
     }
@@ -81,9 +81,11 @@ class ComponentsClient extends BaseClient {
    * @param {object} config - Config object.
    * @returns {null|string} - Null for validate. String (with error message) for error.
    */
-  validate(config) {
-    // validate payload against matching schema
-    return AJV.getSchema(this._type)(config)
+
+  async validate(config) {
+    let schema = await AJV.getSchema(this._type)
+    let result = await schema.schemaEnv.validate(config)
+    return result ? null : await schema.errors
   }
 
   /**
@@ -94,7 +96,7 @@ class ComponentsClient extends BaseClient {
    * @param {string} type - override type
    * @returns {object}
    */
-   create(def, config, type = "") {
+  create(def, config, type = "") {
     return this._request(
       def,
       {
@@ -265,8 +267,8 @@ const generateServiceClass = (type) => {
      * @param {object} config - Config object.
      * @returns {null|string} - Null for validate. String (with error message) for error.
      */
-    validate(config) {
-      return super.validate(config)
+    async validate(config) {
+      return await super.validate(config)
     }
 
     /**
@@ -299,7 +301,7 @@ const generateServiceClass = (type) => {
       //   versionId = versionRes.id
       // }
 
-      return super.create(this._serviceDef.Create, {...config, version })
+      return super.create(this._serviceDef.Create, { ...config, version })
     }
 
     /**
@@ -424,7 +426,7 @@ const generateServiceClass = (type) => {
      * @param {string} version - Version ID.
      * @returns {Promise.<object>|null}
      */
-    async deleteByKey(key, conds=[], version="") {
+    async deleteByKey(key, conds = [], version = "") {
       // get object by key
       const object = await this.getByKey(key, conds, { version, removeGlobal: true })
 
@@ -462,7 +464,7 @@ const generateServiceClass = (type) => {
   // type specific changes
   switch (type) {
     case "workflows":
-      componentClass.prototype.updateActiveWorkflows = function(activeWorkflows) {
+      componentClass.prototype.updateActiveWorkflows = function (activeWorkflows) {
         // make the get request
         return this._request(
           this._serviceDef.ActivateWorkflow,
@@ -476,7 +478,7 @@ const generateServiceClass = (type) => {
       }
       break
     case "apps":
-      componentClass.prototype.getAppHash = function(appHash) {
+      componentClass.prototype.getAppHash = function (appHash) {
         // make the get request
         return this._request(
           this._serviceDef.GetAppHash,
